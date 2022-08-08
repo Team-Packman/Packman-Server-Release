@@ -1,13 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
 const app = express();
-import connectDB from './loaders/db';
 import routes from './routes';
-import config from './config';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
-connectDB();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -41,3 +37,5 @@ app
     console.error(err);
     process.exit(1);
   });
+
+module.exports = app;

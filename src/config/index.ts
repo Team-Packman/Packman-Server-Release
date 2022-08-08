@@ -12,12 +12,28 @@ if (envFound.error) {
 
 export default {
   /**
+   * environment
+   */
+  env: process.env.NODE_ENV as string,
+
+  /**
    * Your favorite port
    */
   port: parseInt(process.env.PORT as string, 10) as number,
 
+  user: process.env.DEV_DB_USER,
+  host: process.env.DEV_DB_HOST,
+  database: process.env.DEV_DB_DB,
+  password: process.env.DEV_DB_PASSWORD,
+
   /**
-   * MongoDB URI
+   * jwt Secret
    */
-  mongoURI: process.env.MONGODB_URI as string,
+
+  jwtSecret: process.env.JWT_SECRET as string,
+
+  /**
+   * jwt Algorithm
+   */
+  jwtAlgo: process.env.JWT_ALGO as string,
 };
