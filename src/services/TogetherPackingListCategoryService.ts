@@ -50,14 +50,14 @@ const createCategory = async (
 
     const { rows: categorys } = await client.query(
       `
-    SELECT c.id, c.name, JSON_AGG(json_build_object(
+    SELECT c.id, c.name,  COALESCE(JSON_AGG(json_build_object(
         'id', p.id,
         'name', p.name, 
         'isChecked', p.is_checked, 
         'packer', (SELECT item FROM (SELECT u.id, u.nickname FROM "user" as u WHERE u.id = p.packer_id) item)
-        )) AS pack
+        ))FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
     FROM "category" as c 
-    JOIN "pack" as p ON c.id = p.category_id
+    LEFT JOIN "pack" as p ON c.id = p.category_id
     WHERE c.list_id = $1
     GROUP BY c.id
     `,
