@@ -29,11 +29,20 @@ const createCategory = async (req: Request, res: Response) => {
     client = await db.connect(req);
     const data = await TogetherPackingListCategoryService.createCategory(client, categoryCreateDto);
 
-    if (data === 400) {
+    if (data === 'exceedLen') {
       res
         .status(statusCode.BAD_REQUEST)
-        .send(util.success(statusCode.BAD_REQUEST, message.NO_DATA));
-    } else {
+        .send(util.fail(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
+    } else if (data === 'noList') {
+      res
+      .status(statusCode.BAD_REQUEST)
+      .send(util.fail(statusCode.BAD_REQUEST, message.NO_PACKINGLIST));
+    } else if (data === 'duplicateCategory') {
+      res
+      .status(statusCode.BAD_REQUEST)
+      .send(util.fail(statusCode.BAD_REQUEST, message.DUPLICATED_CATEGORY));
+    }
+    else {
       res
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.CREATE_TOGETHER_CATEGORY_SUCCESS, data));

@@ -4,8 +4,38 @@ import { TogetherPackingListCategoryResponseDto } from '../interfaces/ITogetherP
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const convertSnakeToCamel = require('../modules/convertSnakeToCamel');
 
-const createCategory = async (client: any, categoryCreateDto: CategoryCreateDto) => {
+const createCategory = async (
+  client: any,
+  categoryCreateDto: CategoryCreateDto,
+): Promise<TogetherPackingListCategoryResponseDto | string> => {
   try {
+    if (categoryCreateDto.name.length > 12) {
+      return 'exceedLen';
+    }
+    const { rows: existList } = await client.query(
+      `
+        SELECT *
+        FROM "packing_list" as t
+        WHERE t.id = $1
+        `,
+      [categoryCreateDto.listId],
+    );
+    if (existList.length === 0) {
+      return 'noList';
+    }
+
+    const { rows: existCategory } = await client.query(
+      `
+          SELECT * 
+          FROM "category" as c 
+          WHERE c.list_id = $1 AND c.name = $2
+          `,
+      [categoryCreateDto.listId, categoryCreateDto.name],
+    );
+    if (existCategory.length > 0) {
+      return 'duplicateCategory';
+    }
+
     const { rows } = await client.query(
       `
         INSERT INTO "category" (list_id, name)
