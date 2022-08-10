@@ -14,6 +14,6 @@ router.patch(
   [body('id').notEmpty(), body('name').notEmpty(), body('listId').notEmpty()],
   TogetherPackingListCategoryController.updateCategory,
 );
-
+router.delete('/:listId/:categoryId', TogetherPackingListCategoryController.deleteCategory);
 
 export default router;

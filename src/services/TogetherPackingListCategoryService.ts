@@ -1,4 +1,4 @@
-import { CategoryCreateDto, CategoryUpdateDto } from '../interfaces/ICategory';
+import { CategoryCreateDto, CategoryDeleteDto, CategoryUpdateDto } from '../interfaces/ICategory';
 import { TogetherPackingListCategoryResponseDto } from '../interfaces/ITogetherPackingListCategory';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -161,7 +161,77 @@ const updateCategory = async(
   }
 };
 
+const deleteCategory = async(client: any, categoryDeleteDto: CategoryDeleteDto): Promise<TogetherPackingListCategoryResponseDto| string>=> {
+  try {
+    const { rows: existList } = await client.query(
+      `
+        SELECT *
+        FROM "packing_list" as t
+        WHERE t.id = $1
+        `,
+      [categoryDeleteDto.listId],
+    );
+    if (existList.length === 0) {
+      return 'no_list';
+    }
+    const { rows: existCategory } = await client.query(
+      `
+        SELECT *
+        FROM "category" as c
+        WHERE c.id = $1
+        `,
+      [categoryDeleteDto.categoryId],
+    );
+
+    if (existCategory.length === 0) {
+      return 'no_category';
+    }
+    if (existCategory[0].list_id !== categoryDeleteDto.listId) {
+      return 'no_list_category'
+    }
+
+
+    const { rows } = await client.query(
+      `
+      DELETE FROM "category" as c
+      WHERE c.id = $1  AND c.list_id = $2
+      `,
+      [categoryDeleteDto.categoryId, categoryDeleteDto.listId]
+    )
+
+    
+
+    const { rows: categorys } = await client.query(
+      `
+    SELECT c.id, c.name,  COALESCE(JSON_AGG(json_build_object(
+        'id', p.id,
+        'name', p.name, 
+        'isChecked', p.is_checked, 
+        'packer', (SELECT item FROM (SELECT u.id, u.nickname FROM "user" as u WHERE u.id = p.packer_id) item)
+        ))FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
+    FROM "category" as c 
+    LEFT JOIN "pack" as p ON c.id = p.category_id
+    WHERE c.list_id = $1
+    GROUP BY c.id
+    `,
+      [categoryDeleteDto.listId],
+    );
+
+    const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
+      id: categoryDeleteDto.listId,
+      category: categorys
+    };
+
+    return categoryResponseDto;
+
+  } catch(error) {
+    console.log(error);
+    throw error;
+  }
+}
+
 export default {
   createCategory,
-  updateCategory
-};
+  updateCategory,
+  deleteCategory
+}
