@@ -82,7 +82,7 @@ const message = {
   SUCCESS_GET_MEMBERS: '멤버 조회 성공',
 
   // 글자수 초과
-  EXCEED_LENGTH: '제한된 글자수를 초과하셨습니다'
+  EXCEED_LENGTH: '제한된 글자수를 초과하였습니다'
 };
 
 export default message;
