@@ -1,4 +1,3 @@
-
 export interface ICategory {
   name: string;
   listId: number;
@@ -15,7 +14,7 @@ export interface CategoryUpdateDto {
   listId: number;
 }
 
-// export interface CategoryDeleteDto {
-//   listId: mongoose.Types.ObjectId;
-//   categoryId: mongoose.Types.ObjectId;
-// }
+export interface CategoryDeleteDto {
+  listId: number;
+  categoryId: number;
+}
