@@ -82,8 +82,8 @@ const updateCategory = async (req: Request, res: Response) => {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
     } else if (data === 'no_list_category') {
       res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_LIST_CATEGORY));
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, message.NO_LIST_CATEGORY));
     } else if (data === 'duplicated_category') {
       res
         .status(statusCode.BAD_REQUEST)
@@ -105,6 +105,13 @@ const updateCategory = async (req: Request, res: Response) => {
   }
 };
 
+
+/**
+ *  @route DELETE /category
+ *  @desc delete category
+ *  @access private
+ **/
+
 const deleteCategory = async (req: Request, res: Response) => {
   const { listId, categoryId } = req.params;
   const listIdToInt: number = parseInt(listId);
@@ -124,8 +131,8 @@ const deleteCategory = async (req: Request, res: Response) => {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
     } else if (data === 'no_list_category') {
       res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_LIST_CATEGORY));
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, message.NO_LIST_CATEGORY));
     }  else {
       res
         .status(statusCode.OK)
