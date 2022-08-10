@@ -35,8 +35,8 @@ const createCategory = async (req: Request, res: Response) => {
         .send(util.fail(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
     } else if (data === 'noList') {
       res
-      .status(statusCode.BAD_REQUEST)
-      .send(util.fail(statusCode.BAD_REQUEST, message.NO_PACKINGLIST));
+      .status(statusCode.NOT_FOUND)
+      .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
     } else if (data === 'duplicateCategory') {
       res
       .status(statusCode.BAD_REQUEST)

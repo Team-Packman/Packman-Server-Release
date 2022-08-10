@@ -32,7 +32,7 @@ const message = {
   SUCCESS_GET_RECENT_CREATED_LIST: '최근 생성된 리스트 조회 성공',
 
   //패킹리스트 공통
-  NO_PACKINGLIST: '존재하지 않는 PackingList입니다',
+  NO_PACKINGLIST: '존재하지 않는 패킹리스트입니다',
   DUPLICATION_PACKINGLIST: '중복된 리스트 이름입니다',
   NO_UPDATEDTITLE: '존재하지 않는 UpdatedTitle입니다',
   NO_UPDATEDDATE: '존재하지 않는 UpdatedDepartureDate입니다',
