@@ -10,7 +10,7 @@ const createCategory = async (
 ): Promise<TogetherPackingListCategoryResponseDto | string> => {
   try {
     if (categoryCreateDto.name.length > 12) {
-      return 'exceedLen';
+      return 'exceed_len';
     }
     const { rows: existList } = await client.query(
       `
@@ -21,7 +21,7 @@ const createCategory = async (
       [categoryCreateDto.listId],
     );
     if (existList.length === 0) {
-      return 'noList';
+      return 'no_list';
     }
 
     const { rows: existCategory } = await client.query(
@@ -33,7 +33,7 @@ const createCategory = async (
       [categoryCreateDto.listId, categoryCreateDto.name],
     );
     if (existCategory.length > 0) {
-      return 'duplicateCategory';
+      return 'duplicate_category';
     }
 
     const { rows } = await client.query(
