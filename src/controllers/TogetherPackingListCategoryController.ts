@@ -12,7 +12,7 @@ const db = require('../loaders/db');
 /**
  *  @route POST /category
  *  @desc create category
- *  @access public
+ *  @access private
  **/
 
 const createCategory = async (req: Request, res: Response) => {
