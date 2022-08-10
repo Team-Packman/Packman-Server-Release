@@ -9,13 +9,3 @@ export interface CategoryCreateDto {
   listId: number;
 }
 
-// export interface CategoryUpdateDto {
-//   id: mongoose.Types.ObjectId;
-//   name: string;
-//   listId: mongoose.Types.ObjectId;
-// }
-
-// export interface CategoryDeleteDto {
-//   listId: mongoose.Types.ObjectId;
-//   categoryId: mongoose.Types.ObjectId;
-// }

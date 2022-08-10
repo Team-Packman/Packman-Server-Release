@@ -1,6 +1,6 @@
 export interface TogetherPackingListCategoryResponseDto {
     id: number;
-    category?: [
+    category: [
       {
         id: number;
         name: string;

@@ -44,9 +44,6 @@ const createCategory = async (
       [categoryCreateDto.listId, categoryCreateDto.name],
     );
 
-    const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
-      id: categoryCreateDto.listId,
-    };
 
     const { rows: categorys } = await client.query(
       `
@@ -63,7 +60,11 @@ const createCategory = async (
     `,
       [categoryCreateDto.listId],
     );
-    categoryResponseDto.category = categorys;
+
+    const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
+      id: categoryCreateDto.listId,
+      category: categorys
+    };
 
     return categoryResponseDto;
   } catch (error) {
