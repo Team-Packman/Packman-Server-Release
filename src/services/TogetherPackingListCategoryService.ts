@@ -44,9 +44,7 @@ const createCategory = async (
       [categoryCreateDto.listId, categoryCreateDto.name],
     );
 
-    const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
-      id: categoryCreateDto.listId,
-    };
+  
 
     const { rows: categorys } = await client.query(
       `
@@ -63,7 +61,11 @@ const createCategory = async (
     `,
       [categoryCreateDto.listId],
     );
-    categoryResponseDto.category = categorys;
+
+    const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
+      id: categoryCreateDto.listId,
+      category: categorys
+    };
 
     return categoryResponseDto;
   } catch (error) {
@@ -133,9 +135,6 @@ const updateCategory = async(
       [categoryUpdateDto.id, categoryUpdateDto.name],
     );
 
-    const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
-      id: categoryUpdateDto.listId,
-    };
 
     const { rows: categorys } = await client.query(
       `
@@ -152,7 +151,11 @@ const updateCategory = async(
     `,
       [categoryUpdateDto.listId],
     );
-    categoryResponseDto.category = categorys;
+
+    const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
+      id: categoryUpdateDto.listId,
+      category: categorys
+    };
 
     return categoryResponseDto;
   } catch (error) {
