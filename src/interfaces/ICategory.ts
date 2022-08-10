@@ -9,11 +9,11 @@ export interface CategoryCreateDto {
   listId: number;
 }
 
-// export interface CategoryUpdateDto {
-//   id: mongoose.Types.ObjectId;
-//   name: string;
-//   listId: mongoose.Types.ObjectId;
-// }
+export interface CategoryUpdateDto {
+  id: number;
+  name: string;
+  listId: number;
+}
 
 // export interface CategoryDeleteDto {
 //   listId: mongoose.Types.ObjectId;
