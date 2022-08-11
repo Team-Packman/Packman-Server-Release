@@ -1,16 +1,16 @@
 export interface TogetherPackingListCategoryResponseDto {
-    id: number;
+    id: string;
     category: [
       {
-        id: number;
+        id: string;
         name: string;
         pack?: [
           {
-            id: number;
+            id: string;
             name: string;
             isChecked: boolean;
             packer: {
-              id: number;
+              id: string;
               nickname: string;
             };
           },
