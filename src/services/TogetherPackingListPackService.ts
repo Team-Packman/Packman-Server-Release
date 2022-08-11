@@ -2,7 +2,42 @@ import { PackCreateDto, PackResponseDto } from '../interfaces/IPack';
 
 import convertSnakeToCamel from '../modules/convertSnakeToCamel';
 
-const createPack = async (client: any, packCreateDto: PackCreateDto): Promise<PackResponseDto> => {
+const createPack = async (
+  client: any,
+  packCreateDto: PackCreateDto,
+): Promise<PackResponseDto | string> => {
+  if (packCreateDto.name.length > 12) return 'exceed_len';
+
+  const { rows: existList } = await client.query(
+    `SELECT *
+     FROM "packing_list" as pl
+     WHERE pl.id = $1
+    `,
+    [packCreateDto.listId],
+  );
+
+  if (existList.length === 0) return 'no_list';
+
+  const { rows: existCategory } = await client.query(
+    `SELECT *
+     FROM "category" as c
+     WHERE c.id = $1
+    `,
+    [packCreateDto.categoryId],
+  );
+
+  if (existCategory.length === 0) return 'no_category';
+
+  const { rows: existListCategory } = await client.query(
+    `SELECT *
+     FROM "category" as c
+     WHERE c.id = $1 AND c.list_id = $2
+    `,
+    [packCreateDto.categoryId, packCreateDto.listId],
+  );
+
+  if (existListCategory.length === 0) return 'no_list_category';
+
   const { rows } = await client.query(
     `
     INSERT INTO "pack" (category_id, name)

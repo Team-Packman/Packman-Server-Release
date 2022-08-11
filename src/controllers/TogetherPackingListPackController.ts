@@ -29,9 +29,25 @@ const createPack = async (req: Request, res: Response) => {
 
     const data = await TogetherPackingListPackService.createPack(client, packCreateDto);
 
-    res
-      .status(statusCode.OK)
-      .send(util.success(statusCode.OK, message.CREATE_TOGETHER_PACK_SUCCESS, data));
+    if (data === 'exceed_len')
+      res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
+    else if (data === 'no_list')
+      res
+        .status(statusCode.NOT_FOUND)
+        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+    else if (data === 'no_category')
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
+    else if (data === 'no_list_category')
+      res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, message.NO_LIST_CATEGORY));
+    else {
+      res
+        .status(statusCode.OK)
+        .send(util.success(statusCode.OK, message.CREATE_TOGETHER_PACK_SUCCESS, data));
+    }
   } catch (error) {
     console.log(error);
     res
