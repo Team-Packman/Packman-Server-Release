@@ -35,26 +35,6 @@ const createUser = async (req: Request, res: Response) => {
   }
 };
 
-const testUser = async (req: Request, res: Response) => {
-  let client;
-
-  try {
-    client = await db.connect(req);
-
-    await UserService.testUser(client);
-
-    res.status(statusCode.OK).send(util.success(statusCode.OK, message.SUCCESS_CREATE_USER));
-  } catch (error) {
-    console.log(error);
-    res
-      .status(statusCode.INTERNAL_SERVER_ERROR)
-      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
-  } finally {
-    client.release();
-  }
-};
-
 export default {
   createUser,
-  testUser,
 };

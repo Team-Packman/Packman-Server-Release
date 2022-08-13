@@ -36,12 +36,9 @@ const getKakaoUser = async (
     };
 
     if (userInfo.length) {
-      //userInfo가 존재하는 경우
       if (userInfo[0].is_deleted) {
-        //email o, is_deleted true
         await UserService.deleteUser(client, userEmail);
       } else {
-        //login
         const accessToken = getToken(userInfo[0].id.toString());
         data = {
           isAlreadyUser: true,
