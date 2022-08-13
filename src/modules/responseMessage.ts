@@ -66,6 +66,10 @@ const message = {
   DELETE_TOGETHERPACKINGLIST_SUCCESS: '폴더 속 함께 패킹리스트 삭제 성공',
   UPDATE_PACKER_SUCCESS: '함께 패킹리스트 담당자 배정 성공',
 
+  // 짐
+  NO_PACK: '존재하지 않는 짐입니다',
+  NO_CATEGORY_PACK: '카테고리에 해당하는 짐이 아닙니다',
+
   // 카테고리
   NO_CATEGORY: '존재하지 않는 카테고리입니다',
   NO_LIST_CATEGORY: '패킹리스트에 해당하는 카테고리가 아닙니다',
