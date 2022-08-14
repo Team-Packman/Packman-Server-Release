@@ -4,12 +4,6 @@ import TogetherPackingListPackController from '../controllers/TogetherPackingLis
 
 const router = Router();
 
-router.post(
-  '/',
-  [body('name').notEmpty(), body('categoryId').notEmpty(), body('listId').notEmpty()],
-  TogetherPackingListPackController.createPack,
-);
-
 router.patch(
   '/',
   [

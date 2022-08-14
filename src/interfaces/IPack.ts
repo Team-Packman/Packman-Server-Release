@@ -1,9 +1,3 @@
-export interface PackCreateDto {
-  name: string;
-  categoryId: string;
-  listId: string;
-}
-
 export interface PackUpdateDto {
   id: string;
   name: string;
