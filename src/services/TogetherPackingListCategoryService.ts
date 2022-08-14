@@ -44,18 +44,19 @@ const createCategory = async (
       [categoryCreateDto.listId, categoryCreateDto.name],
     );
 
-    
-
     const { rows: categorys } = await client.query(
       `
     SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
-        'id::text', p.id,
+        'id', p.id::text,
         'name', p.name, 
         'isChecked', p.is_checked, 
-        'packer', (SELECT item FROM (SELECT u.id::text, u.nickname FROM "user" as u WHERE u.id = p.packer_id) item)
+        'packer', 
+        CASE WHEN (u.id IS NOT NULL) THEN json_build_object('id', u.id::text, 'nickname', u.nickname)
+        END
         ))FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
     FROM "category" as c 
     LEFT JOIN "pack" as p ON c.id = p.category_id
+    LEFT JOIN "user" as u ON u.id = p.packer_id
     WHERE c.list_id = $1
     GROUP BY c.id
     `,
@@ -64,7 +65,7 @@ const createCategory = async (
 
     const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
       id: categoryCreateDto.listId,
-      category: categorys
+      category: categorys,
     };
 
     return categoryResponseDto;
@@ -74,7 +75,7 @@ const createCategory = async (
   }
 };
 
-const updateCategory = async(
+const updateCategory = async (
   client: any,
   categoryUpdateDto: CategoryUpdateDto,
 ): Promise<TogetherPackingListCategoryResponseDto | string> => {
@@ -106,7 +107,7 @@ const updateCategory = async(
       return 'no_category';
     }
     if (existCategory[0].list_id != categoryUpdateDto.listId) {
-      return 'no_list_category'
+      return 'no_list_category';
     }
 
     const { rows: duplicatedCategory } = await client.query(
@@ -122,7 +123,7 @@ const updateCategory = async(
       return 'duplicated_category';
     } else if (duplicatedCategory.length === 1) {
       if (duplicatedCategory[0].id != categoryUpdateDto.id) {
-        return 'duplicated_category'
+        return 'duplicated_category';
       }
     }
 
@@ -135,26 +136,28 @@ const updateCategory = async(
       [categoryUpdateDto.id, categoryUpdateDto.name],
     );
 
-
     const { rows: categorys } = await client.query(
       `
-    SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
-        'id', p.id::text,
-        'name', p.name, 
-        'isChecked', p.is_checked, 
-        'packer', (SELECT item FROM (SELECT u.id::text, u.nickname FROM "user" as u WHERE u.id = p.packer_id) item)
-        ))FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
-    FROM "category" as c 
-    LEFT JOIN "pack" as p ON c.id = p.category_id
-    WHERE c.list_id = $1
-    GROUP BY c.id
-    `,
+      SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
+          'id', p.id::text,
+          'name', p.name, 
+          'isChecked', p.is_checked, 
+          'packer', 
+          CASE WHEN (u.id IS NOT NULL) THEN json_build_object('id', u.id::text, 'nickname', u.nickname)
+          END
+          ))FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
+      FROM "category" as c 
+      LEFT JOIN "pack" as p ON c.id = p.category_id
+      LEFT JOIN "user" as u ON u.id = p.packer_id
+      WHERE c.list_id = $1
+      GROUP BY c.id
+      `,
       [categoryUpdateDto.listId],
     );
 
     const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
       id: categoryUpdateDto.listId,
-      category: categorys
+      category: categorys,
     };
 
     return categoryResponseDto;
@@ -164,7 +167,10 @@ const updateCategory = async(
   }
 };
 
-const deleteCategory = async(client: any, categoryDeleteDto: CategoryDeleteDto): Promise<TogetherPackingListCategoryResponseDto| string>=> {
+const deleteCategory = async (
+  client: any,
+  categoryDeleteDto: CategoryDeleteDto,
+): Promise<TogetherPackingListCategoryResponseDto | string> => {
   try {
     const { rows: existList } = await client.query(
       `
@@ -190,51 +196,50 @@ const deleteCategory = async(client: any, categoryDeleteDto: CategoryDeleteDto):
       return 'no_category';
     }
     if (existCategory[0].list_id != categoryDeleteDto.listId) {
-      return 'no_list_category'
+      return 'no_list_category';
     }
-
 
     const { rows } = await client.query(
       `
       DELETE FROM "category" as c
       WHERE c.id = $1  AND c.list_id = $2
       `,
-      [categoryDeleteDto.categoryId, categoryDeleteDto.listId]
-    )
-
-    
+      [categoryDeleteDto.categoryId, categoryDeleteDto.listId],
+    );
 
     const { rows: categorys } = await client.query(
       `
-    SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
-        'id', p.id::text,
-        'name', p.name, 
-        'isChecked', p.is_checked, 
-        'packer', (SELECT item FROM (SELECT u.id::text, u.nickname FROM "user" as u WHERE u.id = p.packer_id) item)
-        ))FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
-    FROM "category" as c 
-    LEFT JOIN "pack" as p ON c.id = p.category_id
-    WHERE c.list_id = $1
-    GROUP BY c.id
-    `,
+      SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
+          'id', p.id::text,
+          'name', p.name, 
+          'isChecked', p.is_checked, 
+          'packer', 
+          CASE WHEN (u.id IS NOT NULL) THEN json_build_object('id', u.id::text, 'nickname', u.nickname)
+          END
+          ))FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
+      FROM "category" as c 
+      LEFT JOIN "pack" as p ON c.id = p.category_id
+      LEFT JOIN "user" as u ON u.id = p.packer_id
+      WHERE c.list_id = $1
+      GROUP BY c.id
+      `,
       [categoryDeleteDto.listId],
     );
 
     const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
       id: categoryDeleteDto.listId,
-      category: categorys
+      category: categorys,
     };
 
     return categoryResponseDto;
-
-  } catch(error) {
+  } catch (error) {
     console.log(error);
     throw error;
   }
-}
+};
 
 export default {
   createCategory,
   updateCategory,
-  deleteCategory
-}
+  deleteCategory,
+};
