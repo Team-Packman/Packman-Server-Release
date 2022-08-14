@@ -12,6 +12,12 @@ export interface PackUpdateDto {
   categoryId: string;
 }
 
+export interface PackDeleteDto {
+  listId: string;
+  categoryId: string;
+  packId: string;
+}
+
 export interface PackResponseDto {
   id: string;
   category: [
