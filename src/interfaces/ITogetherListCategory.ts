@@ -1,4 +1,4 @@
-export interface TogetherPackingListCategoryResponseDto {
+export interface TogetherListCategoryResponseDto {
     id: string;
     category: [
       {

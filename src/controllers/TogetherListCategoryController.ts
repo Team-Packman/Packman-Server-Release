@@ -4,7 +4,7 @@ import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import { CategoryCreateDto, CategoryDeleteDto, CategoryUpdateDto } from '../interfaces/ICategory';
-import { TogetherPackingListCategoryService } from '../services';
+import { TogetherListCategoryService } from '../services';
 import config from '../config';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const db = require('../loaders/db');
@@ -27,7 +27,7 @@ const createCategory = async (req: Request, res: Response) => {
 
   try {
     client = await db.connect(req);
-    const data = await TogetherPackingListCategoryService.createCategory(client, categoryCreateDto);
+    const data = await TogetherListCategoryService.createCategory(client, categoryCreateDto);
 
     if (data === 'exceed_len') {
       res
@@ -72,7 +72,7 @@ const updateCategory = async (req: Request, res: Response) => {
 
   try {
     const client = await db.connect(req);
-    const data = await TogetherPackingListCategoryService.updateCategory(client, categoryUpdateDto);
+    const data = await TogetherListCategoryService.updateCategory(client, categoryUpdateDto);
 
     if (data === 'no_list') {
       res
@@ -114,15 +114,13 @@ const updateCategory = async (req: Request, res: Response) => {
 
 const deleteCategory = async (req: Request, res: Response) => {
   const { listId, categoryId } = req.params;
-  const listIdToInt: number = parseInt(listId);
-  const categoryIdToInt: number = parseInt(categoryId);
   const categoryDeleteDto: CategoryDeleteDto = {
-    listId: listIdToInt, 
-    categoryId: categoryIdToInt
+    listId: listId, 
+    categoryId: categoryId
   };
   try {
     const client = await db.connect(req);
-    const data = await TogetherPackingListCategoryService.deleteCategory(client, categoryDeleteDto);
+    const data = await TogetherListCategoryService.deleteCategory(client, categoryDeleteDto);
     if (data === 'no_list') {
       res
         .status(statusCode.NOT_FOUND)

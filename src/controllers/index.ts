@@ -1,3 +1,3 @@
 import UserControllers from './UserControllers';
-import TogetherPackingListCategoryController from './TogetherPackingListCategoryController';
-export { UserControllers, TogetherPackingListCategoryController };
+import TogetherListCategoryController from './TogetherListCategoryController';
+export { UserControllers, TogetherListCategoryController };

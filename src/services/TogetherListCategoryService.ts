@@ -1,5 +1,5 @@
 import { CategoryCreateDto, CategoryDeleteDto, CategoryUpdateDto } from '../interfaces/ICategory';
-import { TogetherPackingListCategoryResponseDto } from '../interfaces/ITogetherPackingListCategory';
+import { TogetherListCategoryResponseDto } from '../interfaces/ITogetherListCategory';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const convertSnakeToCamel = require('../modules/convertSnakeToCamel');
@@ -7,7 +7,7 @@ const convertSnakeToCamel = require('../modules/convertSnakeToCamel');
 const createCategory = async (
   client: any,
   categoryCreateDto: CategoryCreateDto,
-): Promise<TogetherPackingListCategoryResponseDto | string> => {
+): Promise<TogetherListCategoryResponseDto | string> => {
   try {
     if (categoryCreateDto.name.length > 12) {
       return 'exceed_len';
@@ -63,7 +63,7 @@ const createCategory = async (
       [categoryCreateDto.listId],
     );
 
-    const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
+    const categoryResponseDto: TogetherListCategoryResponseDto = {
       id: categoryCreateDto.listId,
       category: categorys,
     };
@@ -78,7 +78,7 @@ const createCategory = async (
 const updateCategory = async (
   client: any,
   categoryUpdateDto: CategoryUpdateDto,
-): Promise<TogetherPackingListCategoryResponseDto | string> => {
+): Promise<TogetherListCategoryResponseDto | string> => {
   try {
     if (categoryUpdateDto.name.length > 12) {
       return 'exceed_len';
@@ -155,7 +155,7 @@ const updateCategory = async (
       [categoryUpdateDto.listId],
     );
 
-    const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
+    const categoryResponseDto: TogetherListCategoryResponseDto = {
       id: categoryUpdateDto.listId,
       category: categorys,
     };
@@ -170,7 +170,7 @@ const updateCategory = async (
 const deleteCategory = async (
   client: any,
   categoryDeleteDto: CategoryDeleteDto,
-): Promise<TogetherPackingListCategoryResponseDto | string> => {
+): Promise<TogetherListCategoryResponseDto | string> => {
   try {
     const { rows: existList } = await client.query(
       `
@@ -226,7 +226,7 @@ const deleteCategory = async (
       [categoryDeleteDto.listId],
     );
 
-    const categoryResponseDto: TogetherPackingListCategoryResponseDto = {
+    const categoryResponseDto: TogetherListCategoryResponseDto = {
       id: categoryDeleteDto.listId,
       category: categorys,
     };

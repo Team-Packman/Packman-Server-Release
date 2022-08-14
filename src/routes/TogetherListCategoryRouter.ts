@@ -1,19 +1,19 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import TogetherPackingListCategoryController from '../controllers/TogetherPackingListCategoryController';
+import TogetherListCategoryController from '../controllers/TogetherListCategoryController';
 
 const router: Router = Router();
 
 router.post(
   '/',
   [body('name').notEmpty(), body('listId').notEmpty()],
-  TogetherPackingListCategoryController.createCategory,
+  TogetherListCategoryController.createCategory,
 );
 router.patch(
   '/',
   [body('id').notEmpty(), body('name').notEmpty(), body('listId').notEmpty()],
-  TogetherPackingListCategoryController.updateCategory,
+  TogetherListCategoryController.updateCategory,
 );
-router.delete('/:listId/:categoryId', TogetherPackingListCategoryController.deleteCategory);
+router.delete('/:listId/:categoryId', TogetherListCategoryController.deleteCategory);
 
 export default router;

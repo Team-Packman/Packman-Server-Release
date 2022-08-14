@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import UserRouter from './UserRouter';
-import TogetherPackingListCategoryRouter from './TogetherPackingListCategoryRouter';
+import TogetherListCategoryRouter from './TogetherListCategoryRouter';
 
 const router = Router();
 
 router.use('/user', UserRouter);
-router.use('/packingList/together/category', TogetherPackingListCategoryRouter);
+router.use('/list/together/category', TogetherListCategoryRouter);
 
 export default router;
