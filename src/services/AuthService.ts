@@ -39,7 +39,7 @@ const getKakaoUser = async (
       if (userInfo[0].is_deleted) {
         await UserService.deleteUser(client, userEmail);
       } else {
-        const accessToken = getToken(userInfo[0].id.toString());
+        const accessToken = getToken(userInfo[0].id);
         data = {
           isAlreadyUser: true,
           id: userInfo[0].id.toString(),
