@@ -5,12 +5,11 @@ import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import UserService from '../services/UserService';
 import { UserCreateDto } from '../interfaces/IUser';
-import getToken from '../modules/jwtHandler';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const db = require('../loaders/db');
 
 /**
- *  @route POST /user
+ *  @route POST /user/profile
  *  @desc create user
  *  @access public
  **/
