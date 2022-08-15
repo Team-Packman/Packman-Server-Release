@@ -32,7 +32,7 @@ const message = {
   SUCCESS_GET_RECENT_CREATED_LIST: '최근 생성된 리스트 조회 성공',
 
   //패킹리스트 공통
-  NO_PACKINGLIST: '존재하지 않는 PackingList입니다',
+  NO_PACKINGLIST: '존재하지 않는 패킹리스트입니다',
   DUPLICATION_PACKINGLIST: '중복된 리스트 이름입니다',
   NO_UPDATEDTITLE: '존재하지 않는 UpdatedTitle입니다',
   NO_UPDATEDDATE: '존재하지 않는 UpdatedDepartureDate입니다',
@@ -76,6 +76,9 @@ const message = {
   // 초대 코드 관련
   SUCCESS_INVITE_TOGETHER_PACKING: '함께 패킹리스트 초대 성공',
   READ_DETAILEDTEMPLTATE_SUCCESS: '템플릿 상세조회 성공',
+
+  // 그룹
+  NO_GROUP: '존재하지 않는 그룹입니다',
 
   // 멤버
   SUCCESS_GET_MEMBERS: '멤버 조회 성공',

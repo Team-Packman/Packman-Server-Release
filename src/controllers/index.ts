@@ -1,3 +1,4 @@
 import UserController from './UserController';
 import AuthController from './AuthController';
-export { UserController, AuthController };
+import TogetherListController from './TogetherListController';
+export { UserController, AuthController, TogetherListController };
