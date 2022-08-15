@@ -41,4 +41,13 @@ export interface TogetherListResponseDto {
       }[];
     }[];
   };
+  group?: {
+    id: string;
+    members: {
+      id: string;
+      nickname: string;
+      profileImage: string;
+    }[];
+  };
+  isMember?: boolean;
 }
