@@ -74,20 +74,20 @@ const addMember = async (client: any, listId: string, userId: string): Promise<s
       [packingList[0].id, false],
     );
 
-    const { rows: togetherPackingList } = await client.query(
+    const { rows: togetherAloneList } = await client.query(
       `
-        INSERT INTO "together_packing_list" (id, my_packing_list_id, group_id)
-        VALUES ($1, $2, $3)
+        INSERT INTO "together_alone_packing_list" (my_packing_list_id, together_packing_list_id)
+        VALUES ($1, $2)
         `,
-      [togetherList[0].id, aloneList[0].id, togetherList[0].group_id],
+      [aloneList[0].id, togetherList[0].id],
     );
 
-    const { rows: folderPackingList } = await client.query(
+    const { rows: folderList } = await client.query(
       `
         INSERT INTO "folder_packing_list" (folder_id, list_id)
         VALUES ($1, $2)
         `,
-      [folderId, togetherList[0].id],
+      [folderId, aloneList[0].id],
     );
   } catch (error) {
     console.log(error);
