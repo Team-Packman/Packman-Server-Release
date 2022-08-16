@@ -1,4 +1,4 @@
 import UserService from './UserService';
-import TogetherPackingListPackService from './TogetherPackingListPackService';
+import TogetherListPackService from './TogetherListPackService';
 
-export { UserService, TogetherPackingListPackService };
+export { UserService, TogetherListPackService };

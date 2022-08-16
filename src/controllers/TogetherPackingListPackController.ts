@@ -3,7 +3,7 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import { TogetherPackingListPackService } from '../services';
+import { TogetherListPackService } from '../services';
 import { PackDeleteDto } from '../interfaces/IPack';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const db = require('../loaders/db');
@@ -26,7 +26,7 @@ const deletePack = async (req: Request, res: Response) => {
 
   try {
     client = await db.connect(req);
-    const data = await TogetherPackingListPackService.deletePack(client, packDeleteDto);
+    const data = await TogetherListPackService.deletePack(client, packDeleteDto);
 
     if (data === 'no_list')
       res
