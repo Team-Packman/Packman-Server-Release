@@ -1,2 +1,3 @@
 import UserControllers from './UserControllers';
-export { UserControllers };
+import ListController from './ListController';
+export { UserControllers, ListController };
