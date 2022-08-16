@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import TogetherPackingListPackController from '../controllers/TogetherPackingListPackController';
+import TogetherListPackController from '../controllers/TogetherListPackController';
 
 const router = Router();
 
 router.post(
   '/',
   [body('name').notEmpty(), body('categoryId').notEmpty(), body('listId').notEmpty()],
-  TogetherPackingListPackController.createPack,
+  TogetherListPackController.createPack,
 );
 export default router;
