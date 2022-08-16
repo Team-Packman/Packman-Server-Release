@@ -70,11 +70,11 @@ const updatePack = async (
     `
     SELECT    c.id,
     c.name,
-    coalesce(json_agg( json_build_object( 'id', p.ID::text, 'name', p.name, 'isChecked', p.is_checked,'packer',
+    coalesce(json_agg( json_build_object( 'id', p.ID::text, 'name', p.name, 'is_checked', p.is_checked,'packer',
     CASE
               WHEN u.id IS NULL THEN NULL
               ELSE json_build_object('id', u.ID::text, 'name', u.nickname)
-              end)) filter( WHERE p.id IS NOT NULL ), '[]' ) AS pack
+              end) ORDER BY p.id) filter( WHERE p.id IS NOT NULL ), '[]' ) AS pack
     FROM      category c
     LEFT JOIN pack p
     ON        c.id = p.category_id
@@ -82,6 +82,7 @@ const updatePack = async (
     ON        u.id = p.packer_id
     WHERE     c.list_id = $1
     GROUP BY  c.id
+    ORDER BY  c.id
     `,
     [packUpdateDto.listId],
   );
