@@ -1,2 +1,3 @@
 import UserControllers from './UserControllers';
-export { UserControllers };
+import AuthController from './AuthController';
+export { UserControllers, AuthController };
