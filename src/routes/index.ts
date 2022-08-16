@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import UserRouter from './UserRouter';
-import TogetherPackingListPackRouter from './TogetherPackingListPackRouter';
+import TogetherListPackRouter from './TogetherListPackRouter';
 
 const router = Router();
 
 router.use('/user', UserRouter);
-router.use('/packingList/together/pack', TogetherPackingListPackRouter);
+router.use('/packingList/together/pack', TogetherListPackRouter);
 
 export default router;

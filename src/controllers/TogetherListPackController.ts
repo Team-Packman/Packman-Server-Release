@@ -3,7 +3,7 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import { TogetherPackingListPackService } from '../services';
+import { TogetherListPackService } from '../services';
 import { PackUpdateDto } from '../interfaces/IPack';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const db = require('../loaders/db');
@@ -26,7 +26,7 @@ const updatePack = async (req: Request, res: Response) => {
   try {
     client = await db.connect(req);
 
-    const data = await TogetherPackingListPackService.updatePack(client, packUpdateDto);
+    const data = await TogetherListPackService.updatePack(client, packUpdateDto);
 
     if (data === 'exceed_len')
       res

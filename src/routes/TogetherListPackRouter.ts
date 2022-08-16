@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import TogetherPackingListPackController from '../controllers/TogetherPackingListPackController';
+import TogetherListPackController from '../controllers/TogetherListPackController';
 
 const router = Router();
 
@@ -13,6 +13,6 @@ router.patch(
     body('listId').notEmpty(),
     body('categoryId').notEmpty(),
   ],
-  TogetherPackingListPackController.updatePack,
+  TogetherListPackController.updatePack,
 );
 export default router;
