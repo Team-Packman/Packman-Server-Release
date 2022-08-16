@@ -5,6 +5,6 @@ import TogetherListPackRouter from './TogetherListPackRouter';
 const router = Router();
 
 router.use('/user', UserRouter);
-router.use('/packingList/together/pack', TogetherListPackRouter);
+router.use('/list/together/pack', TogetherListPackRouter);
 
 export default router;
