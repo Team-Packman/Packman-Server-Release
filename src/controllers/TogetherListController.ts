@@ -100,7 +100,7 @@ const readTogetherList = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route FATCH /list/together/packer
+ *  @route PATCH /list/together/packer
  *  @desc update packer
  *  @access private
  **/
