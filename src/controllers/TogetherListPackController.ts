@@ -3,13 +3,13 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import { TogetherPackingListPackService } from '../services';
+import { TogetherListPackService } from '../services';
 import { PackCreateDto } from '../interfaces/IPack';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const db = require('../loaders/db');
 
 /**
- *  @route POST /packingList/together/pack
+ *  @route POST /list/together/pack
  *  @desc create Pack
  *  @access private
  **/
@@ -27,7 +27,7 @@ const createPack = async (req: Request, res: Response) => {
   try {
     client = await db.connect(req);
 
-    const data = await TogetherPackingListPackService.createPack(client, packCreateDto);
+    const data = await TogetherListPackService.createPack(client, packCreateDto);
 
     if (data === 'exceed_len')
       res
