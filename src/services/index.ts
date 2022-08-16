@@ -1,3 +1,4 @@
 import UserService from './UserService';
+import FolderService from './FolderService';
 
-export { UserService };
+export { UserService, FolderService };
