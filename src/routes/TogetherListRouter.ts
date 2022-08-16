@@ -11,4 +11,6 @@ router.post(
   TogetherListController.createTogetherList,
 );
 router.get('/:listId', Auth, TogetherListController.readTogetherList);
+router.patch('/packer', Auth, TogetherListController.updatePacker);
+
 export default router;

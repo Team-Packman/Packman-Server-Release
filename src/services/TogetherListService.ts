@@ -1,5 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-import { TogetherListCreateDto, TogetherListResponseDto } from '../interfaces/ITogetherList';
+import {
+  OnlyTogetherListResponseDto,
+  PackerUpdateDto,
+  TogetherListCreateDto,
+  TogetherListResponseDto,
+} from '../interfaces/ITogetherList';
 
 const createTogetherList = async (
   client: any,
@@ -248,7 +253,57 @@ const readTogetherList = async (
 
   return data;
 };
+
+const updatePacker = async (
+  client: any,
+  packerUpdateDto: PackerUpdateDto,
+): Promise<OnlyTogetherListResponseDto | null | string> => {
+  const { rows: updatedPackIdArray } = await client.query(
+    `
+    UPDATE "pack"
+    SET packer_id=$1
+    WHERE id=$2::integer
+    RETURNING id
+    `,
+    [packerUpdateDto.packerId, packerUpdateDto.packId],
+  );
+  if (!updatedPackIdArray.length) return 'not_found_pack';
+
+  const { rows: togetherListCategoryArray } = await client.query(
+    `
+    SELECT c.id::text AS "id", c.name AS "name",
+      COALESCE(json_agg(json_build_object(
+        'id', p.id::text,
+        'name', p.name,
+        'isChecked', p.is_checked,
+        'packer',
+        CASE
+            WHEN p.packer_id IS NULL THEN NULL
+            ELSE json_build_object('id', u.id, 'nickname', u.nickname )
+        END) ORDER BY p.id) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
+
+    FROM (SELECT id FROM "together_packing_list" WHERE id=$1) t
+    JOIN "category" c ON t.id = c.list_id
+    LEFT JOIN "pack" p ON c.id = p.category_id
+    LEFT JOIN (SELECT id, nickname FROM "user") u ON p.packer_id = u.id
+
+    GROUP BY t.id, c.id, c.name
+    ORDER BY c.id
+    `,
+    [packerUpdateDto.listId],
+  );
+  if (!togetherListCategoryArray.length) return 'not_found_category';
+
+  const data: OnlyTogetherListResponseDto = {
+    id: packerUpdateDto.listId,
+    category: togetherListCategoryArray,
+  };
+
+  return data;
+};
+
 export default {
   createTogetherList,
   readTogetherList,
+  updatePacker,
 };

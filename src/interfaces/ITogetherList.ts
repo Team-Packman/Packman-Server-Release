@@ -51,3 +51,25 @@ export interface TogetherListResponseDto {
   };
   isMember?: boolean;
 }
+export interface OnlyTogetherListResponseDto {
+  id: string;
+  category: {
+    id: string;
+    name: string;
+    pack: {
+      id: string;
+      name: string;
+      isChecked: boolean;
+      packer: {
+        id: string;
+        nickname: string;
+      } | null;
+    }[];
+  }[];
+}
+
+export interface PackerUpdateDto {
+  listId: string;
+  packId: string;
+  packerId: string;
+}

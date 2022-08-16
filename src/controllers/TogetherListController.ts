@@ -3,7 +3,7 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import { TogetherListCreateDto } from '../interfaces/ITogetherList';
+import { PackerUpdateDto, TogetherListCreateDto } from '../interfaces/ITogetherList';
 import TogetherListService from '../services/TogetherListService';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const db = require('../loaders/db');
@@ -99,7 +99,46 @@ const readTogetherList = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @route FATCH /list/together/packer
+ *  @desc update packer
+ *  @access private
+ **/
+const updatePacker = async (req: Request, res: Response) => {
+  let client;
+  const packerUpdateDto: PackerUpdateDto = req.body;
+
+  try {
+    client = await db.connect(req);
+
+    const data = await TogetherListService.updatePacker(client, packerUpdateDto);
+    if (!data)
+      return res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, message.FAIL_CREATE_USER));
+
+    if (data == 'not_found_pack')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_PACK));
+    else if (data == 'not_found_category')
+      res
+        .status(statusCode.NOT_FOUND)
+        .send(util.success(statusCode.NOT_FOUND, message.NO_CATEGORY));
+    else
+      res
+        .status(statusCode.OK)
+        .send(util.success(statusCode.OK, message.UPDATE_PACKER_SUCCESS, data));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+};
+
 export default {
   createTogetherList,
   readTogetherList,
+  updatePacker,
 };

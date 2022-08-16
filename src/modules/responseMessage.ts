@@ -65,8 +65,11 @@ const message = {
   UPDATE_PACKER_SUCCESS: '함께 패킹리스트 담당자 배정 성공',
 
   // 카테고리
-  NO_CATEGORY: '존재하지 않는 Category입니다',
+  NO_CATEGORY: '존재하지 않는 카테고리입니다',
   NO_LIST_CATEGORY: '리스트에 존재하지 않는 Category입니다',
+
+  //짐
+  NO_PACK: '존재하지 않는 짐입니다',
 
   //템플릿
   NO_TEMPLATE: '존재하지 않는 Template입니다',
