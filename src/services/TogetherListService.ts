@@ -7,7 +7,7 @@ const createTogetherList = async (
   togetherListCreateDto: TogetherListCreateDto,
 ): Promise<TogetherListResponseDto | null | string> => {
   //테스트 위해 invite code 더미로 넣어 둠
-  const inviteCode = 'tr';
+  const inviteCode = 'akwl';
 
   if (togetherListCreateDto.title.length > 12) return 'exceed_limit';
 
@@ -147,18 +147,18 @@ const createTogetherList = async (
   );
 
   const data: TogetherListResponseDto = {
-    id: togetherMyId,
+    id: togetherMyId.toString(),
     title: etcData.title,
     departureDate: etcData.departureDate,
     togetherPackingList: {
-      id: togetherListId,
-      groupId: etcData.groupId,
+      id: togetherListId.toString(),
+      groupId: etcData.groupId.toString(),
       category: togetherListCategoryArray,
       inviteCode: etcData.inviteCode,
       isSaved: etcData.isSaved,
     },
     myPackingList: {
-      id: myListId,
+      id: myListId.toString(),
       category: [],
     },
   };
