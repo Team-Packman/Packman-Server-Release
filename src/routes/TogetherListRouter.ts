@@ -10,4 +10,5 @@ router.post(
   Auth,
   TogetherListController.createTogetherList,
 );
+router.get('/:listId', Auth, TogetherListController.readTogetherList);
 export default router;

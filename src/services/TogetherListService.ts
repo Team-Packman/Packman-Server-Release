@@ -166,6 +166,89 @@ const createTogetherList = async (
   return data;
 };
 
+const readTogetherList = async (
+  client: any,
+  listId: string,
+  userId: number,
+): Promise<TogetherListResponseDto | null | string> => {
+  const { rows: etcDataArray } = await client.query(
+    `
+    SELECT ta.together_packing_list_id::text AS "togetherListId", ta.my_packing_list_id::text AS "myListId",
+       t.group_id::text AS "groupId", t.invite_code AS "inviteCode",
+       p.title AS "title", TO_CHAR(p.departure_date,'YYYY.MM.DD') AS "departureDate", p.is_templated AS "isSaved"
+    FROM (SELECT * FROM "together_alone_packing_list" WHERE id=$1) ta
+    JOIN "together_packing_list" t ON ta.together_packing_list_id=t.id
+    JOIN "packing_list" p ON t.id=p.id
+    `,
+    [listId],
+  );
+  if (!etcDataArray.length) return 'not_found_list';
+  const etcData = etcDataArray[0];
+
+  const { rows: togetherListCategoryArray } = await client.query(
+    `
+    SELECT c.id::text AS "id", c.name AS "name",
+      COALESCE(json_agg(json_build_object(
+        'id', p.id::text,
+        'name', p.name,
+        'isChecked', p.is_checked,
+        'packer',
+        CASE
+            WHEN p.packer_id IS NULL THEN NULL
+            ELSE json_build_object('id', u.id, 'nickname', u.nickname )
+        END) ORDER BY p.id) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
+
+    FROM (SELECT id FROM "together_packing_list" WHERE id=$1) t
+    JOIN "category" c ON t.id = c.list_id
+    LEFT JOIN "pack" p ON c.id = p.category_id
+    LEFT JOIN (SELECT id, nickname FROM "user") u ON p.packer_id = u.id
+
+    GROUP BY t.id, c.id, c.name
+    ORDER BY c.id
+    `,
+    [etcData.togetherListId],
+  );
+
+  const { rows: myListCategoryArray } = await client.query(
+    `
+    SELECT c.id::text AS "id", c.name AS "name",
+     COALESCE(json_agg(json_build_object(
+        'id', p.id::text,
+        'name', p.name,
+        'isChecked', p.is_checked,
+        'packer', NULL
+    ) ORDER BY p.id) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
+
+    FROM (SELECT id FROM "alone_packing_list" WHERE id=$1) a
+    JOIN "category" c ON a.id = c.list_id
+    LEFT JOIN "pack" p ON c.id = p.category_id
+
+    GROUP BY a.id, c.id, c.name
+    ORDER BY c.id
+    `,
+    [etcData.myListId],
+  );
+
+  const data: TogetherListResponseDto = {
+    id: listId,
+    title: etcData.title,
+    departureDate: etcData.departureDate,
+    togetherPackingList: {
+      id: etcData.togetherListId,
+      groupId: etcData.groupId,
+      category: togetherListCategoryArray,
+      inviteCode: etcData.inviteCode,
+      isSaved: etcData.isSaved,
+    },
+    myPackingList: {
+      id: etcData.myListId,
+      category: myListCategoryArray,
+    },
+  };
+
+  return data;
+};
 export default {
   createTogetherList,
+  readTogetherList,
 };
