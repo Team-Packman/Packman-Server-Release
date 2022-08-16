@@ -1,2 +1,3 @@
 import UserControllers from './UserControllers';
-export { UserControllers };
+import FolderController from './FolderController';
+export { UserControllers, FolderController };
