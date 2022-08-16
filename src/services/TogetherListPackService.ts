@@ -60,7 +60,7 @@ const updatePack = async (
   const { rows } = await client.query(
     `
     UPDATE "pack"
-    SET name = $1, is_checked = $2, updated_at = now()
+    SET name = $1, is_checked = $2
     WHERE id = $3
     `,
     [packUpdateDto.name, packUpdateDto.isChecked, packUpdateDto.id],
