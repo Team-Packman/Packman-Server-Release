@@ -106,6 +106,13 @@ const readTogetherList = async (req: Request, res: Response) => {
  **/
 const updatePacker = async (req: Request, res: Response) => {
   let client;
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res
+      .status(statusCode.BAD_REQUEST)
+      .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
+  }
+
   const packerUpdateDto: PackerUpdateDto = req.body;
 
   try {
