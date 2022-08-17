@@ -33,21 +33,11 @@ const createTogetherList = async (req: Request, res: Response) => {
       userId,
       togetherListCreateDto,
     );
-    if (!data)
-      return res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.fail(statusCode.BAD_REQUEST, message.FAIL_CREATE_USER));
 
-    if (data == 'exceed_limit')
+    if (data === 'exceed_len')
       res
         .status(statusCode.BAD_REQUEST)
         .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
-    else if (data == 'not_found_list')
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.success(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
-    else if (data == 'not_found_group')
-      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_GROUP));
     else
       res
         .status(statusCode.OK)
