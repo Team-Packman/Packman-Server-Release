@@ -5,11 +5,11 @@ const createTogetherList = async (
   client: any,
   userId: number,
   togetherListCreateDto: TogetherListCreateDto,
-): Promise<TogetherListResponseDto | null | string> => {
+): Promise<TogetherListResponseDto | string> => {
   //테스트 위해 invite code 더미로 넣어 둠
-  const inviteCode = 'akwl';
+  const inviteCode = '1ef';
 
-  if (togetherListCreateDto.title.length > 12) return 'exceed_limit';
+  if (togetherListCreateDto.title.length > 12) return 'exceed_len';
 
   const { rows: listIdArray } = await client.query(
     `
@@ -19,7 +19,6 @@ const createTogetherList = async (
     `,
     [togetherListCreateDto.title, togetherListCreateDto.departureDate],
   );
-  if (listIdArray.length < 2) return 'not_found_list';
   const togetherListId = listIdArray[0].id;
   const myListId = listIdArray[1].id;
 
@@ -30,7 +29,6 @@ const createTogetherList = async (
     RETURNING id
     `,
   );
-  if (!group.length) return 'not_found_group';
   const groupId = group[0].id;
 
   await client.query(
@@ -75,7 +73,23 @@ const createTogetherList = async (
   );
   const togetherMyId = togetherMyIdArray[0].id;
 
-  if (togetherListCreateDto.templateId) {
+  await client.query(
+    `
+    INSERT INTO "category" (list_id, name)
+    VALUES ($1, '기본')
+    `,
+    [myListId],
+  );
+
+  if (!togetherListCreateDto.templateId) {
+    await client.query(
+      `
+      INSERT INTO "category" (list_id, name)
+      VALUES ($1, '기본')
+      `,
+      [togetherListId],
+    );
+  } else {
     const { rows: templateCategoryIdArray } = await client.query(
       `
       SELECT c.id
@@ -84,7 +98,6 @@ const createTogetherList = async (
       `,
       [togetherListCreateDto.templateId],
     );
-    if (!templateCategoryIdArray.length) return 'not_found_category';
 
     for await (const element of templateCategoryIdArray) {
       const templateCategoryId = element.id;
@@ -116,7 +129,8 @@ const createTogetherList = async (
     SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY.MM.DD') AS "departureDate", p.is_templated AS "isSaved",
        t.group_id AS "groupId", t.invite_code AS "inviteCode"
     FROM "packing_list" p
-    JOIN "together_packing_list" t ON p.id=t.id AND p.id=$1
+    JOIN "together_packing_list" t ON p.id=t.id 
+    WHERE t.id=$1
     `,
     [togetherListId],
   );
@@ -132,18 +146,38 @@ const createTogetherList = async (
         'packer',
         CASE
             WHEN p.packer_id IS NULL THEN NULL
-            ELSE json_build_object('id', u.id, 'nickname', u.nickname )
+            ELSE json_build_object('id', u.id::text, 'nickname', u.nickname )
         END) ORDER BY p.id) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
 
-    FROM (SELECT id FROM "together_packing_list" WHERE id=$1) t
-    JOIN "category" c ON t.id = c.list_id
+    FROM "category" c
     LEFT JOIN "pack" p ON c.id = p.category_id
     LEFT JOIN (SELECT id, nickname FROM "user") u ON p.packer_id = u.id
+    WHERE c.list_id=$1
 
-    GROUP BY t.id, c.id, c.name
+    GROUP BY c.id
     ORDER BY c.id
     `,
     [togetherListId],
+  );
+
+  const { rows: myListCategoryArray } = await client.query(
+    `
+    SELECT c.id::text AS "id", c.name AS "name",
+     COALESCE(json_agg(json_build_object(
+        'id', p.id::text,
+        'name', p.name,
+        'isChecked', p.is_checked,
+        'packer', NULL
+    ) ORDER BY p.id) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
+
+    FROM "category" c
+    LEFT JOIN "pack" p ON c.id = p.category_id
+    WHERE c.list_id=$1
+
+    GROUP BY c.id
+    ORDER BY c.id
+    `,
+    [myListId],
   );
 
   const data: TogetherListResponseDto = {
@@ -159,7 +193,7 @@ const createTogetherList = async (
     },
     myPackingList: {
       id: myListId.toString(),
-      category: [],
+      category: myListCategoryArray,
     },
   };
 
