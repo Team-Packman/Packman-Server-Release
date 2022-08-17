@@ -28,12 +28,8 @@ const createUser = async (req: Request, res: Response) => {
     client = await db.connect(req);
 
     const data = await UserService.createUser(client, userCreateDto);
-    if (!data)
-      return res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.fail(statusCode.BAD_REQUEST, message.FAIL_CREATE_USER));
 
-    if (data == 'exceed_limit')
+    if (data === 'exceed_len')
       res
         .status(statusCode.BAD_REQUEST)
         .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
