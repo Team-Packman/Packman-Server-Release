@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import { UserCreateDto, UserResponseDto } from '../interfaces/IUser';
-import getToken from '../modules/jwtHandler';
+import jwtHandler from '../modules/jwtHandler';
 
 const createUser = async (
   client: any,
@@ -8,16 +8,25 @@ const createUser = async (
 ): Promise<UserResponseDto | null | string> => {
   if (userCreateDto.nickname.length > 4) return 'exceed_limit';
 
+  const refreshToken = jwtHandler.getRefreshToken();
+  userCreateDto.refreshToken = refreshToken;
+
   const { rows } = await client.query(
     `
-    INSERT INTO "user" (email, name, nickname, profile_image)
-    VALUES ($1, $2, $3, $4)
-    RETURNING id, nickname, email, profile_image
+    INSERT INTO "user" (email, name, nickname, profile_image, refresh_token)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING id, nickname, email, profile_image, refresh_token
     `,
-    [userCreateDto.email, userCreateDto.name, userCreateDto.nickname, userCreateDto.profileImage],
+    [
+      userCreateDto.email,
+      userCreateDto.name,
+      userCreateDto.nickname,
+      userCreateDto.profileImage,
+      userCreateDto.refreshToken,
+    ],
   );
 
-  const accessToken = getToken(rows[0].id);
+  const accessToken = jwtHandler.getAccessToken(rows[0].id);
 
   const data: UserResponseDto = {
     id: rows[0].id.toString(),
@@ -25,6 +34,7 @@ const createUser = async (
     email: rows[0].email,
     profileImage: rows[0].profile_image,
     accessToken: accessToken,
+    refreshToken: rows[0].refresh_token,
   };
 
   return data;
