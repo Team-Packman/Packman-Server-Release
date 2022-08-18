@@ -4,9 +4,10 @@ const updatePack = async (
   client: any,
   packUpdateDto: PackUpdateDto,
 ): Promise<PackResponseDto | string> => {
-  if (packUpdateDto.name.length > 12) return 'exceed_len';
+  try {
+    if (packUpdateDto.name.length > 12) return 'exceed_len';
 
-  const { rows: existPack } = await client.query(
+    const { rows: existPack } = await client.query(
     `
     SELECT *
     FROM "pack" as p
@@ -92,9 +93,13 @@ const updatePack = async (
 
   const packResponseDto: PackResponseDto = {
     id: packUpdateDto.listId,
-    category: category,
-  };
-  return packResponseDto;
+      category: category,
+    };
+    return packResponseDto;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
 export default {
