@@ -70,6 +70,7 @@ const message = {
 
   //짐
   NO_PACK: '존재하지 않는 짐입니다',
+  NO_LIST_PACK: '패킹리스트에 해당하는 짐이 아닙니다',
 
   //템플릿
   NO_TEMPLATE: '존재하지 않는 Template입니다',

@@ -119,17 +119,17 @@ const updatePacker = async (req: Request, res: Response) => {
     client = await db.connect(req);
 
     const data = await TogetherListService.updatePacker(client, packerUpdateDto);
-    if (!data)
-      return res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.fail(statusCode.BAD_REQUEST, message.FAIL_CREATE_USER));
 
-    if (data == 'not_found_pack')
-      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_PACK));
-    else if (data == 'not_found_category')
+    if (data == 'no_list')
       res
         .status(statusCode.NOT_FOUND)
-        .send(util.success(statusCode.NOT_FOUND, message.NO_CATEGORY));
+        .send(util.success(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+    else if (data == 'no_pack')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_PACK));
+    else if (data == 'no_list_pack')
+      res
+        .status(statusCode.NOT_FOUND)
+        .send(util.success(statusCode.NOT_FOUND, message.NO_LIST_PACK));
     else
       res
         .status(statusCode.OK)

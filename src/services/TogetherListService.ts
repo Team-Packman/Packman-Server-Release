@@ -258,6 +258,38 @@ const updatePacker = async (
   client: any,
   packerUpdateDto: PackerUpdateDto,
 ): Promise<OnlyTogetherListResponseDto | null | string> => {
+  const { rows: existList } = await client.query(
+    `
+      SELECT *
+      FROM "packing_list" pl
+      WHERE pl.id =$1  AND pl.is_deleted=false
+      `,
+    [packerUpdateDto.listId],
+  );
+  if (existList.length === 0) return 'no_list';
+
+  const { rows: existPack } = await client.query(
+    `
+      SELECT *
+      FROM "pack" p
+      WHERE p.id = $1 
+      `,
+    [packerUpdateDto.packId],
+  );
+  if (existPack.length === 0) return 'no_pack';
+
+  const { rows: existListPack } = await client.query(
+    `
+    SELECT *
+    FROM "packing_list" pl
+    JOIN "category" c ON pl.id=c.list_id
+    JOIN "pack" p ON c.id=p.category_id
+    WHERE pl.id=$1 AND p.id =$2
+    `,
+    [packerUpdateDto.listId, packerUpdateDto.packId],
+  );
+  if (existListPack.length === 0) return 'no_list_pack';
+
   const { rows: updatedPackIdArray } = await client.query(
     `
     UPDATE "pack"
