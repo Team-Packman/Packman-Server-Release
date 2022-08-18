@@ -9,9 +9,10 @@ const createPack = async (
   if (packCreateDto.name.length > 12) return 'exceed_len';
 
   const { rows: existList } = await client.query(
-    `SELECT *
-     FROM "packing_list" as pl
-     WHERE pl.id = $1
+    `
+    SELECT *
+    FROM "packing_list" as pl
+    WHERE pl.id = $1
     `,
     [packCreateDto.listId],
   );
@@ -19,9 +20,10 @@ const createPack = async (
   if (existList.length === 0) return 'no_list';
 
   const { rows: existCategory } = await client.query(
-    `SELECT *
-     FROM "category" as c
-     WHERE c.id = $1
+    `
+    SELECT *
+    FROM "category" as c
+    WHERE c.id = $1
     `,
     [packCreateDto.categoryId],
   );
@@ -29,9 +31,10 @@ const createPack = async (
   if (existCategory.length === 0) return 'no_category';
 
   const { rows: existListCategory } = await client.query(
-    `SELECT *
-     FROM "category" as c
-     WHERE c.id = $1 AND c.list_id = $2
+    `
+    SELECT *
+    FROM "category" as c
+    WHERE c.id = $1 AND c.list_id = $2
     `,
     [packCreateDto.categoryId, packCreateDto.listId],
   );
