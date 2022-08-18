@@ -251,11 +251,21 @@ const readTogetherList = async (
       FROM "user_group" ug
       JOIN "user" u ON ug.user_id=u.id
       RIGHT JOIN "group" g ON ug.group_id=g.id
-      WHERE g.id=31
+      WHERE g.id=$1
 
       GROUP BY g.id
       `,
       [etcData.groupId],
+    );
+
+    const { rows: isMember } = await client.query(
+      `
+      SELECT EXISTS(
+      SELECT *
+      FROM "user_group" ug
+      WHERE ug.group_id=$1 AND ug.user_id=$2)
+      `,
+      [etcData.groupId, userId],
     );
 
     const data: TogetherListResponseDto = {
@@ -274,7 +284,7 @@ const readTogetherList = async (
         category: myListCategoryArray,
       },
       group: groupInfo,
-      isMember: false,
+      isMember: isMember.exists,
     };
 
     return data;
