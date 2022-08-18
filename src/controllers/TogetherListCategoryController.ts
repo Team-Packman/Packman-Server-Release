@@ -3,8 +3,8 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import { CategoryCreateDto, CategoryUpdateDto } from '../interfaces/ICategory';
-import { TogetherPackingListCategoryService } from '../services';
+import { CategoryCreateDto, CategoryDeleteDto, CategoryUpdateDto } from '../interfaces/ICategory';
+import { TogetherListCategoryService } from '../services';
 import config from '../config';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const db = require('../loaders/db');
@@ -27,7 +27,7 @@ const createCategory = async (req: Request, res: Response) => {
 
   try {
     client = await db.connect(req);
-    const data = await TogetherPackingListCategoryService.createCategory(client, categoryCreateDto);
+    const data = await TogetherListCategoryService.createCategory(client, categoryCreateDto);
 
     if (data === 'exceed_len') {
       res
@@ -72,7 +72,7 @@ const updateCategory = async (req: Request, res: Response) => {
 
   try {
     const client = await db.connect(req);
-    const data = await TogetherPackingListCategoryService.updateCategory(client, categoryUpdateDto);
+    const data = await TogetherListCategoryService.updateCategory(client, categoryUpdateDto);
 
     if (data === 'no_list') {
       res
@@ -82,8 +82,8 @@ const updateCategory = async (req: Request, res: Response) => {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
     } else if (data === 'no_list_category') {
       res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_LIST_CATEGORY));
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, message.NO_LIST_CATEGORY));
     } else if (data === 'duplicated_category') {
       res
         .status(statusCode.BAD_REQUEST)
@@ -105,7 +105,48 @@ const updateCategory = async (req: Request, res: Response) => {
   }
 };
 
+
+/**
+ *  @route DELETE /category
+ *  @desc delete category
+ *  @access private
+ **/
+
+const deleteCategory = async (req: Request, res: Response) => {
+  const { listId, categoryId } = req.params;
+  const categoryDeleteDto: CategoryDeleteDto = {
+    listId: listId, 
+    categoryId: categoryId
+  };
+  try {
+    const client = await db.connect(req);
+    const data = await TogetherListCategoryService.deleteCategory(client, categoryDeleteDto);
+    if (data === 'no_list') {
+      res
+        .status(statusCode.NOT_FOUND)
+        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+    } else if (data === 'no_category') {
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
+    } else if (data === 'no_list_category') {
+      res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, message.NO_LIST_CATEGORY));
+    }  else {
+      res
+        .status(statusCode.OK)
+        .send(util.success(statusCode.OK, message.DELETE_TOGETHER_CATEGORY_SUCCESS, data));
+    }
+  } catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  }
+};
+
+
 export default {
   createCategory,
   updateCategory,
+  deleteCategory
 };

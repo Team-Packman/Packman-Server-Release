@@ -1,3 +1,3 @@
 import UserService from './UserService';
-import TogetherPackingListCategoryService from './TogetherPackingListCategoryService';
-export { UserService, TogetherPackingListCategoryService };
+import TogetherListCategoryService from './TogetherListCategoryService';
+export { UserService, TogetherListCategoryService };

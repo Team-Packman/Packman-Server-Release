@@ -1,16 +1,16 @@
 
-export interface ICategory {
-  name: string;
-  listId: number;
-}
-
 export interface CategoryCreateDto {
   name: string;
-  listId: number;
+  listId: string;
 }
 
 export interface CategoryUpdateDto {
-  id: number;
+  id: string;
   name: string;
-  listId: number;
+  listId: string;
+}
+
+export interface CategoryDeleteDto {
+  listId: string;
+  categoryId: string;
 }
