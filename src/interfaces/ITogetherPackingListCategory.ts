@@ -4,7 +4,7 @@ export interface TogetherPackingListCategoryResponseDto {
       {
         id: number;
         name: string;
-        pack?: [
+        pack: [
           {
             id: number;
             name: string;

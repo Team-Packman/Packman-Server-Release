@@ -9,6 +9,11 @@ router.post(
   [body('name').notEmpty(), body('listId').notEmpty()],
   TogetherPackingListCategoryController.createCategory,
 );
+router.patch(
+  '/',
+  [body('id').notEmpty(), body('name').notEmpty(), body('listId').notEmpty()],
+  TogetherPackingListCategoryController.updateCategory,
+);
 
 
 export default router;
