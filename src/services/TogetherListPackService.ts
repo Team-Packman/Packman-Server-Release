@@ -51,8 +51,7 @@ const createPack = async (
     c.name,
     coalesce(json_agg( json_build_object( 'id', p.ID::text, 'name', p.name, 'is_checked', p.is_checked,'packer',
     CASE
-              WHEN u.id IS NULL THEN NULL
-              ELSE json_build_object('id', u.ID::text, 'name', u.nickname)
+              WHEN u.id IS NOT NULL THEN json_build_object('id', u.ID::text, 'name', u.nickname)
               end) ORDER BY p.id) filter( WHERE p.id IS NOT NULL ), '[]' ) AS pack
     FROM      category c
     LEFT JOIN pack p
