@@ -9,9 +9,10 @@ const updatePack = async (
   if (packUpdateDto.name.length > 12) return 'exceed_len';
 
   const { rows: existPack } = await client.query(
-    `SELECT *
-     FROM "pack" as p
-     WHERE p.id = $1
+    `
+    SELECT *
+    FROM "pack" as p
+    WHERE p.id = $1
     `,
     [packUpdateDto.id],
   );
@@ -19,9 +20,10 @@ const updatePack = async (
   if (existPack.length === 0) return 'no_pack';
 
   const { rows: existList } = await client.query(
-    `SELECT *
-     FROM "packing_list" as pl
-     WHERE pl.id = $1
+    `
+    SELECT *
+    FROM "packing_list" as pl
+    WHERE pl.id = $1
     `,
     [packUpdateDto.listId],
   );
@@ -29,9 +31,10 @@ const updatePack = async (
   if (existList.length === 0) return 'no_list';
 
   const { rows: existCategory } = await client.query(
-    `SELECT *
-     FROM "category" as c
-     WHERE c.id = $1
+    `
+    SELECT *
+    FROM "category" as c
+    WHERE c.id = $1
     `,
     [packUpdateDto.categoryId],
   );
@@ -39,18 +42,20 @@ const updatePack = async (
   if (existCategory.length === 0) return 'no_category';
 
   const { rows: existListCategory } = await client.query(
-    `SELECT *
-     FROM "category" as c
-     WHERE c.id = $1 AND c.list_id = $2
+    `
+    SELECT *
+    FROM "category" as c
+    WHERE c.id = $1 AND c.list_id = $2
     `,
     [packUpdateDto.categoryId, packUpdateDto.listId],
   );
 
   if (existListCategory.length === 0) return 'no_list_category';
   const { rows: existCategoryPack } = await client.query(
-    `SELECT *
-     FROM "pack" as p
-     WHERE p.id = $1 AND p.category_id = $2
+    `
+    SELECT *
+    FROM "pack" as p
+    WHERE p.id = $1 AND p.category_id = $2
     `,
     [packUpdateDto.id, packUpdateDto.categoryId],
   );
