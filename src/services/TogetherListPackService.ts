@@ -1,7 +1,5 @@
 import { PackResponseDto, PackUpdateDto } from '../interfaces/IPack';
 
-import convertSnakeToCamel from '../modules/convertSnakeToCamel';
-
 const updatePack = async (
   client: any,
   packUpdateDto: PackUpdateDto,
@@ -75,7 +73,7 @@ const updatePack = async (
     `
     SELECT    c.id,
     c.name,
-    coalesce(json_agg( json_build_object( 'id', p.ID::text, 'name', p.name, 'is_checked', p.is_checked,'packer',
+    coalesce(json_agg( json_build_object( 'id', p.ID::text, 'name', p.name, 'isChecked', p.is_checked,'packer',
     CASE
               WHEN u.id IS NULL THEN NULL
               ELSE json_build_object('id', u.ID::text, 'name', u.nickname)
@@ -96,7 +94,7 @@ const updatePack = async (
     id: packUpdateDto.listId,
     category: category,
   };
-  return convertSnakeToCamel.keysToCamel(packResponseDto);
+  return packResponseDto;
 };
 
 export default {
