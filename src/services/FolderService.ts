@@ -43,7 +43,7 @@ const getRecentCreatedList = async (
     );
     recentListId = togetherListId[0].id;
   }
-  console.log(recentListId);
+
   const { rows: recentList } = await client.query(
     `
     SELECT  pl.title,
