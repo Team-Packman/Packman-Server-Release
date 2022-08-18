@@ -152,7 +152,7 @@ const createTogetherList = async (
 
       FROM "category" c
       LEFT JOIN "pack" p ON c.id = p.category_id
-      LEFT JOIN (SELECT id, nickname FROM "user") u ON p.packer_id = u.id
+      LEFT JOIN "user" u ON p.packer_id = u.id
       WHERE c.list_id=$1
 
       GROUP BY c.id
