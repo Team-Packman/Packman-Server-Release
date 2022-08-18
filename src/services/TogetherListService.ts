@@ -1,12 +1,12 @@
 const addMember = async (client: any, listId: string, userId: string): Promise<string | void> => {
   try {
     const { rows: togetherList } = await client.query(
-      `SELECT *
-             FROM "packing_list" as pl
-             JOIN "together_packing_list" as t ON pl.id = t.id
-             WHERE pl.id = $1 
-             LIMIT 1 
-            `,
+      `
+        SELECT *
+        FROM "packing_list" as pl
+        JOIN "together_packing_list" as t ON pl.id = t.id
+        WHERE pl.id = $1 AND pl.is_deleted = false
+      `,
       [listId],
     );
     if (togetherList.length === 0) return 'no_list';
@@ -35,20 +35,20 @@ const addMember = async (client: any, listId: string, userId: string): Promise<s
       `
         SELECT * 
         FROM "folder" as f
-        WHERE f.name = $1 AND f.user_id = $2 AND f.is_aloned = $3
+        WHERE f.name = '기본' AND f.user_id = $1 AND f.is_aloned = false
         `,
-      ['기본', userId, false],
+      [userId],
     );
 
     let folderId;
     if (defaultFolder.length === 0) {
       const { rows: newFolder } = await client.query(
         `
-            INSERT INTO "folder" (user_id, name, is_aloned)
-            VALUES ($1, $2, $3)
-            RETURNING *
-            `,
-        [userId, '기본', false],
+          INSERT INTO "folder" (user_id, name, is_aloned)
+          VALUES ($1, '기본', false)
+          RETURNING *
+          `,
+        [userId],
       );
       folderId = newFolder[0].id;
     } else {
@@ -68,10 +68,10 @@ const addMember = async (client: any, listId: string, userId: string): Promise<s
     const { rows: aloneList } = await client.query(
       `
         INSERT INTO "alone_packing_list" (id, is_aloned)
-        VALUES ($1, $2)
+        VALUES ($1, false)
         RETURNING *
         `,
-      [packingList[0].id, false],
+      [packingList[0].id],
     );
 
     const { rows: togetherAloneList } = await client.query(
