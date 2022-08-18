@@ -1,8 +1,6 @@
 import { CategoryCreateDto, CategoryUpdateDto } from '../interfaces/ICategory';
 import { TogetherPackingListCategoryResponseDto } from '../interfaces/ITogetherPackingListCategory';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const convertSnakeToCamel = require('../modules/convertSnakeToCamel');
 
 const createCategory = async (
   client: any,
