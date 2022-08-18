@@ -51,6 +51,8 @@ const createCategory = async (req: Request, res: Response) => {
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
   }
 };
 
@@ -67,11 +69,11 @@ const updateCategory = async (req: Request, res: Response) => {
       .status(statusCode.BAD_REQUEST)
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
-
+  let client;
   const categoryUpdateDto: CategoryUpdateDto = req.body;
 
   try {
-    const client = await db.connect(req);
+    client = await db.connect(req);
     const data = await TogetherListCategoryService.updateCategory(client, categoryUpdateDto);
 
     if (data === 'no_list') {
@@ -102,9 +104,10 @@ const updateCategory = async (req: Request, res: Response) => {
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
   }
 };
-
 
 /**
  *  @route DELETE /category
@@ -113,13 +116,14 @@ const updateCategory = async (req: Request, res: Response) => {
  **/
 
 const deleteCategory = async (req: Request, res: Response) => {
+  let client;
   const { listId, categoryId } = req.params;
   const categoryDeleteDto: CategoryDeleteDto = {
-    listId: listId, 
-    categoryId: categoryId
+    listId: listId,
+    categoryId: categoryId,
   };
   try {
-    const client = await db.connect(req);
+    client = await db.connect(req);
     const data = await TogetherListCategoryService.deleteCategory(client, categoryDeleteDto);
     if (data === 'no_list') {
       res
@@ -131,7 +135,7 @@ const deleteCategory = async (req: Request, res: Response) => {
       res
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, message.NO_LIST_CATEGORY));
-    }  else {
+    } else {
       res
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.UPDATE_TOGETHER_CATEGORY_SUCCESS, data));
@@ -141,12 +145,13 @@ const deleteCategory = async (req: Request, res: Response) => {
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
   }
 };
-
 
 export default {
   createCategory,
   updateCategory,
-  deleteCategory
+  deleteCategory,
 };
