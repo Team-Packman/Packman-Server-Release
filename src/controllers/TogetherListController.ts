@@ -120,13 +120,13 @@ const updatePacker = async (req: Request, res: Response) => {
 
     const data = await TogetherListService.updatePacker(client, packerUpdateDto);
 
-    if (data == 'no_list')
+    if (data === 'no_list')
       res
         .status(statusCode.NOT_FOUND)
         .send(util.success(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
-    else if (data == 'no_pack')
+    else if (data === 'no_pack')
       res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_PACK));
-    else if (data == 'no_list_pack')
+    else if (data === 'no_list_pack')
       res
         .status(statusCode.NOT_FOUND)
         .send(util.success(statusCode.NOT_FOUND, message.NO_LIST_PACK));

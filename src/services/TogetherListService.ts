@@ -258,80 +258,82 @@ const updatePacker = async (
   client: any,
   packerUpdateDto: PackerUpdateDto,
 ): Promise<OnlyTogetherListResponseDto | null | string> => {
-  const { rows: existList } = await client.query(
-    `
+  try {
+    const { rows: existList } = await client.query(
+      `
       SELECT *
       FROM "packing_list" pl
       WHERE pl.id =$1  AND pl.is_deleted=false
       `,
-    [packerUpdateDto.listId],
-  );
-  if (existList.length === 0) return 'no_list';
+      [packerUpdateDto.listId],
+    );
+    if (existList.length === 0) return 'no_list';
 
-  const { rows: existPack } = await client.query(
-    `
+    const { rows: existPack } = await client.query(
+      `
       SELECT *
       FROM "pack" p
       WHERE p.id = $1 
       `,
-    [packerUpdateDto.packId],
-  );
-  if (existPack.length === 0) return 'no_pack';
+      [packerUpdateDto.packId],
+    );
+    if (existPack.length === 0) return 'no_pack';
 
-  const { rows: existListPack } = await client.query(
-    `
-    SELECT *
-    FROM "packing_list" pl
-    JOIN "category" c ON pl.id=c.list_id
-    JOIN "pack" p ON c.id=p.category_id
-    WHERE pl.id=$1 AND p.id =$2
+    const { rows: existListPack } = await client.query(
+      `
+      SELECT *
+      FROM "packing_list" pl
+      JOIN "category" c ON pl.id=c.list_id
+      JOIN "pack" p ON c.id=p.category_id
+      WHERE pl.id=$1 AND p.id =$2
     `,
-    [packerUpdateDto.listId, packerUpdateDto.packId],
-  );
-  if (existListPack.length === 0) return 'no_list_pack';
+      [packerUpdateDto.listId, packerUpdateDto.packId],
+    );
+    if (existListPack.length === 0) return 'no_list_pack';
 
-  const { rows: updatedPackIdArray } = await client.query(
-    `
-    UPDATE "pack"
-    SET packer_id=$1
-    WHERE id=$2
-    RETURNING id
+    await client.query(
+      `
+      UPDATE "pack"
+      SET packer_id=$1
+      WHERE id=$2
     `,
-    [packerUpdateDto.packerId, packerUpdateDto.packId],
-  );
-  if (!updatedPackIdArray.length) return 'not_found_pack';
+      [packerUpdateDto.packerId, packerUpdateDto.packId],
+    );
 
-  const { rows: togetherListCategoryArray } = await client.query(
-    `
-    SELECT c.id::text AS "id", c.name AS "name",
-      COALESCE(json_agg(json_build_object(
-        'id', p.id::text,
-        'name', p.name,
-        'isChecked', p.is_checked,
-        'packer',
-        CASE
-            WHEN p.packer_id IS NULL THEN NULL
-            ELSE json_build_object('id', u.id, 'nickname', u.nickname )
-        END) ORDER BY p.id) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
+    const { rows: togetherListCategoryArray } = await client.query(
+      `
+      SELECT c.id::text AS "id", c.name AS "name",
+        COALESCE(json_agg(json_build_object(
+          'id', p.id::text,
+          'name', p.name,
+          'isChecked', p.is_checked,
+          'packer',
+          CASE
+              WHEN p.packer_id IS NULL THEN NULL
+              ELSE json_build_object('id', u.id::text, 'nickname', u.nickname )
+          END) ORDER BY p.id) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
 
-    FROM (SELECT id FROM "together_packing_list" WHERE id=$1) t
-    JOIN "category" c ON t.id = c.list_id
-    LEFT JOIN "pack" p ON c.id = p.category_id
-    LEFT JOIN (SELECT id, nickname FROM "user") u ON p.packer_id = u.id
+      FROM "category" c
+      LEFT JOIN "pack" p ON c.id = p.category_id
+      LEFT JOIN "user" u ON p.packer_id = u.id
+      WHERE c.list_id=$1
 
-    GROUP BY t.id, c.id, c.name
-    ORDER BY c.id
-    `,
-    [packerUpdateDto.listId],
-  );
-  if (!togetherListCategoryArray.length) return 'not_found_category';
+      GROUP BY c.id
+      ORDER BY c.id
+      `,
+      [packerUpdateDto.listId],
+    );
 
-  const data: OnlyTogetherListResponseDto = {
-    id: packerUpdateDto.listId,
-    category: togetherListCategoryArray,
-  };
+    const data: OnlyTogetherListResponseDto = {
+      id: packerUpdateDto.listId,
+      category: togetherListCategoryArray,
+    };
 
-  return data;
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
 export default {
