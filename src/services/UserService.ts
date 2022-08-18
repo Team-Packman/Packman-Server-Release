@@ -51,7 +51,21 @@ const deleteUser = async (client: any, userEmail: string) => {
   );
 };
 
+const checkUser = async (client: any, userId: string) => {
+  const { rows } = await client.query(
+    `
+    SELECT *
+    FROM "user" u
+    WHERE u.id = $1 and is_deleted = false
+    `,
+    [userId],
+  );
+
+  return rows[0];
+};
+
 export default {
   createUser,
   deleteUser,
+  checkUser,
 };

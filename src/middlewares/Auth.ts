@@ -16,6 +16,11 @@ export default (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const decoded = jwt.verify(token, config.jwtSecret);
+    const existUser = await UserService.checkUser(client, user.id);
+    if (!existUser)
+      return res
+        .status(statusCode.UNAUTHORIZED)
+        .send(util.fail(statusCode.UNAUTHORIZED, message.NO_USER));
 
     req.body.user = (decoded as any).user;
 
