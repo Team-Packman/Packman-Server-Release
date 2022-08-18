@@ -1,7 +1,5 @@
 import { PackDeleteDto, PackResponseDto } from '../interfaces/IPack';
 
-import convertSnakeToCamel from '../modules/convertSnakeToCamel';
-
 const deletePack = async (
   client: any,
   packDeleteDto: PackDeleteDto,

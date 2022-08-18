@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
-import { validationResult } from 'express-validator';
 import { TogetherListPackService } from '../services';
 import { PackDeleteDto } from '../interfaces/IPack';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
