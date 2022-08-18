@@ -7,11 +7,11 @@ const getPackingByInviteCode = async (
   try {
     const { rows: packingList } = await client.query(
       `
-            SELECT pl.id, pl.title
-            FROM "together_packing_list" as t
-            JOIN "packing_list" as pl ON pl.id = t.id
-            WHERE t.invite_code = $1
-            `,
+        SELECT pl.id, pl.title
+        FROM "together_packing_list" as t
+        JOIN "packing_list" as pl ON pl.id = t.id
+        WHERE t.invite_code = $1
+    `,
       [inviteCode],
     );
     if (packingList.length === 0) return 'no_list';
