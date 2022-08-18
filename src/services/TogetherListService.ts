@@ -294,7 +294,7 @@ const updatePacker = async (
     `
     UPDATE "pack"
     SET packer_id=$1
-    WHERE id=$2::integer
+    WHERE id=$2
     RETURNING id
     `,
     [packerUpdateDto.packerId, packerUpdateDto.packId],
