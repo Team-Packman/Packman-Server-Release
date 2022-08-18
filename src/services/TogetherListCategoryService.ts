@@ -49,13 +49,14 @@ const createCategory = async (
         'isChecked', p.is_checked, 
         'packer', 
         CASE WHEN (u.id IS NOT NULL) THEN json_build_object('id', u.id::text, 'nickname', u.nickname)
-        END
-        ))FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
+        END) ORDER BY p.id
+      ) FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
     FROM "category" as c 
     LEFT JOIN "pack" as p ON c.id = p.category_id
     LEFT JOIN "user" as u ON u.id = p.packer_id
     WHERE c.list_id = $1
     GROUP BY c.id
+    ORDER BY c.id
     `,
       [categoryCreateDto.listId],
     );
@@ -135,20 +136,21 @@ const updateCategory = async (
 
     const { rows: categorys } = await client.query(
       `
-      SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
-          'id', p.id::text,
-          'name', p.name, 
-          'isChecked', p.is_checked, 
-          'packer', 
-          CASE WHEN (u.id IS NOT NULL) THEN json_build_object('id', u.id::text, 'nickname', u.nickname)
-          END
-          ))FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
-      FROM "category" as c 
-      LEFT JOIN "pack" as p ON c.id = p.category_id
-      LEFT JOIN "user" as u ON u.id = p.packer_id
-      WHERE c.list_id = $1
-      GROUP BY c.id
-      `,
+    SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
+        'id', p.id::text,
+        'name', p.name, 
+        'isChecked', p.is_checked, 
+        'packer', 
+        CASE WHEN (u.id IS NOT NULL) THEN json_build_object('id', u.id::text, 'nickname', u.nickname)
+        END) ORDER BY p.id
+      ) FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
+    FROM "category" as c 
+    LEFT JOIN "pack" as p ON c.id = p.category_id
+    LEFT JOIN "user" as u ON u.id = p.packer_id
+    WHERE c.list_id = $1
+    GROUP BY c.id
+    ORDER BY c.id
+    `,
       [categoryUpdateDto.listId],
     );
 
@@ -206,20 +208,21 @@ const deleteCategory = async (
 
     const { rows: categorys } = await client.query(
       `
-      SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
-          'id', p.id::text,
-          'name', p.name, 
-          'isChecked', p.is_checked, 
-          'packer', 
-          CASE WHEN (u.id IS NOT NULL) THEN json_build_object('id', u.id::text, 'nickname', u.nickname)
-          END
-          ))FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
-      FROM "category" as c 
-      LEFT JOIN "pack" as p ON c.id = p.category_id
-      LEFT JOIN "user" as u ON u.id = p.packer_id
-      WHERE c.list_id = $1
-      GROUP BY c.id
-      `,
+    SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
+        'id', p.id::text,
+        'name', p.name, 
+        'isChecked', p.is_checked, 
+        'packer', 
+        CASE WHEN (u.id IS NOT NULL) THEN json_build_object('id', u.id::text, 'nickname', u.nickname)
+        END) ORDER BY p.id
+      ) FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
+    FROM "category" as c 
+    LEFT JOIN "pack" as p ON c.id = p.category_id
+    LEFT JOIN "user" as u ON u.id = p.packer_id
+    WHERE c.list_id = $1
+    GROUP BY c.id
+    ORDER BY c.id
+    `,
       [categoryDeleteDto.listId],
     );
 
