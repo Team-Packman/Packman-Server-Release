@@ -244,7 +244,7 @@ const readTogetherList = async (
       `
       SELECT g.id::text AS "id",
             COALESCE(json_agg(json_build_object(
-                'id', u.id,
+                'id', u.id::text,
                 'name', u.nickname,
                 'profileImage',u.profile_image
                 ) ORDER BY ug.id) FILTER(WHERE u.id IS NOT NULL AND u.is_deleted=false),'[]') AS "member"
@@ -284,7 +284,7 @@ const readTogetherList = async (
         category: myListCategoryArray,
       },
       group: groupInfo,
-      isMember: isMember.exists,
+      isMember: isMember[0].exists,
     };
 
     return data;
