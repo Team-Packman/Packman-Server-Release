@@ -76,12 +76,8 @@ const readTogetherList = async (req: Request, res: Response) => {
     client = await db.connect(req);
 
     const data = await TogetherListService.readTogetherList(client, listId, userId);
-    if (!data)
-      return res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.fail(statusCode.BAD_REQUEST, message.FAIL_CREATE_USER));
 
-    if (data == 'not_found_list')
+    if (data === 'no_list')
       res
         .status(statusCode.NOT_FOUND)
         .send(util.success(statusCode.NOT_FOUND, message.NO_PACKINGLIST));

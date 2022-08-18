@@ -43,7 +43,7 @@ export interface TogetherListResponseDto {
   };
   group?: {
     id: string;
-    members: {
+    member: {
       id: string;
       nickname: string;
       profileImage: string;
