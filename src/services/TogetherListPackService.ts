@@ -49,7 +49,7 @@ const createPack = async (
     );
     const { rows: category } = await client.query(
       `
-      SELECT    c.id,
+      SELECT    c.id::text,
       c.name,
       coalesce(json_agg( json_build_object( 'id', p.ID::text, 'name', p.name, 'isChecked', p.is_checked,'packer',
       CASE
