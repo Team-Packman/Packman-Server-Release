@@ -46,24 +46,14 @@ const getRecentCreatedList = async (
 
   const { rows: recentList } = await client.query(
     `
-    SELECT  pl.title,
-            TO_CHAR(pl.departure_date,'YYYY-MM-DD') as departure_date,
-            Count(p.id) AS total,
-            (SELECT Count(p.id) AS remain
-            FROM   "packing_list" pl
-                    LEFT JOIN category c
-                          ON pl.id = c.list_id
-                    LEFT JOIN pack p
-                          ON c.id = p.category_id
-            WHERE  pl.id = $1 AND p.is_checked = false)
-        FROM   "packing_list" pl
-            LEFT JOIN category c
-                  ON pl.id = c.list_id
-            LEFT JOIN pack p
-                  ON c.id = p.category_id
-    WHERE  pl.id = $1
-    GROUP  BY pl.departure_date,
-          pl.title
+    SELECT  pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as departure_date,
+      Count(CASE WHEN p.is_checked = false THEN p.id END) AS remain,
+      Count(p.id) AS total
+    FROM   "packing_list" pl
+    LEFT JOIN category c ON pl.id = c.list_id
+    LEFT JOIN pack p ON c.id = p.category_id
+    WHERE pl.id = $1
+    GROUP BY pl.departure_date, pl.title
     `,
     [recentListId],
   );
