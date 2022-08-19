@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 import { UserCreateDto, UserResponseDto } from '../interfaces/IUser';
 import getToken from '../modules/jwtHandler';
 
@@ -38,9 +37,9 @@ const createUser = async (
 const deleteUser = async (client: any, userEmail: string) => {
   await client.query(
     `
-          DELETE 
-          FROM "user"
-          WHERE email=$1
+    DELETE 
+    FROM "user"
+    WHERE email=$1
     `,
     [userEmail],
   );

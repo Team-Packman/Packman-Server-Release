@@ -3,10 +3,7 @@ import { AuthResponseDto } from '../interfaces/IUser';
 import getToken from '../modules/jwtHandler';
 import UserService from './UserService';
 
-const getKakaoUser = async (
-  client: any,
-  kakaoToken: string,
-): Promise<AuthResponseDto | null | undefined> => {
+const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthResponseDto | null> => {
   try {
     const response = await axios({
       method: 'get',
@@ -22,17 +19,17 @@ const getKakaoUser = async (
 
     const { rows: userInfo } = await client.query(
       `
-          SELECT *
-          FROM "user"
-          WHERE email=$1
-    `,
+      SELECT *
+      FROM "user"
+      WHERE email=$1
+      `,
       [userEmail],
     );
 
     let data: AuthResponseDto = {
       isAlreadyUser: false,
-      email: userEmail,
       name: userName,
+      email: userEmail,
     };
 
     if (userInfo.length) {
@@ -54,6 +51,7 @@ const getKakaoUser = async (
     return data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 export default {

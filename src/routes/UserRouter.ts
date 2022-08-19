@@ -14,4 +14,5 @@ router.post(
   ],
   UserController.createUser,
 );
+
 export default router;
