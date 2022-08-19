@@ -331,7 +331,7 @@ const readTogetherList = async (
 const updatePacker = async (
   client: any,
   packerUpdateDto: PackerUpdateDto,
-): Promise<OnlyTogetherListResponseDto | null | string> => {
+): Promise<OnlyTogetherListResponseDto | string> => {
   try {
     const { rows: existList } = await client.query(
       `
