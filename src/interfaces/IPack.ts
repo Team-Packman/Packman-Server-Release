@@ -1,7 +1,9 @@
-export interface PackCreateDto {
+export interface PackUpdateDto {
+  id: string;
   name: string;
-  categoryId: string;
+  isChecked: boolean;
   listId: string;
+  categoryId: string;
 }
 
 export interface PackResponseDto {

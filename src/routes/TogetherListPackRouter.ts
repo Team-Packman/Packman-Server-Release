@@ -9,4 +9,17 @@ router.post(
   [body('name').notEmpty(), body('categoryId').notEmpty(), body('listId').notEmpty()],
   TogetherListPackController.createPack,
 );
+
+router.patch(
+  '/',
+  [
+    body('id').notEmpty(),
+    body('name').notEmpty(),
+    body('isChecked').notEmpty(),
+    body('listId').notEmpty(),
+    body('categoryId').notEmpty(),
+  ],
+  TogetherListPackController.updatePack,
+);
+
 export default router;
