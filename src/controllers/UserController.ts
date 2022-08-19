@@ -2,29 +2,41 @@ import { Request, Response } from 'express';
 import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
+import { validationResult } from 'express-validator';
 import UserService from '../services/UserService';
+import { UserCreateDto } from '../interfaces/IUser';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const db = require('../loaders/db');
 
 /**
- *  @route POST /user
+ *  @route POST /user/profile
  *  @desc create user
  *  @access public
  **/
 const createUser = async (req: Request, res: Response) => {
   let client;
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res
+      .status(statusCode.BAD_REQUEST)
+      .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
+  }
+
+  const userCreateDto: UserCreateDto = req.body;
 
   try {
     client = await db.connect(req);
 
-    const email: string = req.body.email;
-    const nickname: string = req.body.nickname;
-    const profileImage: number = req.body.profileImage;
-    const name: string = req.body.name;
+    const data = await UserService.createUser(client, userCreateDto);
 
-    await UserService.createUser(client, email, nickname, name, profileImage);
-
-    res.status(statusCode.OK).send(util.success(statusCode.OK, message.SUCCESS_CREATE_USER));
+    if (data === 'exceed_len')
+      res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
+    else
+      res
+        .status(statusCode.OK)
+        .send(util.success(statusCode.OK, message.SUCCESS_CREATE_USER, data));
   } catch (error) {
     console.log(error);
     res
