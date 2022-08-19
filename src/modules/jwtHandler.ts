@@ -9,7 +9,7 @@ const getToken = (userId: number): string => {
     },
   };
 
-  const accessToken: string = jwt.sign(payload, '' + config.jwtSecret, { expiresIn: '10d' });
+  const accessToken: string = jwt.sign(payload, '' + config.jwtSecret, { expiresIn: '15d' });
 
   return accessToken;
 };

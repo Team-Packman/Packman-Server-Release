@@ -10,4 +10,6 @@ router.post(
   Auth,
   TogetherListController.createTogetherList,
 );
+router.post('/add-member', [body('listId').notEmpty()], TogetherListController.addMember);
+
 export default router;
