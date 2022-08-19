@@ -1,4 +1,4 @@
-import { PackCreateDto, PackUpdateDto, PackResponseDto } from '../interfaces/IPack';
+import { PackCreateDto, PackUpdateDto, PackDeleteDto, PackResponseDto } from '../interfaces/IPack';
 
 const createPack = async (
   client: any,
@@ -276,7 +276,6 @@ const deletePack = async (
     throw error;
   }
 };
-
 
 export default {
   createPack,
