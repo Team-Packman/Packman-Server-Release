@@ -1,10 +1,12 @@
 const message = {
-  NULL_VALUE: '필요한 값이 없습니다.',
+  NULL_VALUE: '필요한 값이 없습니다',
   NOT_FOUND: '존재하지 않는 자원',
   BAD_REQUEST: '잘못된 요청',
   INTERNAL_SERVER_ERROR: '서버 내부 오류',
   INVALID_PARAMS: '유효하지 않은 파라미터 입니다',
-  NO_DATA: '존재하지 않는 data입니다',
+
+  // 글자수 초과
+  EXCEED_LENGTH: '제한된 글자수를 초과하였습니다',
 
   // 토큰 관련
   NULL_VALUE_TOKEN: '토큰이 없습니다',
@@ -32,7 +34,8 @@ const message = {
   SUCCESS_GET_RECENT_CREATED_LIST: '최근 생성된 리스트 조회 성공',
 
   //패킹리스트 공통
-  NO_PACKINGLIST: '존재하지 않는 PackingList입니다',
+  NO_PACKINGLIST: '존재하지 않는 패킹리스트입니다',
+  NO_USER_LIST: '유저가 생성한 리스트가 없습니다',
   DUPLICATION_PACKINGLIST: '중복된 리스트 이름입니다',
   NO_UPDATEDTITLE: '존재하지 않는 UpdatedTitle입니다',
   NO_UPDATEDDATE: '존재하지 않는 UpdatedDepartureDate입니다',
@@ -64,9 +67,14 @@ const message = {
   DELETE_TOGETHERPACKINGLIST_SUCCESS: '폴더 속 함께 패킹리스트 삭제 성공',
   UPDATE_PACKER_SUCCESS: '함께 패킹리스트 담당자 배정 성공',
 
+  // 짐
+  NO_PACK: '존재하지 않는 짐입니다',
+  NO_CATEGORY_PACK: '카테고리에 해당하는 짐이 아닙니다',
+
   // 카테고리
-  NO_CATEGORY: '존재하지 않는 Category입니다',
-  NO_LIST_CATEGORY: '리스트에 존재하지 않는 Category입니다',
+  NO_CATEGORY: '존재하지 않는 카테고리입니다',
+  NO_LIST_CATEGORY: '리스트에 존재하지 않는 카테고리입니다',
+  DUPLICATED_CATEGORY: '중복된 카테고리 명입니다',
 
   //템플릿
   NO_TEMPLATE: '존재하지 않는 Template입니다',
@@ -76,9 +84,10 @@ const message = {
   // 초대 코드 관련
   SUCCESS_INVITE_TOGETHER_PACKING: '함께 패킹리스트 초대 성공',
   READ_DETAILEDTEMPLTATE_SUCCESS: '템플릿 상세조회 성공',
-
+  SUCCESS_ADD_MEMBER: '그룹원 추가 성공',
   // 멤버
   SUCCESS_GET_MEMBERS: '멤버 조회 성공',
+  ALREADY_EXIST_MEMBER: '이미 추가된 멤버입니다',
 };
 
 export default message;

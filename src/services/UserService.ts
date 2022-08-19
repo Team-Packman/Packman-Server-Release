@@ -1,13 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const convertSnakeToCamel = require('../modules/convertSnakeToCamel');
-
-const createUser = async (
-  client: any,
-  email: string,
-  nickname: string,
-  name: string,
-  profile_image: number,
-) => {
+const createUser = async (client: any, email: string, nickname: string, profile_image: number) => {
   const { rows } = await client.query(
     `
     INSERT INTO "user" (email, nickname, profile_image, name, is_deleted)
