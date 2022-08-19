@@ -11,6 +11,12 @@ router.post(
   TogetherListController.createTogetherList,
 );
 router.get('/:listId', Auth, TogetherListController.readTogetherList);
+router.patch(
+  '/packer',
+  [body('listId').notEmpty(), body('packId').notEmpty(), body('packerId').notEmpty()],
+  Auth,
+  TogetherListController.updatePacker,
+);
 router.post('/add-member', [body('listId').notEmpty()], TogetherListController.addMember);
 
 export default router;

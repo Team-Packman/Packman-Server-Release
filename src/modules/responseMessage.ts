@@ -69,6 +69,7 @@ const message = {
 
   // 짐
   NO_PACK: '존재하지 않는 짐입니다',
+  NO_LIST_PACK: '패킹리스트에 해당하는 짐이 아닙니다',
   NO_CATEGORY_PACK: '카테고리에 해당하는 짐이 아닙니다',
 
   // 카테고리
