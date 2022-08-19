@@ -9,7 +9,7 @@ const getRecentCreatedList = async (
     `
     SELECT *
     FROM "folder" f
-    LEFT JOIN folder_packing_list fpl ON f.id = fpl.folder_id
+    JOIN folder_packing_list fpl ON f.id = fpl.folder_id
     WHERE f.user_id = $1
     `,
     [userId],
