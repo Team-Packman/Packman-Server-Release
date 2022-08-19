@@ -4,6 +4,12 @@ import TogetherListPackController from '../controllers/TogetherListPackControlle
 
 const router = Router();
 
+router.post(
+  '/',
+  [body('name').notEmpty(), body('categoryId').notEmpty(), body('listId').notEmpty()],
+  TogetherListPackController.createPack,
+);
+
 router.patch(
   '/',
   [
@@ -15,4 +21,5 @@ router.patch(
   ],
   TogetherListPackController.updatePack,
 );
+
 export default router;
