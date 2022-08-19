@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 import { TogetherListController } from '../controllers';
-
-const router: Router = Router();
+import Auth from '../middlewares/Auth';
+const router = Router();
 
 router.post(
-  '/add-member',
-  [body('listId').notEmpty()],
-  TogetherListController.addMember
+  '/',
+  [body('departureDate').notEmpty(), body('folderId').notEmpty(), body('title').notEmpty()],
+  Auth,
+  TogetherListController.createTogetherList,
 );
+router.post('/add-member', [body('listId').notEmpty()], TogetherListController.addMember);
 
 export default router;
