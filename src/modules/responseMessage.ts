@@ -88,9 +88,6 @@ const message = {
   // 멤버
   SUCCESS_GET_MEMBERS: '멤버 조회 성공',
   ALREADY_EXIST_MEMBER: '이미 추가된 멤버입니다',
-
-  // 글자수 초과
-  EXCEED_LENGTH: '제한된 글자수를 초과하였습니다'
 };
 
 export default message;

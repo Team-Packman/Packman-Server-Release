@@ -20,8 +20,9 @@ const createUser = async (req: Request, res: Response) => {
     const email: string = req.body.email;
     const nickname: string = req.body.nickname;
     const profileImage: number = req.body.profileImage;
+    const name: string = req.body.name;
 
-    await UserService.createUser(client, email, nickname, profileImage);
+    await UserService.createUser(client, email, nickname, name, profileImage);
 
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.SUCCESS_CREATE_USER));
   } catch (error) {

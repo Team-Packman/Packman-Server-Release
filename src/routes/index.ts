@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import UserRouter from './UserRouter';
+import AuthRouter from './AuthRouter';
 import TogetherListCategoryRouter from './TogetherListCategoryRouter';
 import TogetherListRouter from './TogetherListRouter';
 import ListRouter from './ListRouter';
@@ -9,6 +10,7 @@ import FolderRouter from './FolderRouter';
 const router = Router();
 
 router.use('/user', UserRouter);
+router.use('/auth', AuthRouter);
 router.use('/list', ListRouter);
 router.use('/list/together/category', TogetherListCategoryRouter);
 router.use('/list/together', TogetherListRouter);
