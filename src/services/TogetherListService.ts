@@ -179,12 +179,13 @@ const readTogetherList = async (
     const { rows: existList } = await client.query(
       `
       SELECT *
-      FROM "together_alone_packing_list" l
-      WHERE l.id=$1
+      FROM "together_alone_packing_list" as l
+      JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
+      WHERE l.id=$1 AND p.is_deleted=false
       `,
       [listId],
     );
-    if (existList.length === 0) return 'no_list';
+    if (existList.length < 2) return 'no_list';
 
     const { rows: etcDataArray } = await client.query(
       `
