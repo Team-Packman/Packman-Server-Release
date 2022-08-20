@@ -1,11 +1,11 @@
-import { AloneListCategoryResponseDto } from '../interfaces/IAloneListCategory';
+import { AloneCategoryResponseDto } from '../interfaces/ICategory';
 
 async function aloneCategoryResponse(
   client: any,
   aloneListId: string,
-): Promise<AloneListCategoryResponseDto> {
+): Promise<AloneCategoryResponseDto[]> {
   try {
-    const { rows } = await client.query(
+    const { rows: category } = await client.query(
       `
       SELECT c.id::text, c.name,	COALESCE(json_agg(json_build_object(
           'id', p.id::text,
@@ -22,7 +22,6 @@ async function aloneCategoryResponse(
       `,
       [aloneListId],
     );
-    const category: AloneListCategoryResponseDto = { category: rows };
 
     return category;
   } catch (error) {

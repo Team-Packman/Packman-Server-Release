@@ -1,13 +1,13 @@
-import { TogetherListCategoryResponseDto } from '../interfaces/ITogetherListCategory';
+import { TogetherCategoryResponseDto } from '../interfaces/ICategory';
 
 async function togetherCategoryResponse(
   client: any,
   togetherListId: string,
-): Promise<TogetherListCategoryResponseDto> {
+): Promise<TogetherCategoryResponseDto[]> {
   try {
-    const { rows } = await client.query(
+    const { rows: category } = await client.query(
       ` 
-      SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
+      SELECT c.id::text, c.name, COALESCE(JSON_AGG(json_build_object(
           'id', p.id::text,
           'name', p.name, 
           'isChecked', p.is_checked, 
@@ -24,7 +24,6 @@ async function togetherCategoryResponse(
       `,
       [togetherListId],
     );
-    const category: TogetherListCategoryResponseDto = { category: rows };
 
     return category;
   } catch (error) {
