@@ -24,7 +24,7 @@ async function togetherCategoryResponse(
       `,
       [togetherListId],
     );
-    const category: TogetherListCategoryResponseDto = rows;
+    const category: TogetherListCategoryResponseDto = { category: rows };
 
     return category;
   } catch (error) {
