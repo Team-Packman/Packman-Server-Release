@@ -214,13 +214,12 @@ const readTogetherList = async (
     const { rows: existList } = await client.query(
       `
       SELECT *
-      FROM "together_alone_packing_list" as l
-      JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
-      WHERE l.id=$1 AND p.is_deleted=false
+      FROM "together_alone_packing_list" l
+      WHERE l.id=$1
       `,
       [listId],
     );
-    if (existList.length < 2) return 'no_list';
+    if (existList.length === 0) return 'no_list';
 
     const { rows: etcDataArray } = await client.query(
       `
@@ -280,7 +279,7 @@ const readTogetherList = async (
       SELECT g.id::text AS "id",
         COALESCE(json_agg(json_build_object(
             'id', u.id::text,
-            'name', u.nickname,
+            'nickname', u.nickname,
             'profileImage',u.profile_image
             ) ORDER BY ug.id) FILTER(WHERE u.id IS NOT NULL AND u.is_deleted=false),'[]') AS "member"
       FROM "user_group" ug
@@ -331,7 +330,7 @@ const readTogetherList = async (
 const updatePacker = async (
   client: any,
   packerUpdateDto: PackerUpdateDto,
-): Promise<OnlyTogetherListResponseDto | null | string> => {
+): Promise<OnlyTogetherListResponseDto | string> => {
   try {
     const { rows: existList } = await client.query(
       `

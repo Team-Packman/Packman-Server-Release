@@ -10,10 +10,10 @@ const createUser = async (
 
     const { rows } = await client.query(
       `
-    INSERT INTO "user" (email, name, nickname, profile_image)
-    VALUES ($1, $2, $3, $4)
-    RETURNING id, nickname, email, profile_image
-    `,
+      INSERT INTO "user" (email, name, nickname, profile_image)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, nickname, email, profile_image
+      `,
       [userCreateDto.email, userCreateDto.name, userCreateDto.nickname, userCreateDto.profileImage],
     );
 
