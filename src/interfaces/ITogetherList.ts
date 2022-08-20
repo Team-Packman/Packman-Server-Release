@@ -12,60 +12,74 @@ export interface TogetherListResponseDto {
   togetherPackingList: {
     id: string;
     groupId: string;
-    category: {
-      id: string;
-      name: string;
-      pack: {
+    category: [
+      {
         id: string;
         name: string;
-        isChecked: boolean;
-        packer: {
-          id: string;
-          nickname: string;
-        } | null;
-      }[];
-    }[];
+        pack: [
+          {
+            id: string;
+            name: string;
+            isChecked: boolean;
+            packer: {
+              id: string;
+              nickname: string;
+            };
+          },
+        ];
+      },
+    ];
     inviteCode: string;
     isSaved: boolean;
   };
   myPackingList: {
     id: string;
-    category: {
-      id: string;
-      name: string;
-      pack: {
+    category: [
+      {
         id: string;
         name: string;
-        isChecked: boolean;
-        packer: null;
-      }[];
-    }[];
+        pack: [
+          {
+            id: string;
+            name: string;
+            isChecked: boolean;
+            packer: null;
+          },
+        ];
+      },
+    ];
   };
   group?: {
     id: string;
-    member: {
-      id: string;
-      nickname: string;
-      profileImage: string;
-    }[];
+    member: [
+      {
+        id: string;
+        nickname: string;
+        profileImage: string;
+      },
+    ];
   };
   isMember?: boolean;
 }
 export interface OnlyTogetherListResponseDto {
   id: string;
-  category: {
-    id: string;
-    name: string;
-    pack: {
+  category: [
+    {
       id: string;
       name: string;
-      isChecked: boolean;
-      packer: {
-        id: string;
-        nickname: string;
-      } | null;
-    }[];
-  }[];
+      pack: [
+        {
+          id: string;
+          name: string;
+          isChecked: boolean;
+          packer: {
+            id: string;
+            nickname: string;
+          };
+        },
+      ];
+    },
+  ];
 }
 
 export interface PackerUpdateDto {

@@ -3,7 +3,7 @@ import { AloneListCategoryResponseDto } from '../interfaces/IAloneListCategory';
 async function aloneCategoryResponse(
   client: any,
   aloneListId: string,
-): Promise<AloneListCategoryResponseDto | null> {
+): Promise<AloneListCategoryResponseDto> {
   try {
     const { rows } = await client.query(
       `

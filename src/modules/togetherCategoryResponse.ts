@@ -3,7 +3,7 @@ import { TogetherListCategoryResponseDto } from '../interfaces/ITogetherListCate
 async function togetherCategoryResponse(
   client: any,
   togetherListId: string,
-): Promise<TogetherListCategoryResponseDto | null> {
+): Promise<TogetherListCategoryResponseDto> {
   try {
     const { rows } = await client.query(
       ` 
