@@ -6,3 +6,8 @@ export interface RecentCreatedListResponseDto {
   packRemainNum: number;
   url: string;
 }
+
+export interface ListInviteResponseDto {
+  id: string;
+  title: string;
+}
