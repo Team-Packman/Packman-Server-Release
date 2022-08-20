@@ -1,5 +1,6 @@
 import { RecentCreatedListResponseDto } from '../interfaces/IList';
 import dayjs from 'dayjs';
+import { FolderResponseDto } from '../interfaces/IFolder';
 
 const getRecentCreatedList = async (
   client: any,
@@ -75,10 +76,29 @@ const getRecentCreatedList = async (
     packRemainNum: recentList[0].remain,
     url: url,
   };
+  return data;
+};
+
+const getTogetherFolders = async (
+  client: any,
+  userId: string,
+): Promise<FolderResponseDto[] | string> => {
+  const { rows: togetherFolders } = await client.query(
+    `
+    SELECT f.id, f.name
+    FROM "folder" f
+    WHERE f.user_id = $1 and f.is_aloned = false
+    ORDER BY f.id
+    `,
+    [userId],
+  );
+
+  const data: FolderResponseDto[] = togetherFolders;
 
   return data;
 };
 
 export default {
   getRecentCreatedList,
+  getTogetherFolders,
 };
