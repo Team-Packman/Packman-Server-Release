@@ -1,8 +1,8 @@
 import {
-  OnlyTogetherListResponseDto,
   PackerUpdateDto,
   TogetherListCreateDto,
   TogetherListResponseDto,
+  TogetherListCategoryResponseDto,
 } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
@@ -143,8 +143,8 @@ const createTogetherList = async (
     );
     const etcData = etcDataArray[0];
 
-    const togetherListCategoryArray = await togetherCategoryResponse(client, togetherListId);
-    const myListCategoryArray = await aloneCategoryResponse(client, myListId);
+    const togetherCategory = await togetherCategoryResponse(client, togetherListId);
+    const myListCategory = await aloneCategoryResponse(client, myListId);
 
     const data: TogetherListResponseDto = {
       id: togetherMyId.toString(),
@@ -153,13 +153,13 @@ const createTogetherList = async (
       togetherPackingList: {
         id: togetherListId.toString(),
         groupId: etcData.groupId.toString(),
-        category: togetherListCategoryArray.category,
+        category: togetherCategory,
         inviteCode: etcData.inviteCode,
         isSaved: etcData.isSaved,
       },
       myPackingList: {
         id: myListId.toString(),
-        category: myListCategoryArray.category,
+        category: myListCategory,
       },
     };
 
@@ -199,45 +199,8 @@ const readTogetherList = async (
     );
     const etcData = etcDataArray[0];
 
-    const { rows: togetherListCategoryArray } = await client.query(
-      `
-      SELECT c.id::text AS "id", c.name AS "name",
-        COALESCE(json_agg(json_build_object(
-          'id', p.id::text,
-          'name', p.name,
-          'isChecked', p.is_checked,
-          'packer',
-          CASE
-              WHEN p.packer_id IS NULL THEN NULL
-              ELSE json_build_object('id', u.id::text, 'nickname', u.nickname )
-          END) ORDER BY p.id) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
-      FROM "category" c
-      LEFT JOIN "pack" p ON c.id = p.category_id
-      LEFT JOIN "user" u ON p.packer_id = u.id
-      WHERE c.list_id=$1
-      GROUP BY c.id
-      ORDER BY c.id
-      `,
-      [etcData.togetherListId],
-    );
-
-    const { rows: myListCategoryArray } = await client.query(
-      `
-      SELECT c.id::text AS "id", c.name AS "name",
-        COALESCE(json_agg(json_build_object(
-          'id', p.id::text,
-          'name', p.name,
-          'isChecked', p.is_checked,
-          'packer', NULL
-      ) ORDER BY p.id) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
-      FROM "category" c
-      LEFT JOIN "pack" p ON c.id = p.category_id
-      WHERE c.list_id=$1
-      GROUP BY c.id
-      ORDER BY c.id
-      `,
-      [etcData.myListId],
-    );
+    const togetherCategory = await togetherCategoryResponse(client, etcData.togetherListId);
+    const myCategory = await aloneCategoryResponse(client, etcData.myListId);
 
     const { rows: groupInfo } = await client.query(
       `
@@ -273,13 +236,13 @@ const readTogetherList = async (
       togetherPackingList: {
         id: etcData.togetherListId,
         groupId: etcData.groupId,
-        category: togetherListCategoryArray,
+        category: togetherCategory,
         inviteCode: etcData.inviteCode,
         isSaved: etcData.isSaved,
       },
       myPackingList: {
         id: etcData.myListId,
-        category: myListCategoryArray,
+        category: myCategory,
       },
       group: groupInfo,
       isMember: isMember[0].exists,
@@ -295,7 +258,7 @@ const readTogetherList = async (
 const updatePacker = async (
   client: any,
   packerUpdateDto: PackerUpdateDto,
-): Promise<OnlyTogetherListResponseDto | string> => {
+): Promise<TogetherListCategoryResponseDto | string> => {
   try {
     const { rows: existList } = await client.query(
       `
@@ -338,31 +301,11 @@ const updatePacker = async (
       [packerUpdateDto.packerId, packerUpdateDto.packId],
     );
 
-    const { rows: togetherListCategoryArray } = await client.query(
-      `
-      SELECT c.id::text AS "id", c.name AS "name",
-        COALESCE(json_agg(json_build_object(
-          'id', p.id::text,
-          'name', p.name,
-          'isChecked', p.is_checked,
-          'packer',
-          CASE
-              WHEN p.packer_id IS NULL THEN NULL
-              ELSE json_build_object('id', u.id::text, 'nickname', u.nickname )
-          END) ORDER BY p.id) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
-      FROM "category" c
-      LEFT JOIN "pack" p ON c.id = p.category_id
-      LEFT JOIN "user" u ON p.packer_id = u.id
-      WHERE c.list_id=$1
-      GROUP BY c.id
-      ORDER BY c.id
-      `,
-      [packerUpdateDto.listId],
-    );
+    const togetherCategory = await togetherCategoryResponse(client, packerUpdateDto.listId);
 
-    const data: OnlyTogetherListResponseDto = {
+    const data: TogetherListCategoryResponseDto = {
       id: packerUpdateDto.listId,
-      category: togetherListCategoryArray,
+      category: togetherCategory,
     };
 
     return data;

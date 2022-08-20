@@ -1,5 +1,6 @@
 import { CategoryCreateDto, CategoryDeleteDto, CategoryUpdateDto } from '../interfaces/ICategory';
-import { TogetherListCategoryResponseDto } from '../interfaces/ITogetherListCategory';
+import { TogetherListCategoryResponseDto } from '../interfaces/ITogetherList';
+import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
 
 const createCategory = async (
   client: any,
@@ -41,32 +42,14 @@ const createCategory = async (
       [categoryCreateDto.listId, categoryCreateDto.name],
     );
 
-    const { rows: categorys } = await client.query(
-      `
-    SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
-        'id', p.id::text,
-        'name', p.name, 
-        'isChecked', p.is_checked, 
-        'packer', 
-        CASE WHEN (u.id IS NOT NULL) THEN json_build_object('id', u.id::text, 'nickname', u.nickname)
-        END) ORDER BY p.id
-      ) FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
-    FROM "category" as c 
-    LEFT JOIN "pack" as p ON c.id = p.category_id
-    LEFT JOIN "user" as u ON u.id = p.packer_id
-    WHERE c.list_id = $1
-    GROUP BY c.id
-    ORDER BY c.id
-    `,
-      [categoryCreateDto.listId],
-    );
+    const category = await togetherCategoryResponse(client, categoryCreateDto.listId);
 
-    const categoryResponseDto: TogetherListCategoryResponseDto = {
+    const togetherListCategoryResponseDto: TogetherListCategoryResponseDto = {
       id: categoryCreateDto.listId,
-      category: categorys,
+      category: category,
     };
 
-    return categoryResponseDto;
+    return togetherListCategoryResponseDto;
   } catch (error) {
     console.log(error);
     throw error;
@@ -134,32 +117,14 @@ const updateCategory = async (
       [categoryUpdateDto.id, categoryUpdateDto.name],
     );
 
-    const { rows: categorys } = await client.query(
-      `
-    SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
-        'id', p.id::text,
-        'name', p.name, 
-        'isChecked', p.is_checked, 
-        'packer', 
-        CASE WHEN (u.id IS NOT NULL) THEN json_build_object('id', u.id::text, 'nickname', u.nickname)
-        END) ORDER BY p.id
-      ) FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
-    FROM "category" as c 
-    LEFT JOIN "pack" as p ON c.id = p.category_id
-    LEFT JOIN "user" as u ON u.id = p.packer_id
-    WHERE c.list_id = $1
-    GROUP BY c.id
-    ORDER BY c.id
-    `,
-      [categoryUpdateDto.listId],
-    );
+    const category = await togetherCategoryResponse(client, categoryUpdateDto.listId);
 
-    const categoryResponseDto: TogetherListCategoryResponseDto = {
+    const togetherListResponseDto: TogetherListCategoryResponseDto = {
       id: categoryUpdateDto.listId,
-      category: categorys,
+      category: category,
     };
 
-    return categoryResponseDto;
+    return togetherListResponseDto;
   } catch (error) {
     console.log(error);
     throw error;
@@ -206,32 +171,14 @@ const deleteCategory = async (
       [categoryDeleteDto.categoryId, categoryDeleteDto.listId],
     );
 
-    const { rows: categorys } = await client.query(
-      `
-    SELECT c.id::text, c.name,  COALESCE(JSON_AGG(json_build_object(
-        'id', p.id::text,
-        'name', p.name, 
-        'isChecked', p.is_checked, 
-        'packer', 
-        CASE WHEN (u.id IS NOT NULL) THEN json_build_object('id', u.id::text, 'nickname', u.nickname)
-        END) ORDER BY p.id
-      ) FILTER (WHERE p.id IS NOT NULL), '[]') AS pack
-    FROM "category" as c 
-    LEFT JOIN "pack" as p ON c.id = p.category_id
-    LEFT JOIN "user" as u ON u.id = p.packer_id
-    WHERE c.list_id = $1
-    GROUP BY c.id
-    ORDER BY c.id
-    `,
-      [categoryDeleteDto.listId],
-    );
+    const category = await togetherCategoryResponse(client, categoryDeleteDto.listId);
 
-    const categoryResponseDto: TogetherListCategoryResponseDto = {
+    const togetherListCategoryResponseDto: TogetherListCategoryResponseDto = {
       id: categoryDeleteDto.listId,
-      category: categorys,
+      category: category,
     };
 
-    return categoryResponseDto;
+    return togetherListCategoryResponseDto;
   } catch (error) {
     console.log(error);
     throw error;
