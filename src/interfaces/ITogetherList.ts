@@ -1,10 +1,12 @@
+import { AloneListCategoryResponseDto } from './IAloneList';
+import { TogetherCategoryResponseDto } from './ICategory';
+
 export interface TogetherListCreateDto {
   departureDate: string;
   folderId: string;
   title: string;
   templateId: string;
 }
-
 export interface TogetherListResponseDto {
   id: string;
   title: string;
@@ -12,43 +14,11 @@ export interface TogetherListResponseDto {
   togetherPackingList: {
     id: string;
     groupId: string;
-    category: [
-      {
-        id: string;
-        name: string;
-        pack: [
-          {
-            id: string;
-            name: string;
-            isChecked: boolean;
-            packer: {
-              id: string;
-              nickname: string;
-            };
-          },
-        ];
-      },
-    ];
+    category: TogetherCategoryResponseDto[];
     inviteCode: string;
     isSaved: boolean;
   };
-  myPackingList: {
-    id: string;
-    category: [
-      {
-        id: string;
-        name: string;
-        pack: [
-          {
-            id: string;
-            name: string;
-            isChecked: boolean;
-            packer: null;
-          },
-        ];
-      },
-    ];
-  };
+  myPackingList: AloneListCategoryResponseDto;
   group?: {
     id: string;
     member: [
@@ -61,29 +31,13 @@ export interface TogetherListResponseDto {
   };
   isMember?: boolean;
 }
-export interface OnlyTogetherListResponseDto {
-  id: string;
-  category: [
-    {
-      id: string;
-      name: string;
-      pack: [
-        {
-          id: string;
-          name: string;
-          isChecked: boolean;
-          packer: {
-            id: string;
-            nickname: string;
-          };
-        },
-      ];
-    },
-  ];
-}
-
 export interface PackerUpdateDto {
   listId: string;
   packId: string;
   packerId: string;
+}
+
+export interface TogetherListCategoryResponseDto {
+  id: string;
+  category: TogetherCategoryResponseDto[];
 }
