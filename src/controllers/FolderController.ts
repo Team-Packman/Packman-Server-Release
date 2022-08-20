@@ -36,6 +36,34 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @route GET /folder/together
+ *  @desc read togetherFolders
+ *  @access private
+ **/
+const getTogetherFolders = async (req: Request, res: Response) => {
+  let client;
+
+  const userId = '1'; // 추후 소셜 로그인 연결 후 바꾸기
+
+  try {
+    client = await db.connect(req);
+    const data = await FolderService.getTogetherFolders(client, userId);
+
+    res
+      .status(statusCode.OK)
+      .send(util.success(statusCode.OK, message.SUCCESS_GET_TOGETHER_FOLDERS, data));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+};
+
 export default {
   getRecentCreatedList,
+  getTogetherFolders,
 };
