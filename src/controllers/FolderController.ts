@@ -52,7 +52,7 @@ const getAloneFolders = async (req: Request, res: Response) => {
 
     res
       .status(statusCode.OK)
-      .send(util.success(statusCode.OK, message.SUCCESS_GET_ALONE_FOLDERS, data));
+      .send(util.success(statusCode.OK, message.SUCCESS_GET_ALONE_FOLDERS, { aloneFolder: data }));
   } catch (error) {
     console.log(error);
     res
