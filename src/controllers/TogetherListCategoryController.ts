@@ -5,16 +5,13 @@ import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import { CategoryCreateDto, CategoryDeleteDto, CategoryUpdateDto } from '../interfaces/ICategory';
 import { TogetherListCategoryService } from '../services';
-import config from '../config';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const db = require('../loaders/db');
+import db from '../loaders/db';
 
 /**
  *  @route POST /category
  *  @desc create category
  *  @access private
  **/
-
 const createCategory = async (req: Request, res: Response) => {
   const error = validationResult(req);
   if (!error.isEmpty()) {
@@ -61,7 +58,6 @@ const createCategory = async (req: Request, res: Response) => {
  *  @desc update category
  *  @access private
  **/
-
 const updateCategory = async (req: Request, res: Response) => {
   const error = validationResult(req);
   if (!error.isEmpty()) {
@@ -114,7 +110,6 @@ const updateCategory = async (req: Request, res: Response) => {
  *  @desc delete category
  *  @access private
  **/
-
 const deleteCategory = async (req: Request, res: Response) => {
   let client;
   const { listId, categoryId } = req.params;

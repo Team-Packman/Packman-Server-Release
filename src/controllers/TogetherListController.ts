@@ -5,8 +5,7 @@ import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import { PackerUpdateDto, TogetherListCreateDto } from '../interfaces/ITogetherList';
 import TogetherListService from '../services/TogetherListService';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const db = require('../loaders/db');
+import db from '../loaders/db';
 
 /**
  *  @route POST /list/together

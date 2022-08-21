@@ -3,16 +3,13 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { AuthService } from '../services';
-import jwtHandler from '../modules/jwtHandler';
+import db from '../loaders/db';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const db = require('../loaders/db');
 /**
  *  @route POST /auth/kakao
  *  @desc get kakao user
  *  @access public
  **/
-
 const getKakaoUser = async (req: Request, res: Response) => {
   let client;
   const token = req.body.accessToken;
@@ -46,7 +43,6 @@ const getKakaoUser = async (req: Request, res: Response) => {
  *  @desc get new token
  *  @access private
  **/
-
 const getNewToken = async (req: Request, res: Response) => {
   let client;
   const accessToken = req.headers['authorization']?.split(' ').reverse()[0] as string;
@@ -92,7 +88,7 @@ const getNewToken = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 

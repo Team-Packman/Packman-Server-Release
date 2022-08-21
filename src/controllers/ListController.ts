@@ -4,15 +4,13 @@ import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import { ListService } from '../services';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const db = require('../loaders/db');
+import db from '../loaders/db';
 
 /**
  *  @route GET /invite/:inviteCode
  *  @desc invite packing list
  *  @access private
  **/
-
 const inviteList = async (req: Request, res: Response) => {
   let client;
 
