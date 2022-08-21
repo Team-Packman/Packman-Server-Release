@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import TogetherListCategoryController from '../controllers/TogetherListCategoryController';
+import { TogetherListCategoryController } from '../controllers';
 
 const router: Router = Router();
 
