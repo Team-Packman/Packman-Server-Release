@@ -113,6 +113,7 @@ const updateCategory = async (req: Request, res: Response) => {
 const deleteCategory = async (req: Request, res: Response) => {
   let client;
   const { listId, categoryId } = req.params;
+
   const categoryDeleteDto: CategoryDeleteDto = {
     listId: listId,
     categoryId: categoryId,
