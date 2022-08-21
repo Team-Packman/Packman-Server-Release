@@ -79,10 +79,7 @@ const getRecentCreatedList = async (
   return data;
 };
 
-const getTogetherFolders = async (
-  client: any,
-  userId: string,
-): Promise<FolderResponseDto[] | string> => {
+const getTogetherFolders = async (client: any, userId: string): Promise<FolderResponseDto[]> => {
   try {
     const { rows: togetherFolders } = await client.query(
       `
