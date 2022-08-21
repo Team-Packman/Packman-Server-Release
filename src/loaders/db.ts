@@ -82,6 +82,6 @@ const connect = async (req: any) => {
   return client;
 };
 
-module.exports = {
+export default {
   connect,
 };
