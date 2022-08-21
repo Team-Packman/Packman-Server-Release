@@ -84,7 +84,7 @@ const getAloneFolders = async (client: any, userId: string): Promise<FolderRespo
   try {
     const { rows: aloneFolders } = await client.query(
       `
-      SELECT f.id, f.name
+      SELECT f.id::text, f.name
       FROM "folder" f
       WHERE f.user_id = $1 and f.is_aloned = true
       ORDER BY f.id
