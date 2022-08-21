@@ -50,9 +50,11 @@ const getTogetherFolders = async (req: Request, res: Response) => {
     client = await db.connect(req);
     const data = await FolderService.getTogetherFolders(client, userId);
 
-    res
-      .status(statusCode.OK)
-      .send(util.success(statusCode.OK, message.SUCCESS_GET_TOGETHER_FOLDERS, data));
+    res.status(statusCode.OK).send(
+      util.success(statusCode.OK, message.SUCCESS_GET_TOGETHER_FOLDERS, {
+        togetherFolder: data,
+      }),
+    );
   } catch (error) {
     console.log(error);
     res
