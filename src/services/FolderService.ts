@@ -80,10 +80,7 @@ const getRecentCreatedList = async (
   return data;
 };
 
-const getAloneFolders = async (
-  client: any,
-  userId: string,
-): Promise<FolderResponseDto[] | string> => {
+const getAloneFolders = async (client: any, userId: string): Promise<FolderResponseDto[]> => {
   try {
     const { rows: aloneFolders } = await client.query(
       `
