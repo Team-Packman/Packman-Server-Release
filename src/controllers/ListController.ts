@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
-import { validationResult } from 'express-validator';
 import { ListService } from '../services';
 import db from '../loaders/db';
 
@@ -14,12 +13,6 @@ import db from '../loaders/db';
 const inviteList = async (req: Request, res: Response) => {
   let client;
 
-  const error = validationResult(req);
-  if (!error.isEmpty()) {
-    return res
-      .status(statusCode.BAD_REQUEST)
-      .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
-  }
   const inviteCode = req.params.inviteCode;
   try {
     client = await db.connect(req);
