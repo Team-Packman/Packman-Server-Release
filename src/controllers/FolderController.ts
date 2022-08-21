@@ -12,8 +12,7 @@ import db from '../loaders/db';
  **/
 const getRecentCreatedList = async (req: Request, res: Response) => {
   let client;
-
-  const userId = '1'; // 추후 소셜 로그인 연결 후 바꾸기
+  const userId = req.body.user.id;
 
   try {
     client = await db.connect(req);

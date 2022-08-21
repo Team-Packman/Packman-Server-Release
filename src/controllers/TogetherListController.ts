@@ -144,9 +144,10 @@ const addMember = async (req: Request, res: Response) => {
 
   let client;
   const listId = req.body.listId;
+  const userId = req.body.user.id;
   try {
     client = await db.connect(req);
-    const data = await TogetherListService.addMember(client, listId, '2'); // "4"는 user_id, 토큰 관련해서 생성되면 req.body.user로 받아올거
+    const data = await TogetherListService.addMember(client, listId, userId);
     if (data === 'no_list') {
       res
         .status(statusCode.NOT_FOUND)
