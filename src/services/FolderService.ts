@@ -79,6 +79,64 @@ const getRecentCreatedList = async (
   return data;
 };
 
+import { AllFolderResponseDto, FolderCreateDto, FolderInfoDto } from '../interfaces/IFolder';
+
+const createFolder = async (
+  client: any,
+  userId: string,
+  folderCreateDto: FolderCreateDto,
+): Promise<AllFolderResponseDto | string> => {
+  try {
+    if (folderCreateDto.name.length > 12) return 'exceed_len';
+
+    const { rows: newFolder } = await client.query(
+      `
+      INSERT INTO "folder" (user_id, name, is_aloned)
+      VALUES ($1, $2, $3)
+    `,
+      [userId, folderCreateDto.name, folderCreateDto.isAloned],
+    );
+
+    const { rows: folders } = await client.query(
+      `
+        SELECT  f.id::text,f.name, f.is_aloned AS "isAloned",COUNT(al.id) AS "listNum"
+        FROM (
+                SELECT * 
+                FROM "folder" 
+                WHERE user_id = $1
+                ) AS f
+        LEFT JOIN "folder_packing_list" as fl ON f.id = fl.folder_id
+        LEFT JOIN "packing_list" as pl ON pl.id = fl.list_id AND pl.is_deleted = false
+        LEFT JOIN "alone_packing_list" as al ON al.id = fl.list_id
+        GROUP BY f.id, f.name, f.is_aloned
+        ORDER BY f.id DESC
+        `,
+      [userId],
+    );
+
+    const aloneFolder: FolderInfoDto[] = [];
+    const togetherFolder: FolderInfoDto[] = [];
+    for await (const folder of folders) {
+      if (folder.isAloned) {
+        aloneFolder.push(folder);
+      } else {
+        togetherFolder.push(folder);
+      }
+    }
+
+    const data: AllFolderResponseDto = {
+      aloneFolder: aloneFolder,
+      togetherFolder: togetherFolder,
+    };
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export default {
   getRecentCreatedList,
+  createFolder,
 };
