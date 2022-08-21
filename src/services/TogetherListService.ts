@@ -6,6 +6,7 @@ import {
 } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
+import { nanoid } from 'nanoid';
 
 const createTogetherList = async (
   client: any,
@@ -13,8 +14,7 @@ const createTogetherList = async (
   togetherListCreateDto: TogetherListCreateDto,
 ): Promise<TogetherListResponseDto | string> => {
   try {
-    //테스트 위해 invite code 더미로 넣어 둠
-    const inviteCode = '1249';
+    const inviteCode = nanoid(5);
 
     if (togetherListCreateDto.title.length > 12) return 'exceed_len';
 
