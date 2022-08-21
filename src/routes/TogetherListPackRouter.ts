@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import TogetherListPackController from '../controllers/TogetherListPackController';
+import { TogetherListPackController } from '../controllers';
 
 const router = Router();
 
