@@ -293,6 +293,16 @@ const updatePacker = async (
     );
     if (existListPack.length === 0) return 'no_list_pack';
 
+    const { rows: existUser } = await client.query(
+      `
+      SELECT *
+      FROM "user" u
+      WHERE u.id=$1 AND u.is_deleted = false
+    `,
+      [packerUpdateDto.packerId],
+    );
+    if (existUser.length === 0) return 'no_user';
+
     await client.query(
       `
       UPDATE "pack"

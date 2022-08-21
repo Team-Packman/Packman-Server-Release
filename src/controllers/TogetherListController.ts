@@ -115,6 +115,8 @@ const updatePacker = async (req: Request, res: Response) => {
       res
         .status(statusCode.NOT_FOUND)
         .send(util.success(statusCode.NOT_FOUND, message.NO_LIST_PACK));
+    else if (data === 'no_user')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_USER));
     else
       res
         .status(statusCode.OK)
