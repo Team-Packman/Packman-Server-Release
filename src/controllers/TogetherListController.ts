@@ -48,7 +48,7 @@ const createTogetherList = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 
@@ -81,7 +81,7 @@ const readTogetherList = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 
@@ -126,7 +126,7 @@ const updatePacker = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 
@@ -164,7 +164,7 @@ const addMember = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 
