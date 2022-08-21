@@ -4,8 +4,7 @@ import util from '../modules/util';
 import message from '../modules/responseMessage';
 import jwtHandler from '../modules/jwtHandler';
 import { UserService } from '../services';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const db = require('../loaders/db');
+import db from '../loaders/db';
 
 export default async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers['authorization']?.split(' ').reverse()[0];
@@ -47,6 +46,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   } catch (error: any) {
     console.log(error);
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
