@@ -14,6 +14,8 @@ const db = require('../loaders/db');
  **/
 
 const inviteList = async (req: Request, res: Response) => {
+  let client;
+
   const error = validationResult(req);
   if (!error.isEmpty()) {
     return res
@@ -22,7 +24,7 @@ const inviteList = async (req: Request, res: Response) => {
   }
   const inviteCode = req.params.inviteCode;
   try {
-    const client = await db.connect(req);
+    client = await db.connect(req);
     const data = await ListService.getPackingByInviteCode(client, inviteCode);
     if (data === 'no_list') {
       res
