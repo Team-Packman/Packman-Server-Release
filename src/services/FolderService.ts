@@ -83,19 +83,24 @@ const getTogetherFolders = async (
   client: any,
   userId: string,
 ): Promise<FolderResponseDto[] | string> => {
-  const { rows: togetherFolders } = await client.query(
-    `
-    SELECT f.id, f.name
-    FROM "folder" f
-    WHERE f.user_id = $1 and f.is_aloned = false
-    ORDER BY f.id
-    `,
-    [userId],
-  );
+  try {
+    const { rows: togetherFolders } = await client.query(
+      `
+      SELECT f.id, f.name
+      FROM "folder" f
+      WHERE f.user_id = $1 and f.is_aloned = false
+      ORDER BY f.id
+      `,
+      [userId],
+    );
 
-  const data: FolderResponseDto[] = togetherFolders;
+    const data: FolderResponseDto[] = togetherFolders;
 
-  return data;
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
 export default {
