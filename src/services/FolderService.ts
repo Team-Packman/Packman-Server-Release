@@ -20,7 +20,7 @@ const getRecentCreatedList = async (
 
     const { rows: aloneList } = await client.query(
       `
-      SELECT pl.id, apl.is_aloned
+      SELECT pl.id::text, apl.is_aloned
       FROM "folder" f
       LEFT JOIN folder_packing_list fpl ON f.id = fpl.folder_id
       LEFT JOIN packing_list pl ON fpl.list_id = pl.id
@@ -36,7 +36,7 @@ const getRecentCreatedList = async (
     if (aloneList[0].is_aloned === false) {
       const { rows: togetherListId } = await client.query(
         `
-          SELECT tapl.together_packing_list_id AS id
+          SELECT tapl.together_packing_list_id::text AS id
           FROM "together_alone_packing_list" tapl
           WHERE tapl.my_packing_list_id = $1
           `,
