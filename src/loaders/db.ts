@@ -1,8 +1,8 @@
 // 필요한 모듈들
-import { Pool, Query } from 'pg'; //postgres
+import { Pool, Query } from 'pg';
 import dayjs from 'dayjs';
-import dotenv from 'dotenv';
-dotenv.config();
+import { config } from 'dotenv';
+config();
 
 // DB Config (유저, 호스트, DB 이름, 패스워드)를 로딩해줍시다.
 import dbConfig from '../config/index';
@@ -12,20 +12,6 @@ const devMode = process.env.NODE_ENV === 'development';
 
 // SQL 쿼리문을 콘솔에 프린트할지 말지 결정해주는 변수를 선언합시다.
 const sqlDebug = true;
-
-// 기본 설정에서는 우리가 실행하게 되는 SQL 쿼리문이 콘솔에 찍히지 않기 때문에,
-// pg 라이브러리 내부의 함수를 살짝 손봐서 SQL 쿼리문이 콘솔에 찍히게 만들어 줍시다.
-const submit = Query.prototype.submit;
-Query.prototype.submit = function () {
-  const text = this.text;
-  const values = this.values || [];
-  const query = text.replace(/\$([0-9]+)/g, (m: any, v: any) =>
-    JSON.stringify(values[parseInt(v) - 1]),
-  );
-  // devMode === true 이면서 sqlDebug === true일 때 SQL 쿼리문을 콘솔에 찍겠다는 분기입니다.
-  devMode && sqlDebug && console.log(`\n\n[👻 SQL STATEMENT]\n${query}\n_________\n`);
-  submit.apply(this, arguments);
-};
 
 // 서버가 실행되면 현재 환경이 개발 모드(로컬)인지 프로덕션 모드(배포)인지 콘솔에 찍어줍시다.
 console.log(`[🔥DB] ${process.env.NODE_ENV}`);
@@ -56,18 +42,9 @@ const connect = async (req: any) => {
   const release = client.release;
 
   const releaseChecker = setTimeout(() => {
-    // devMode
     console.error('[ERROR] client connection이 15초 동안 릴리즈되지 않았습니다.', { callStack });
-    console.error(`마지막으로 실행된 쿼리문입니다. ${client.lastQuery}`);
-    //   ? console.error('[ERROR] client connection이 15초 동안 릴리즈되지 않았습니다.', { callStack })
-    //   : functions.logger.error('[ERROR] client connection이 15초 동안 릴리즈되지 않았습니다.', { callStack });
-    // devMode ? console.error(`마지막으로 실행된 쿼리문입니다. ${client.lastQuery}`) : functions.logger.error(`마지막으로 실행된 쿼리문입니다. ${client.lastQuery}`);
   }, 15 * 1000);
 
-  client.query = (...args: any) => {
-    client.lastQuery = args;
-    return query.apply(client, args);
-  };
   client.release = () => {
     clearTimeout(releaseChecker);
     const time = dayjs().diff(now, 'millisecond');
