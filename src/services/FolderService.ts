@@ -1,4 +1,5 @@
 import { RecentCreatedListResponseDto } from '../interfaces/IList';
+import { FolderResponseDto } from '../interfaces/IFolder';
 import dayjs from 'dayjs';
 
 const getRecentCreatedList = async (
@@ -79,6 +80,31 @@ const getRecentCreatedList = async (
   return data;
 };
 
+const getAloneFolders = async (
+  client: any,
+  userId: string,
+): Promise<FolderResponseDto[] | string> => {
+  try {
+    const { rows: aloneFolders } = await client.query(
+      `
+      SELECT f.id, f.name
+      FROM "folder" f
+      WHERE f.user_id = $1 and f.is_aloned = true
+      ORDER BY f.id
+      `,
+      [userId],
+    );
+
+    const data: FolderResponseDto[] = aloneFolders;
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export default {
   getRecentCreatedList,
+  getAloneFolders,
 };
