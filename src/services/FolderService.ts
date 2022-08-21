@@ -71,7 +71,7 @@ const getRecentCreatedList = async (
     const data: RecentCreatedListResponseDto = {
       id: recentListId,
       title: recentList[0].title,
-      remainDay: remainDay,
+      remainDay: remainDay.toString(),
       packTotalNum: recentList[0].total,
       packRemainNum: recentList[0].remain,
       url: url,
