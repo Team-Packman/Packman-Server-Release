@@ -8,7 +8,7 @@ import jwtHandler from '../modules/jwtHandler';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const db = require('../loaders/db');
 /**
- *  @route GET /auth/kakao
+ *  @route POST /auth/kakao
  *  @desc get kakao user
  *  @access public
  **/

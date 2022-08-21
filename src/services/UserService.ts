@@ -1,12 +1,12 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 import { UserCreateDto, UserResponseDto } from '../interfaces/IUser';
 import jwtHandler from '../modules/jwtHandler';
 
 const createUser = async (
   client: any,
   userCreateDto: UserCreateDto,
-): Promise<UserResponseDto | null | string> => {
-  if (userCreateDto.nickname.length > 4) return 'exceed_limit';
+): Promise<UserResponseDto | string> => {
+  try {
+    if (userCreateDto.nickname.length > 4) return 'exceed_len';
 
   const refreshToken = jwtHandler.getRefreshToken();
   userCreateDto.refreshToken = refreshToken;
@@ -37,15 +37,19 @@ const createUser = async (
     refreshToken: rows[0].refresh_token,
   };
 
-  return data;
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
 const deleteUser = async (client: any, userEmail: string) => {
   await client.query(
     `
-          DELETE 
-          FROM "user"
-          WHERE email=$1
+    DELETE 
+    FROM "user"
+    WHERE email=$1
     `,
     [userEmail],
   );

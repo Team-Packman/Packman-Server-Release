@@ -20,6 +20,7 @@ const getAccessToken = (userId: number): string => {
   };
 
   const accessToken: string = jwt.sign(payload, config.jwtSecret, ac_options);
+  
   return accessToken;
 };
 
