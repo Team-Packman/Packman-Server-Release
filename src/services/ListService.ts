@@ -31,7 +31,7 @@ const updateListTitle = async (
   listTitleUpdateDto: ListTitleUpdateDto,
 ): Promise<ListTitleUpdateDto | string> => {
   try {
-    let data: ListTitleUpdateDto;
+    let updatedTitle;
 
     if (listTitleUpdateDto.isAloned === true) {
       const { rows: existList } = await client.query(
@@ -45,24 +45,20 @@ const updateListTitle = async (
       );
       if (existList.length === 0) return 'no_list';
 
-      const { rows: updateData } = await client.query(
+      const { rows: updatedData } = await client.query(
         `
         UPDATE "packing_list"
         SET title=$1
         WHERE id=$2
-        RETURNING id, title 
+        RETURNING title 
         `,
         [listTitleUpdateDto.title, listTitleUpdateDto.id],
       );
-
-      data = {
-        id: updateData[0].id,
-        title: updateData[0].title,
-      };
+      updatedTitle = updatedData[0].title;
     } else {
       const { rows: existList } = await client.query(
         `
-        SELECT l.id, together_packing_list_id, my_packing_list_id
+        SELECT together_packing_list_id, my_packing_list_id
         FROM "together_alone_packing_list" as l
         JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
         WHERE l.id=$1 AND p.is_deleted=false
@@ -71,11 +67,10 @@ const updateListTitle = async (
       );
       if (existList.length < 2) return 'no_list';
 
-      const listId = existList[0].id;
       const togetherListId = existList[0].together_packing_list_id;
       const aloneListId = existList[0].my_packing_list_id;
 
-      const { rows: updateData } = await client.query(
+      const { rows: updatedData } = await client.query(
         `
         UPDATE "packing_list"
         SET title=$1
@@ -84,12 +79,13 @@ const updateListTitle = async (
         `,
         [listTitleUpdateDto.title, togetherListId, aloneListId],
       );
-
-      data = {
-        id: listId,
-        title: updateData[0].title,
-      };
+      updatedTitle = updatedData[0].title;
     }
+
+    const data = {
+      id: listTitleUpdateDto.id,
+      title: updatedTitle,
+    };
 
     return data;
   } catch (error) {
