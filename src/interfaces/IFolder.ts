@@ -6,19 +6,11 @@ export interface FolderCreateDto {
 export interface FolderInfoDto {
     id: string;
     name: string;
-    listNum: number;
+    listNum: string;
 }
   
 export interface AllFolderResponseDto {
-    aloneFolder: {
-      id: string;
-      name: string;
-      listNum: number;
-    }[];
-    togetherFolder: {
-      id: string;
-      name: string;
-      listNum: number;
-    }[];
+    aloneFolder: FolderInfoDto[];
+    togetherFolder: FolderInfoDto[];
   }
   
