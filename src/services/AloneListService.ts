@@ -88,13 +88,13 @@ const createAloneList = async (
     );
     const etcData = etcDataArray[0];
 
-    const myListCategory = await aloneCategoryResponse(client, aloneListId);
+    const aloneListCategory = await aloneCategoryResponse(client, aloneListId);
 
     const data: AloneListResponseDto = {
       id: aloneListId.toString(),
       title: etcData.title,
       departureDate: etcData.departureDate,
-      category: myListCategory,
+      category: aloneListCategory,
       isSaved: etcData.isSaved,
     };
 
