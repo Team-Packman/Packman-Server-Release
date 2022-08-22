@@ -38,8 +38,8 @@ const inviteList = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route PATCH /list/title
- *  @desc update packing list title
+ *  @route PATCH /list/myTemplate
+ *  @desc update packing list my template
  *  @access private
  **/
 
