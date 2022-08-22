@@ -3,7 +3,7 @@ import { AloneListResponseDto } from '../interfaces/IAloneList';
 
 const readAloneList = async (
   client: any,
-  listId: string,
+  aloneListId: string,
 ): Promise<AloneListResponseDto | string> => {
   try {
     const { rows: existList } = await client.query(
@@ -13,7 +13,7 @@ const readAloneList = async (
       JOIN "packing_list" p ON l.id=p.id
       WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
       `,
-      [listId],
+      [aloneListId],
     );
     if (existList.length === 0) return 'no_list';
 
@@ -23,14 +23,14 @@ const readAloneList = async (
       FROM "packing_list" p
       WHERE p.id=$1
       `,
-      [listId],
+      [aloneListId],
     );
     const etcData = etcDataArray[0];
 
-    const category = await aloneCategoryResponse(client, listId);
+    const category = await aloneCategoryResponse(client, aloneListId);
 
     const data: AloneListResponseDto = {
-      id: listId.toString(),
+      id: aloneListId.toString(),
       title: etcData.title,
       departureDate: etcData.departureDate,
       category: category,
