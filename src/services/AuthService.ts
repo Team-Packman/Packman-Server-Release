@@ -39,6 +39,16 @@ const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthRespon
       } else {
         const accessToken = jwtHandler.getAccessToken(userInfo[0].id);
         const refreshToken = jwtHandler.getRefreshToken();
+
+        await client.query(
+          `
+          UPDATE "user"
+          SET refresh_token = $1
+          WHERE id = $2
+          `,
+          [refreshToken, userInfo[0].id],
+        );
+
         data = {
           isAlreadyUser: true,
           id: userInfo[0].id.toString(),

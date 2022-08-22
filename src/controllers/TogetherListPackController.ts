@@ -5,8 +5,7 @@ import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import { TogetherListPackService } from '../services';
 import { PackCreateDto, PackUpdateDto, PackDeleteDto } from '../interfaces/IPack';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const db = require('../loaders/db');
+import db from '../loaders/db';
 
 /**
  *  @route POST /list/together/pack
@@ -54,7 +53,7 @@ const createPack = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 
@@ -109,7 +108,7 @@ const updatePack = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 
@@ -160,7 +159,7 @@ const deletePack = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 

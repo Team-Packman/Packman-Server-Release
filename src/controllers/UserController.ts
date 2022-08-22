@@ -5,8 +5,7 @@ import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import UserService from '../services/UserService';
 import { UserCreateDto } from '../interfaces/IUser';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const db = require('../loaders/db');
+import db from '../loaders/db';
 
 /**
  *  @route POST /user/profile
@@ -43,7 +42,7 @@ const createUser = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 

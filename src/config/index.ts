@@ -27,6 +27,11 @@ export default {
   password: process.env.PROD_DB_PASSWORD,
 
   /**
+   * baseUrl
+   */
+  baseUrl: process.env.BASE_URL as string,
+
+  /**
    * jwt Secret
    */
 

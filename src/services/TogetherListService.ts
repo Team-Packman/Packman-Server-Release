@@ -6,6 +6,7 @@ import {
 } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
+import { nanoid } from 'nanoid';
 
 const createTogetherList = async (
   client: any,
@@ -13,8 +14,7 @@ const createTogetherList = async (
   togetherListCreateDto: TogetherListCreateDto,
 ): Promise<TogetherListResponseDto | string> => {
   try {
-    //테스트 위해 invite code 더미로 넣어 둠
-    const inviteCode = '1249';
+    const inviteCode = nanoid(5);
 
     if (togetherListCreateDto.title.length > 12) return 'exceed_len';
 
@@ -292,6 +292,16 @@ const updatePacker = async (
       [packerUpdateDto.listId, packerUpdateDto.packId],
     );
     if (existListPack.length === 0) return 'no_list_pack';
+
+    const { rows: existUser } = await client.query(
+      `
+      SELECT *
+      FROM "user" u
+      WHERE u.id=$1 AND u.is_deleted = false
+    `,
+      [packerUpdateDto.packerId],
+    );
+    if (existUser.length === 0) return 'no_user';
 
     await client.query(
       `
