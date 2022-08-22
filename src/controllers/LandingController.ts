@@ -3,8 +3,6 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import UserService from '../services/UserService';
-import { UserCreateDto } from '../interfaces/IUser';
 import db from '../loaders/db';
 import { LandingService } from '../services';
 
