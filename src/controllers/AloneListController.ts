@@ -5,6 +5,7 @@ import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import db from '../loaders/db';
 import { ListCreateDto } from '../interfaces/IList';
+import { AloneListService } from '../services';
 
 /**
  *  @route POST /list/alone
@@ -43,4 +44,8 @@ const createAloneList = async (req: Request, res: Response) => {
   } finally {
     if (client !== undefined) client.release();
   }
+};
+
+export default {
+  createAloneList,
 };

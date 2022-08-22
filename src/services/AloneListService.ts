@@ -104,3 +104,7 @@ const createAloneList = async (
     throw error;
   }
 };
+
+export default {
+  createAloneList,
+};
