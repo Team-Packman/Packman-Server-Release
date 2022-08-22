@@ -4,6 +4,7 @@ import TogetherListCategoryService from './TogetherListCategoryService';
 import TogetherListService from './TogetherListService';
 import ListService from './ListService';
 import TogetherListPackService from './TogetherListPackService';
+import LandingService from './LandingService';
 
 export {
   UserService,
@@ -12,4 +13,5 @@ export {
   TogetherListService,
   ListService,
   TogetherListPackService,
+  LandingService,
 };
