@@ -5,6 +5,7 @@ import TogetherListController from './TogetherListController';
 import ListController from './ListController';
 import TogetherListPackController from './TogetherListPackController';
 import FolderController from './FolderController';
+import LandingController from './LandingController';
 
 export {
   UserController,
@@ -14,4 +15,5 @@ export {
   TogetherListController,
   ListController,
   TogetherListPackController,
+  LandingController,
 };
