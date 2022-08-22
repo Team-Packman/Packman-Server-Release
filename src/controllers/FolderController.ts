@@ -51,8 +51,7 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
   let client;
-  // const userId = req.body.user.id;
-  const userId = '1';
+  const userId = req.body.user.id;
   const folderCreateDto = req.body;
   try {
     client = await db.connect(req);
