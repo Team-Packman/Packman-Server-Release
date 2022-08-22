@@ -98,6 +98,10 @@ const message = {
   // 멤버
   SUCCESS_GET_MEMBERS: '멤버 조회 성공',
   ALREADY_EXIST_MEMBER: '이미 추가된 멤버입니다',
+
+  // 랜딩
+  DUPLICATED_PHONE: '이미 존재하는 핸드폰 번호입니다',
+  SUCCESS_CREATE_LANDING_USER: '랜딩페이지 유저 생성 성공',
 };
 
 export default message;
