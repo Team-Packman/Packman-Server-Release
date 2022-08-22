@@ -7,10 +7,19 @@ export interface FolderInfoDto {
     id: string;
     name: string;
     listNum: string;
+    isAloned: boolean;
 }
   
 export interface AllFolderResponseDto {
-    aloneFolder: FolderInfoDto[];
-    togetherFolder: FolderInfoDto[];
-  }
+  aloneFolder: {
+    id: string;
+    name: string;
+    listNum: number;
+  }[];
+  togetherFolder: {
+    id: string;
+    name: string;
+    listNum: number;
+  }[];
+}
   
