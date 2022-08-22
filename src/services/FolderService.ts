@@ -1,5 +1,6 @@
 import { RecentCreatedListResponseDto } from '../interfaces/IList';
 import dayjs from 'dayjs';
+import { TogetherListInFolderResponseDto } from '../interfaces/IFolder';
 
 const getRecentCreatedList = async (
   client: any,
@@ -79,6 +80,87 @@ const getRecentCreatedList = async (
   return data;
 };
 
+const getTogetherListInFolder = async (
+  client: any,
+  userId: string,
+  folderId: string,
+): Promise<TogetherListInFolderResponseDto | string> => {
+  try {
+    const { rows: existFolder } = await client.query(
+      `
+      SELECT *
+      FROM "folder" f
+      WHERE f.id = $1
+      `,
+      [folderId],
+    );
+
+    if (existFolder.length === 0) return 'no_folder';
+
+    const { rows: currentFolder } = await client.query(
+      `
+      SELECT f.id::text, f.name
+      FROM "folder" f
+      WHERE f.user_id = $1 and f.id = $2  
+      `,
+      [userId, folderId],
+    );
+
+    if (currentFolder.length === 0) return 'no_user_folder';
+
+    const { rows: folder } = await client.query(
+      `
+      SELECT f.id::text, f.name
+      FROM "folder" f
+      WHERE f.user_id = $1 and f.is_aloned = false
+      ORDER BY f.id
+      `,
+      [userId],
+    );
+
+    const { rows: listNum } = await client.query(
+      `
+      SELECT COUNT(*) as "listNum"
+      FROM folder_packing_list fpl
+      JOIN packing_list pl on pl.id = fpl.list_id
+      WHERE fpl.folder_id = $1 and pl.is_deleted = false
+  
+      `,
+      [folderId],
+    );
+
+    const { rows: togetherList } = await client.query(
+      `
+      SELECT tapl.together_packing_list_id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY.MM.DD') as "departureDate",
+        Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum",
+        Count(p.id) AS "packTotalNum"
+      FROM folder_packing_list fpl
+      JOIN together_alone_packing_list tapl on fpl.list_id = tapl.my_packing_list_id
+      JOIN packing_list pl on tapl.together_packing_list_id = pl.id
+      LEFT JOIN category c ON pl.id = c.list_id
+      LEFT JOIN pack p ON c.id = p.category_id
+      WHERE fpl.folder_id = $1 and pl.is_deleted = false
+      GROUP BY tapl.together_packing_list_id, pl.title, pl.departure_date
+      ORDER BY tapl.together_packing_list_id
+      `,
+      [folderId],
+    );
+
+    const data: TogetherListInFolderResponseDto = {
+      currentFolder: currentFolder[0],
+      folder: folder,
+      listNum: listNum[0].listNum,
+      togetherPackingList: togetherList,
+    };
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export default {
   getRecentCreatedList,
+  getTogetherListInFolder,
 };
