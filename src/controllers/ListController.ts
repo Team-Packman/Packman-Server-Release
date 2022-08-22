@@ -79,4 +79,5 @@ const updateListTitle = async (req: Request, res: Response) => {
 
 export default {
   inviteList,
+  updateListTitle,
 };
