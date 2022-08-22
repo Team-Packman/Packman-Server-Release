@@ -1,4 +1,4 @@
-import { ListInviteResponseDto, ListTitleUpdateDto } from '../interfaces/IList';
+import { ListInviteResponseDto, TitleUpdateDto } from '../interfaces/IList';
 
 const getPackingByInviteCode = async (
   client: any,
@@ -26,14 +26,15 @@ const getPackingByInviteCode = async (
   }
 };
 
-const updateListTitle = async (
+const updateTitle = async (
   client: any,
-  listTitleUpdateDto: ListTitleUpdateDto,
-): Promise<ListTitleUpdateDto | string> => {
+  titleUpdateDto: TitleUpdateDto,
+): Promise<TitleUpdateDto | string> => {
   try {
     let updatedTitle;
+    if (titleUpdateDto.title.length > 12) return 'exceed_len';
 
-    if (listTitleUpdateDto.isAloned === true) {
+    if (titleUpdateDto.isAloned === true) {
       const { rows: existList } = await client.query(
         `
         SELECT *
@@ -41,7 +42,7 @@ const updateListTitle = async (
         JOIN "packing_list" p ON l.id=p.id
         WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
         `,
-        [listTitleUpdateDto.id],
+        [titleUpdateDto.id],
       );
       if (existList.length === 0) return 'no_list';
 
@@ -52,7 +53,7 @@ const updateListTitle = async (
         WHERE id=$2
         RETURNING title 
         `,
-        [listTitleUpdateDto.title, listTitleUpdateDto.id],
+        [titleUpdateDto.title, titleUpdateDto.id],
       );
       updatedTitle = updatedData[0].title;
     } else {
@@ -63,7 +64,7 @@ const updateListTitle = async (
         JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
         WHERE l.id=$1 AND p.is_deleted=false
         `,
-        [listTitleUpdateDto.id],
+        [titleUpdateDto.id],
       );
       if (existList.length < 2) return 'no_list';
 
@@ -77,13 +78,13 @@ const updateListTitle = async (
         WHERE id=$2 OR id=$3
         RETURNING title
         `,
-        [listTitleUpdateDto.title, togetherListId, aloneListId],
+        [titleUpdateDto.title, togetherListId, aloneListId],
       );
       updatedTitle = updatedData[0].title;
     }
 
     const data = {
-      id: listTitleUpdateDto.id,
+      id: titleUpdateDto.id,
       title: updatedTitle,
     };
 
@@ -95,5 +96,5 @@ const updateListTitle = async (
 };
 export default {
   getPackingByInviteCode,
-  updateListTitle,
+  updateTitle,
 };

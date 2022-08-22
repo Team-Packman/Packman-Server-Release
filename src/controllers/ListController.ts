@@ -5,7 +5,7 @@ import util from '../modules/util';
 import { ListService } from '../services';
 import db from '../loaders/db';
 import { validationResult } from 'express-validator';
-import { ListTitleUpdateDto } from '../interfaces/IList';
+import { TitleUpdateDto } from '../interfaces/IList';
 
 /**
  *  @route GET /invite/:inviteCode
@@ -43,7 +43,7 @@ const inviteList = async (req: Request, res: Response) => {
  *  @access private
  **/
 
-const updateListTitle = async (req: Request, res: Response) => {
+const updateTitle = async (req: Request, res: Response) => {
   let client;
   const error = validationResult(req);
   if (!error.isEmpty()) {
@@ -52,14 +52,18 @@ const updateListTitle = async (req: Request, res: Response) => {
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
 
-  const listTitleUpdateDto: ListTitleUpdateDto = req.body;
+  const titleUpdateDto: TitleUpdateDto = req.body;
 
   try {
     client = await db.connect(req);
 
-    const data = await ListService.updateListTitle(client, listTitleUpdateDto);
+    const data = await ListService.updateTitle(client, titleUpdateDto);
 
-    if (data === 'no_list')
+    if (data === 'exceed_len')
+      res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
+    else if (data === 'no_list')
       res
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, message.NO_PACKINGLIST));
@@ -79,5 +83,5 @@ const updateListTitle = async (req: Request, res: Response) => {
 
 export default {
   inviteList,
-  updateListTitle,
+  updateTitle,
 };

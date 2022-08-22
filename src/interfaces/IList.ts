@@ -12,7 +12,7 @@ export interface ListInviteResponseDto {
   title: string;
 }
 
-export interface ListTitleUpdateDto {
+export interface TitleUpdateDto {
   id: string;
   title: string;
   isAloned?: boolean;

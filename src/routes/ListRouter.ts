@@ -10,7 +10,7 @@ router.patch(
   '/title',
   [body('id').notEmpty(), body('title').notEmpty(), body('isAloned').notEmpty()],
   auth,
-  ListController.updateListTitle,
+  ListController.updateTitle,
 );
 
 export default router;
