@@ -1,17 +1,17 @@
 import {
   PackerUpdateDto,
-  TogetherListCreateDto,
   TogetherListResponseDto,
   TogetherListCategoryResponseDto,
 } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
 import { nanoid } from 'nanoid';
+import { ListCreateDto } from '../interfaces/IList';
 
 const createTogetherList = async (
   client: any,
   userId: number,
-  togetherListCreateDto: TogetherListCreateDto,
+  togetherListCreateDto: ListCreateDto,
 ): Promise<TogetherListResponseDto | string> => {
   try {
     const inviteCode = nanoid(5);

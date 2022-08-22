@@ -11,3 +11,10 @@ export interface ListInviteResponseDto {
   id: string;
   title: string;
 }
+
+export interface ListCreateDto {
+  departureDate: string;
+  folderId: string;
+  title: string;
+  templateId: string;
+}
