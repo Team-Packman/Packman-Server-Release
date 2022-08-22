@@ -10,7 +10,7 @@ router.patch(
   '/departureDate',
   [body('id').notEmpty(), body('departureDate').notEmpty(), body('isAloned').notEmpty()],
   auth,
-  ListController.updateListDate,
+  ListController.updateDate,
 );
 
 export default router;

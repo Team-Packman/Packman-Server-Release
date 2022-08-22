@@ -1,4 +1,4 @@
-import { ListDateUpdateDto, ListInviteResponseDto } from '../interfaces/IList';
+import { DateUpdateDto, ListInviteResponseDto } from '../interfaces/IList';
 
 const getPackingByInviteCode = async (
   client: any,
@@ -26,14 +26,14 @@ const getPackingByInviteCode = async (
   }
 };
 
-const updateListDate = async (
+const updateDate = async (
   client: any,
-  listDateUpdateDto: ListDateUpdateDto,
-): Promise<ListDateUpdateDto | string> => {
+  dateUpdateDto: DateUpdateDto,
+): Promise<DateUpdateDto | string> => {
   try {
     let updatedDate;
 
-    if (listDateUpdateDto.isAloned === true) {
+    if (dateUpdateDto.isAloned === true) {
       const { rows: existList } = await client.query(
         `
         SELECT *
@@ -41,7 +41,7 @@ const updateListDate = async (
         JOIN "packing_list" p ON l.id=p.id
         WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
         `,
-        [listDateUpdateDto.id],
+        [dateUpdateDto.id],
       );
       if (existList.length === 0) return 'no_list';
 
@@ -52,7 +52,7 @@ const updateListDate = async (
         WHERE id=$2
         RETURNING TO_CHAR(departure_date,'YYYY.MM.DD') AS "departureDate"
         `,
-        [listDateUpdateDto.departureDate, listDateUpdateDto.id],
+        [dateUpdateDto.departureDate, dateUpdateDto.id],
       );
       updatedDate = updatedData[0].departureDate;
     } else {
@@ -63,7 +63,7 @@ const updateListDate = async (
         JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
         WHERE l.id=$1 AND p.is_deleted=false
         `,
-        [listDateUpdateDto.id],
+        [dateUpdateDto.id],
       );
       if (existList.length < 2) return 'no_list';
 
@@ -77,13 +77,13 @@ const updateListDate = async (
         WHERE id=$2 OR id=$3
         RETURNING TO_CHAR(departure_date,'YYYY.MM.DD') AS "departureDate"
         `,
-        [listDateUpdateDto.departureDate, togetherListId, aloneListId],
+        [dateUpdateDto.departureDate, togetherListId, aloneListId],
       );
       updatedDate = updatedData[0].departureDate;
     }
 
     const data = {
-      id: listDateUpdateDto.id,
+      id: dateUpdateDto.id,
       departureDate: updatedDate,
     };
 
@@ -96,5 +96,5 @@ const updateListDate = async (
 
 export default {
   getPackingByInviteCode,
-  updateListDate,
+  updateDate,
 };

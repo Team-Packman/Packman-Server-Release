@@ -5,7 +5,7 @@ import util from '../modules/util';
 import { ListService } from '../services';
 import db from '../loaders/db';
 import { validationResult } from 'express-validator';
-import { ListDateUpdateDto } from '../interfaces/IList';
+import { DateUpdateDto } from '../interfaces/IList';
 
 /**
  *  @route GET /invite/:inviteCode
@@ -43,7 +43,7 @@ const inviteList = async (req: Request, res: Response) => {
  *  @access private
  **/
 
-const updateListDate = async (req: Request, res: Response) => {
+const updateDate = async (req: Request, res: Response) => {
   let client;
   const error = validationResult(req);
   if (!error.isEmpty()) {
@@ -52,12 +52,12 @@ const updateListDate = async (req: Request, res: Response) => {
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
 
-  const listDateUpdateDto: ListDateUpdateDto = req.body;
+  const dateUpdateDto: DateUpdateDto = req.body;
 
   try {
     client = await db.connect(req);
 
-    const data = await ListService.updateListDate(client, listDateUpdateDto);
+    const data = await ListService.updateDate(client, dateUpdateDto);
 
     if (data === 'no_list')
       res
@@ -79,5 +79,5 @@ const updateListDate = async (req: Request, res: Response) => {
 
 export default {
   inviteList,
-  updateListDate,
+  updateDate,
 };
