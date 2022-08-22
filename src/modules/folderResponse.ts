@@ -23,15 +23,23 @@ async function folderResponse(client: any, userId: string): Promise<AllFolderRes
     const togetherFolder: FolderInfoDto[] = [];
     for await (const folder of folders) {
       if (folder.isAloned) {
-        aloneFolder.push(folder);
+        aloneFolder.push({
+          id: folder.id,
+          name: folder.name,
+          listNum: folder.listNum,
+        });
       } else {
-        togetherFolder.push(folder);
+        togetherFolder.push({
+          id: folder.id,
+          name: folder.name,
+          listNum: folder.listNum,
+        });
       }
     }
     const folderResponse: AllFolderResponseDto = {
-        aloneFolder: aloneFolder,
-        togetherFolder: togetherFolder,
-      };
+      aloneFolder: aloneFolder,
+      togetherFolder: togetherFolder,
+    };
 
     return folderResponse;
   } catch (error) {

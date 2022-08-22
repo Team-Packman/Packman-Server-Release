@@ -6,7 +6,6 @@ export interface FolderCreateDto {
 export interface FolderInfoDto {
     id: string;
     name: string;
-    isAloned: boolean;
     listNum: number;
 }
   
