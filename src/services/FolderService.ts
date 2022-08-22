@@ -80,6 +80,7 @@ const getRecentCreatedList = async (
 };
 
 import { AllFolderResponseDto, FolderCreateDto, FolderInfoDto } from '../interfaces/IFolder';
+import { folderResponse } from '../modules/folderResponse';
 
 const createFolder = async (
   client: any,
@@ -97,39 +98,9 @@ const createFolder = async (
       [userId, folderCreateDto.name, folderCreateDto.isAloned],
     );
 
-    const { rows: folders } = await client.query(
-      `
-        SELECT  f.id::text,f.name, f.is_aloned AS "isAloned",COUNT(al.id) AS "listNum"
-        FROM (
-                SELECT * 
-                FROM "folder" 
-                WHERE user_id = $1
-                ) AS f
-        LEFT JOIN "folder_packing_list" as fl ON f.id = fl.folder_id
-        LEFT JOIN "packing_list" as pl ON pl.id = fl.list_id AND pl.is_deleted = false
-        LEFT JOIN "alone_packing_list" as al ON al.id = fl.list_id
-        GROUP BY f.id, f.name, f.is_aloned
-        ORDER BY f.id DESC
-        `,
-      [userId],
-    );
+    const folder = await folderResponse(client, userId);
 
-    const aloneFolder: FolderInfoDto[] = [];
-    const togetherFolder: FolderInfoDto[] = [];
-    for await (const folder of folders) {
-      if (folder.isAloned) {
-        aloneFolder.push(folder);
-      } else {
-        togetherFolder.push(folder);
-      }
-    }
-
-    const data: AllFolderResponseDto = {
-      aloneFolder: aloneFolder,
-      togetherFolder: togetherFolder,
-    };
-
-    return data;
+    return folder;
   } catch (error) {
     console.log(error);
     throw error;
