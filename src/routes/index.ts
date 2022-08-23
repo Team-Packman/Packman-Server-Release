@@ -7,6 +7,7 @@ import ListRouter from './ListRouter';
 import TogetherListPackRouter from './TogetherListPackRouter';
 import FolderRouter from './FolderRouter';
 import LandingRouter from './LandingRouter';
+import AloneListPackRouter from './AloneListPackRouter';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use('/list/together', TogetherListRouter);
 router.use('/list/together/pack', TogetherListPackRouter);
 router.use('/folder', FolderRouter);
 router.use('/landing', LandingRouter);
+router.use('/list/alone/pack', AloneListPackRouter);
 
 export default router;
