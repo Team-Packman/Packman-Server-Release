@@ -38,7 +38,7 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
 
 
 /**
- *  @route GET /folder
+ *  @route POST /folder
  *  @desc create folder
  *  @access private
  **/
