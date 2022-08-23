@@ -13,7 +13,7 @@ router.patch(
     body('listId').notEmpty(),
     body('categoryId').notEmpty(),
   ],
-  // auth,
+  auth,
   AloneListPackController.updatePack,
 );
 
