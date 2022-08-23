@@ -95,6 +95,15 @@ const updateMyTemplate = async (
       );
       if (existTemplate.length === 0) return 'no_template';
       templateId = existTemplate[0].id;
+
+      await client.query(
+        `
+        DELETE
+        FROM "template_category" tc
+        WHERE tc.template_id=$1
+        `,
+        [templateId],
+      );
     }
 
     const { rows: categoryIdArray } = await client.query(
