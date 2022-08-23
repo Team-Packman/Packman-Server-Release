@@ -14,6 +14,6 @@ export interface ListInviteResponseDto {
 
 export interface MyTemplateUpdateDto {
   id: string;
-  isSaved: string;
+  isSaved: boolean;
   isAloned?: boolean;
 }

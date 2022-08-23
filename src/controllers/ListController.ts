@@ -57,12 +57,17 @@ const updateMyTemplate = async (req: Request, res: Response) => {
   try {
     client = await db.connect(req);
 
-    const data = await ListService.updateMyTemplate(client, myTemplateUpdateDto);
+    const userId: number = req.body.user.id;
+    const data = await ListService.updateMyTemplate(client, userId, myTemplateUpdateDto);
 
     if (data === 'no_list')
       res
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, message.NO_PACKINGLIST));
+    else if (data === 'no_template')
+      res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, message.NO_TEMPLATE));
     else
       res
         .status(statusCode.OK)
