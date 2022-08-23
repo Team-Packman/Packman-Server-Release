@@ -10,7 +10,7 @@ dotenv.config();
 app.use(
   cors({
     credentials: true,
-    origin: ['http://localhost:3000', config.baseUrl],
+    origin: ['http://localhost:3000', 'www.packman-notification.ml', config.baseUrl],
   }),
 );
 
