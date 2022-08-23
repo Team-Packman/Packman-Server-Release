@@ -130,7 +130,7 @@ const updateMyTemplate = async (
       );
     }
 
-    const { rows: returnData } = client.query(
+    const { rows: returnData } = await client.query(
       `
       SELECT is_templated as "isSaved"
       FROM packing_list p
