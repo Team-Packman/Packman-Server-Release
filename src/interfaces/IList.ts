@@ -30,3 +30,9 @@ export interface DateUpdateDto {
   departureDate: string;
   isAloned?: boolean;
 }
+
+export interface MyTemplateUpdateDto {
+  id: string;
+  isSaved: boolean;
+  isAloned?: boolean;
+}

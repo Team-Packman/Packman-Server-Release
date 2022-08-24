@@ -7,16 +7,22 @@ const router = Router();
 
 router.get('/invite/:inviteCode', auth, ListController.inviteList);
 router.patch(
+  '/title',
+  [body('id').notEmpty(), body('title').notEmpty(), body('isAloned').notEmpty()],
+  auth,
+  ListController.updateTitle,
+);
+router.patch(
   '/departureDate',
   [body('id').notEmpty(), body('departureDate').notEmpty(), body('isAloned').notEmpty()],
   auth,
   ListController.updateDate,
 );
 router.patch(
-  '/title',
-  [body('id').notEmpty(), body('title').notEmpty(), body('isAloned').notEmpty()],
+  '/myTemplate',
+  [body('id').notEmpty(), body('isSaved').notEmpty(), body('isAloned').notEmpty()],
   auth,
-  ListController.updateTitle,
+  ListController.updateMyTemplate,
 );
 
 export default router;
