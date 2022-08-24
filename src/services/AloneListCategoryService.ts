@@ -11,11 +11,12 @@ const updateCategory = async (
       return 'exceed_len';
     }
     const { rows: existList } = await client.query(
-      `
-          SELECT *
-          FROM "packing_list" as pl
-          WHERE pl.id = $1 AND pl.is_deleted = false
-          `,
+        `
+        SELECT *
+        FROM "packing_list" as pl
+        JOIN alone_packing_list apl on pl.id = apl.id
+        WHERE apl.id = $1 and pl.is_deleted = false
+      `,
       [categoryUpdateDto.listId],
     );
     if (existList.length === 0) {
@@ -26,7 +27,7 @@ const updateCategory = async (
           SELECT *
           FROM "category" as c
           WHERE c.id = $1
-          `,
+      `,
       [categoryUpdateDto.id],
     );
 
@@ -39,10 +40,10 @@ const updateCategory = async (
 
     const { rows: duplicatedCategory } = await client.query(
       `
-            SELECT * 
-            FROM "category" as c 
-            WHERE c.list_id = $1 AND c.name = $2
-            `,
+        SELECT * 
+        FROM "category" as c 
+        WHERE c.list_id = $1 AND c.name = $2
+      `,
       [categoryUpdateDto.listId, categoryUpdateDto.name],
     );
 
@@ -59,7 +60,7 @@ const updateCategory = async (
         UPDATE "category" as c
         SET name = $2
         WHERE c.id = $1
-        `,
+      `,
       [categoryUpdateDto.id, categoryUpdateDto.name],
     );
 
