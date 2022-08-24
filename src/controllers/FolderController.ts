@@ -35,7 +35,7 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route GET /list/alone/:folderId
+ *  @route GET /folder/list/alone/:folderId
  *  @desc read aloneLists in Folder
  *  @access private
  **/
