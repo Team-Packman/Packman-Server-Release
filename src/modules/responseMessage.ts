@@ -33,9 +33,13 @@ const message = {
   SUCCESS_UPDATE_FOLDER: '폴더 수정 성공',
   SUCCESS_DELETE_FOLDER: '폴더 수정 성공',
   SUCCESS_GET_FOLDERS: '폴더 조회 성공',
-  NO_FOLDER: '존재하지 않는 Folder입니다',
-  SUCCESS_GET_TOGETHER_PACKINGLIST_IN_FOLDER: '폴더 속 함께 패킹리스트 조회 성공',
+  NO_FOLDER: '존재하지 않는 폴더입니다',
+  NO_USER_FOLDER: '유저에 존재하지 않는 폴더입니다',
+  SUCCESS_GET_TOGETHER_FOLDERS: '함께 패킹리스트 폴더 조회 성공',
+  SUCCESS_GET_ALONE_FOLDERS: '혼자 패킹리스트 폴더 조회 성공',
+  SUCCESS_GET_TOGETHER_LIST_IN_FOLDER: '폴더 속 함께 패킹리스트 조회 성공',
   SUCCESS_GET_ALONE_PACKINGLIST_IN_FOLDER: '폴더 속 혼자 패킹리스트 조회 성공',
+  SUCCESS_GET_ALONE_LIST_IN_FOLDER: '폴더 속 혼자 패킹리스트 조회 성공',
   SUCCESS_GET_RECENT_CREATED_LIST: '최근 생성된 리스트 조회 성공',
 
   //패킹리스트 공통
@@ -101,7 +105,7 @@ const message = {
   ALREADY_EXIST_MEMBER: '이미 추가된 멤버입니다',
 
   // 랜딩
-  DUPLICATED_PHONE: '이미 존재하는 핸드폰 번호입니다',
+  DUPLICATED_PHONE: '이미 제출되었습니다!',
   SUCCESS_CREATE_LANDING_USER: '랜딩페이지 유저 생성 성공',
 };
 
