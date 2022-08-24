@@ -34,6 +34,7 @@ const updateMyTemplate = async (
   try {
     let templateId: string;
     let title: string;
+    let isSaved: boolean;
     let aloneListId: string = myTemplateUpdateDto.id;
     let listId: string = myTemplateUpdateDto.id;
 
@@ -49,6 +50,7 @@ const updateMyTemplate = async (
       );
       if (existList.length === 0) return 'no_list';
       title = existList[0].title;
+      isSaved = existList[0].is_saved;
     } else {
       const { rows: existList } = await client.query(
         `
@@ -56,6 +58,7 @@ const updateMyTemplate = async (
         FROM "together_alone_packing_list" as l
         JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
         WHERE l.id=$1 AND p.is_deleted=false
+        ORDER BY p.id
         `,
         [myTemplateUpdateDto.id],
       );
@@ -63,13 +66,15 @@ const updateMyTemplate = async (
       listId = existList[0].together_packing_list_id.toString();
       aloneListId = existList[0].my_packing_list_id.toString();
       title = existList[0].title;
+      isSaved = existList[1].is_saved;
     }
+    if (isSaved !== myTemplateUpdateDto.isSaved) return 'no_template';
 
     if (myTemplateUpdateDto.isSaved === false) {
       await client.query(
         `
         UPDATE "packing_list"
-        SET is_templated=true
+        SET is_saved=true
         WHERE id=$1
         `,
         [aloneListId],
@@ -141,7 +146,7 @@ const updateMyTemplate = async (
 
     const { rows: returnData } = await client.query(
       `
-      SELECT is_templated as "isSaved"
+      SELECT is_saved as "isSaved"
       FROM packing_list p
       WHERE p.id=$1
       `,

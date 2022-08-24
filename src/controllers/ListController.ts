@@ -62,12 +62,10 @@ const updateMyTemplate = async (req: Request, res: Response) => {
 
     if (data === 'no_list')
       res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.fail(statusCode.BAD_REQUEST, message.NO_PACKINGLIST));
+        .status(statusCode.NOT_FOUND)
+        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
     else if (data === 'no_template')
-      res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.fail(statusCode.BAD_REQUEST, message.NO_TEMPLATE));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_TEMPLATE));
     else
       res
         .status(statusCode.OK)
