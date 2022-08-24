@@ -3,7 +3,7 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import { PackCreateDto, PackUpdateDto, packDeleteDto } from '../interfaces/IPack';
+import { PackCreateDto, PackUpdateDto, PackDeleteDto } from '../interfaces/IPack';
 import db from '../loaders/db';
 import { AloneListPackService } from '../services';
 
@@ -156,7 +156,6 @@ const deletePack = async (req: Request, res: Response) => {
     if (client !== undefined) client.release();
   }
 };
-
 
 export default {
   createPack,
