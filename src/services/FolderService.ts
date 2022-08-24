@@ -118,7 +118,7 @@ const getAloneListInFolder = async (
       SELECT f.id::text, f.name
       FROM "folder" f
       WHERE f.user_id = $1 and f.is_aloned = true
-      ORDER BY f.id
+      ORDER BY f.id DESC
       `,
       [userId],
     );
@@ -145,7 +145,7 @@ const getAloneListInFolder = async (
       LEFT JOIN pack p ON c.id = p.category_id
       WHERE fpl.folder_id = $1 and pl.is_deleted = false and apl.is_aloned = true
       GROUP BY apl.id, pl.title, pl.departure_date
-      ORDER BY apl.id
+      ORDER BY apl.id DESC
       `,
       [folderId],
     );
