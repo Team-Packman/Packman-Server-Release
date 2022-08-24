@@ -92,7 +92,7 @@ const getTogetherFolders = async (client: any, userId: string): Promise<FolderRe
       SELECT f.id::text, f.name
       FROM "folder" f
       WHERE f.user_id = $1 and f.is_aloned = false
-      ORDER BY f.id
+      ORDER BY f.id DESC
       `,
       [userId],
     );
