@@ -1,4 +1,4 @@
-import { ListInviteResponseDto } from '../interfaces/IList';
+import { ListInviteResponseDto, TitleUpdateDto } from '../interfaces/IList';
 
 const getPackingByInviteCode = async (
   client: any,
@@ -26,6 +26,75 @@ const getPackingByInviteCode = async (
   }
 };
 
+const updateTitle = async (
+  client: any,
+  titleUpdateDto: TitleUpdateDto,
+): Promise<TitleUpdateDto | string> => {
+  try {
+    let updatedTitle;
+    if (titleUpdateDto.title.length > 12) return 'exceed_len';
+
+    if (titleUpdateDto.isAloned === true) {
+      const { rows: existList } = await client.query(
+        `
+        SELECT *
+        FROM "alone_packing_list" as l
+        JOIN "packing_list" p ON l.id=p.id
+        WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
+        `,
+        [titleUpdateDto.id],
+      );
+      if (existList.length === 0) return 'no_list';
+
+      const { rows: updatedData } = await client.query(
+        `
+        UPDATE "packing_list"
+        SET title=$1
+        WHERE id=$2
+        RETURNING title 
+        `,
+        [titleUpdateDto.title, titleUpdateDto.id],
+      );
+      updatedTitle = updatedData[0].title;
+    } else {
+      const { rows: existList } = await client.query(
+        `
+        SELECT together_packing_list_id, my_packing_list_id
+        FROM "together_alone_packing_list" as l
+        JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
+        WHERE l.id=$1 AND p.is_deleted=false
+        `,
+        [titleUpdateDto.id],
+      );
+      if (existList.length < 2) return 'no_list';
+
+      const togetherListId = existList[0].together_packing_list_id;
+      const aloneListId = existList[0].my_packing_list_id;
+
+      const { rows: updatedData } = await client.query(
+        `
+        UPDATE "packing_list"
+        SET title=$1
+        WHERE id=$2 OR id=$3
+        RETURNING title
+        `,
+        [titleUpdateDto.title, togetherListId, aloneListId],
+      );
+      updatedTitle = updatedData[0].title;
+    }
+
+    const data = {
+      id: titleUpdateDto.id,
+      title: updatedTitle,
+    };
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 export default {
   getPackingByInviteCode,
+  updateTitle,
 };
