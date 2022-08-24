@@ -7,6 +7,7 @@ import TogetherListPackService from './TogetherListPackService';
 import LandingService from './LandingService';
 import AloneListService from './AloneListService';
 import AloneListCategoryService from './AloneListCategoryService';
+import TemplateService from './TemplateService';
 
 export {
   UserService,
@@ -18,4 +19,5 @@ export {
   LandingService,
   AloneListService,
   AloneListCategoryService,
+  TemplateService,
 };

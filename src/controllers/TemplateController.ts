@@ -3,6 +3,7 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import db from '../loaders/db';
+import { TemplateService } from '../services';
 
 /**
  *  @route GET /template/alone
@@ -30,4 +31,6 @@ const getAloneTemplateList = async (req: Request, res: Response) => {
   }
 };
 
-export default {};
+export default {
+  getAloneTemplateList,
+};
