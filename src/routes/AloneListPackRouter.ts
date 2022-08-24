@@ -4,6 +4,13 @@ import { AloneListPackController } from '../controllers';
 import auth from '../middlewares/auth';
 const router = Router();
 
+router.post(
+  '/',
+  [body('name').notEmpty(), body('categoryId').notEmpty(), body('listId').notEmpty()],
+  auth,
+  AloneListPackController.createPack,
+);
+
 router.patch(
   '/',
   [
