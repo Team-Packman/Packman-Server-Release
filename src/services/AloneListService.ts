@@ -19,7 +19,7 @@ const readAloneList = async (
 
     const { rows: etcDataArray } = await client.query(
       `
-      SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY.MM.DD') AS "departureDate", p.is_templated AS "isSaved"
+      SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY.MM.DD') AS "departureDate", p.is_saved AS "isSaved"
       FROM "packing_list" p
       WHERE p.id=$1
       `,
