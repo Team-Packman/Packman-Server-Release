@@ -15,5 +15,6 @@ router.post(
 router.get('/', auth, FolderController.getFolders);
 router.get('/together', auth, FolderController.getTogetherFolders);
 router.get('/alone', auth, FolderController.getAloneFolders);
+router.get('/list/together/:folderId', auth, FolderController.getTogetherListInFolder);
 
 export default router;
