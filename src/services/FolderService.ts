@@ -145,9 +145,31 @@ const getTogetherFolders = async (client: any, userId: string): Promise<FolderRe
   }
 };
 
+const getAloneFolders = async (client: any, userId: string): Promise<FolderResponseDto[]> => {
+  try {
+    const { rows: aloneFolders } = await client.query(
+      `
+      SELECT f.id::text, f.name
+      FROM "folder" f
+      WHERE f.user_id = $1 and f.is_aloned = true
+      ORDER BY f.id DESC
+      `,
+      [userId],
+    );
+
+    const data: FolderResponseDto[] = aloneFolders;
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export default {
   getRecentCreatedList,
   createFolder,
   getFolders,
   getTogetherFolders,
+  getAloneFolders,
 };

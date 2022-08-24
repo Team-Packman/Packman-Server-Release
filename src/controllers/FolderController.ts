@@ -125,9 +125,37 @@ const getTogetherFolders = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @route GET /folder/alone
+ *  @desc read aloneFolders
+ *  @access private
+ **/
+const getAloneFolders = async (req: Request, res: Response) => {
+  let client;
+
+  const userId = req.body.user.id;
+
+  try {
+    client = await db.connect(req);
+    const data = await FolderService.getAloneFolders(client, userId);
+
+    res
+      .status(statusCode.OK)
+      .send(util.success(statusCode.OK, message.SUCCESS_GET_ALONE_FOLDERS, { aloneFolder: data }));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    if (client !== undefined) client.release();
+  }
+};
+
 export default {
   getRecentCreatedList,
   createFolder,
   getFolders,
   getTogetherFolders,
+  getAloneFolders,
 };

@@ -14,5 +14,6 @@ router.post(
 );
 router.get('/', auth, FolderController.getFolders);
 router.get('/together', auth, FolderController.getTogetherFolders);
+router.get('/alone', auth, FolderController.getAloneFolders);
 
 export default router;
