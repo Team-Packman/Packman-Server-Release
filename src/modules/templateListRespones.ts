@@ -8,19 +8,19 @@ async function templateListResponse(
   try {
     const { rows: basicTemplateList } = await client.query(
       `
-    	SELECT t.id::text, t.title
+      SELECT t.id::text, t.title
       FROM template t
-			WHERE user_id IS NULL AND is_deleted=false
-			ORDER BY t.id
+      WHERE user_id IS NULL AND is_deleted=false
+      ORDER BY t.id
 			`,
     );
 
     const { rows: myTemplateList } = await client.query(
       `
-			SELECT t.id::text, t.title
-			FROM template t
-			WHERE user_id=$1 AND is_aloned=${isAloned} AND is_deleted=false
-			ORDER BY t.id
+      SELECT t.id::text, t.title
+      FROM template t
+      WHERE user_id=$1 AND is_aloned=${isAloned} AND is_deleted=false
+      ORDER BY t.id
 			`,
       [userId],
     );
