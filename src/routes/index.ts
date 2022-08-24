@@ -9,6 +9,7 @@ import FolderRouter from './FolderRouter';
 import LandingRouter from './LandingRouter';
 import AloneListRouter from './AloneListRouter';
 import AloneListCategoryRouter from './AloneListCategoryRouter';
+import TemplateRouter from './TemplateRouter';
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use('/folder', FolderRouter);
 router.use('/landing', LandingRouter);
 router.use('/list/alone', AloneListRouter);
 router.use('/list/alone/category', AloneListCategoryRouter);
+router.use('/template', TemplateRouter);
 
 export default router;
