@@ -1,4 +1,6 @@
 import { RecentCreatedListResponseDto } from '../interfaces/IList';
+import { AllFolderResponseDto, FolderCreateDto } from '../interfaces/IFolder';
+import { folderResponse } from '../modules/folderResponse';
 import dayjs from 'dayjs';
 
 const getRecentCreatedList = async (
@@ -84,6 +86,32 @@ const getRecentCreatedList = async (
   }
 };
 
+const createFolder = async (
+  client: any,
+  userId: string,
+  folderCreateDto: FolderCreateDto,
+): Promise<AllFolderResponseDto | string> => {
+  try {
+    if (folderCreateDto.name.length > 8) return 'exceed_len';
+
+    const { rows: newFolder } = await client.query(
+      `
+      INSERT INTO "folder" (user_id, name, is_aloned)
+      VALUES ($1, $2, $3)
+    `,
+      [userId, folderCreateDto.name, folderCreateDto.isAloned],
+    );
+
+    const folder = await folderResponse(client, userId);
+
+    return folder;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export default {
   getRecentCreatedList,
+  createFolder,
 };
