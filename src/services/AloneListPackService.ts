@@ -31,17 +31,7 @@ const createPack = async (
     );
 
     if (existCategory.length === 0) return 'no_category';
-
-    const { rows: existListCategory } = await client.query(
-      `
-      SELECT *
-      FROM "category" as c
-      WHERE c.id = $1 AND c.list_id = $2
-      `,
-      [packCreateDto.categoryId, packCreateDto.listId],
-    );
-
-    if (existListCategory.length === 0) return 'no_list_category';
+    if (existCategory[0].list_id != packCreateDto.listId) return 'no_list_category';
 
     await client.query(
       `
