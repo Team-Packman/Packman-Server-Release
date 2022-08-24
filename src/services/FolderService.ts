@@ -95,7 +95,7 @@ const getTogetherListInFolder = async (
       `
       SELECT *
       FROM "folder" f
-      WHERE f.id = $1
+      WHERE f.id = $1 and f.is_aloned = false
       `,
       [folderId],
     );
