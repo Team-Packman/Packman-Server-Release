@@ -8,7 +8,7 @@ import { AloneListCategoryService} from '../services';
 import db from '../loaders/db';
 
 /**
- *  @route POST /category
+ *  @route POST /list/alone/category
  *  @desc create category
  *  @access private
  **/
