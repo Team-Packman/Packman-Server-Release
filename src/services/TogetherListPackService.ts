@@ -1,9 +1,11 @@
-import { PackCreateDto, PackUpdateDto, PackDeleteDto, PackResponseDto } from '../interfaces/IPack';
+import { PackCreateDto, PackUpdateDto, PackDeleteDto } from '../interfaces/IPack';
+import { TogetherListCategoryResponseDto } from '../interfaces/ITogetherList';
+import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
 
 const createPack = async (
   client: any,
   packCreateDto: PackCreateDto,
-): Promise<PackResponseDto | string> => {
+): Promise<TogetherListCategoryResponseDto | string> => {
   try {
     if (packCreateDto.name.length > 12) return 'exceed_len';
 
@@ -47,31 +49,14 @@ const createPack = async (
       `,
       [packCreateDto.categoryId, packCreateDto.name],
     );
-    const { rows: category } = await client.query(
-      `
-      SELECT    c.id::text,
-      c.name,
-      coalesce(json_agg( json_build_object( 'id', p.ID::text, 'name', p.name, 'isChecked', p.is_checked,'packer',
-      CASE
-                WHEN u.id IS NOT NULL THEN json_build_object('id', u.ID::text, 'name', u.nickname)
-                end) ORDER BY p.id) filter( WHERE p.id IS NOT NULL ), '[]' ) AS pack
-      FROM      category c
-      LEFT JOIN pack p
-      ON        c.id = p.category_id
-      LEFT JOIN "user" u
-      ON        u.id = p.packer_id
-      WHERE     c.list_id = $1
-      GROUP BY  c.id
-      ORDER BY  c.id
-      `,
-      [packCreateDto.listId],
-    );
 
-    const packResponseDto: PackResponseDto = {
+    const category = await togetherCategoryResponse(client, packCreateDto.listId);
+
+    const togetherListCategoryResponseDto: TogetherListCategoryResponseDto = {
       id: packCreateDto.listId,
       category: category,
     };
-    return packResponseDto;
+    return togetherListCategoryResponseDto;
   } catch (error) {
     console.log(error);
     throw error;
@@ -81,7 +66,7 @@ const createPack = async (
 const updatePack = async (
   client: any,
   packUpdateDto: PackUpdateDto,
-): Promise<PackResponseDto | string> => {
+): Promise<TogetherListCategoryResponseDto | string> => {
   try {
     if (packUpdateDto.name.length > 12) return 'exceed_len';
 
@@ -148,31 +133,13 @@ const updatePack = async (
       [packUpdateDto.name, packUpdateDto.isChecked, packUpdateDto.id],
     );
 
-    const { rows: category } = await client.query(
-      `
-      SELECT    c.id::text,
-      c.name,
-      coalesce(json_agg( json_build_object( 'id', p.ID::text, 'name', p.name, 'isChecked', p.is_checked,'packer',
-      CASE
-                WHEN u.id IS NOT NULL THEN json_build_object('id', u.ID::text, 'name', u.nickname)
-                end) ORDER BY p.id) filter( WHERE p.id IS NOT NULL ), '[]' ) AS pack
-      FROM      category c
-      LEFT JOIN pack p
-      ON        c.id = p.category_id
-      LEFT JOIN "user" u
-      ON        u.id = p.packer_id
-      WHERE     c.list_id = $1
-      GROUP BY  c.id
-      ORDER BY  c.id
-      `,
-      [packUpdateDto.listId],
-    );
+    const category = await togetherCategoryResponse(client, packUpdateDto.listId);
 
-    const packResponseDto: PackResponseDto = {
+    const togetherListCategoryResponseDto: TogetherListCategoryResponseDto = {
       id: packUpdateDto.listId,
       category: category,
     };
-    return packResponseDto;
+    return togetherListCategoryResponseDto;
   } catch (error) {
     console.log(error);
     throw error;
@@ -182,7 +149,7 @@ const updatePack = async (
 const deletePack = async (
   client: any,
   packDeleteDto: PackDeleteDto,
-): Promise<PackResponseDto | string> => {
+): Promise<TogetherListCategoryResponseDto | string> => {
   try {
     const { rows: existList } = await client.query(
       `
@@ -246,31 +213,13 @@ const deletePack = async (
       [packDeleteDto.packId],
     );
 
-    const { rows: category } = await client.query(
-      `
-      SELECT    c.id::text,
-      c.name,
-      coalesce(json_agg( json_build_object( 'id', p.ID::text, 'name', p.name, 'is_checked', p.is_checked,'packer',
-      CASE
-                WHEN u.id IS NOT NULL THEN json_build_object('id', u.ID::text, 'name', u.nickname)
-                end) ORDER BY p.id) filter( WHERE p.id IS NOT NULL ), '[]' ) AS pack
-      FROM      category c
-      LEFT JOIN pack p
-      ON        c.id = p.category_id
-      LEFT JOIN "user" u
-      ON        u.id = p.packer_id
-      WHERE     c.list_id = $1
-      GROUP BY  c.id
-      ORDER BY  c.id
-      `,
-      [packDeleteDto.listId],
-    );
+    const category = await togetherCategoryResponse(client, packDeleteDto.listId);
 
-    const packResponseDto: PackResponseDto = {
+    const togetherListCategoryResponseDto: TogetherListCategoryResponseDto = {
       id: packDeleteDto.listId,
       category: category,
     };
-    return packResponseDto;
+    return togetherListCategoryResponseDto;
   } catch (error) {
     console.log(error);
     throw error;

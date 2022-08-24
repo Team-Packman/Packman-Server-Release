@@ -5,7 +5,7 @@ import auth from '../middlewares/auth';
 
 const router = Router();
 
-router.get('/recentCreatedList', FolderController.getRecentCreatedList);
+router.get('/recentCreatedList', auth, FolderController.getRecentCreatedList);
 router.post(
   '/',
   [body('name').notEmpty(), body('isAloned').notEmpty()],

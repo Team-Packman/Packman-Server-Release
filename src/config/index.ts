@@ -27,13 +27,28 @@ export default {
   password: process.env.PROD_DB_PASSWORD,
 
   /**
+   * baseUrl
+   */
+  baseUrl: process.env.BASE_URL as string,
+
+  /**
    * jwt Secret
    */
 
   jwtSecret: process.env.JWT_SECRET as string,
 
   /**
-   * jwt Algorithm
+   * jwt issuer
    */
-  jwtAlgo: process.env.JWT_ALGO as string,
+  jwtIssuer: process.env.JWT_ISSUER as string,
+
+  /**
+   * jwt accessToken expire time
+   */
+  jwtAcExpires: process.env.JWT_AC_EXPIRES as string,
+
+  /**
+   * jwt refreshToken expire time
+   */
+  jwtRfExpires: process.env.JWT_RF_EXPIRES as string,
 };
