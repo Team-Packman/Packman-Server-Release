@@ -7,7 +7,7 @@ const getAloneTemplateList = async (
   try {
     const { rows: basicTemplateList } = await client.query(
       `
-    	SELECT *
+    	SELECT t.id::text, t.title
       FROM template t
 			WHERE user_id IS NULL AND is_deleted=false
 			ORDER BY t.id
@@ -16,7 +16,7 @@ const getAloneTemplateList = async (
 
     const { rows: myTemplateList } = await client.query(
       `
-			SELECT id, title
+			SELECT t.id::text, t.title
 			FROM template t
 			WHERE user_id=$1 AND is_aloned=true AND is_deleted=false
 			`,
