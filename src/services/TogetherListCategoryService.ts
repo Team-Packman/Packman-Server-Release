@@ -12,9 +12,10 @@ const createCategory = async (
     }
     const { rows: existList } = await client.query(
       `
-        SELECT *
-        FROM "packing_list" as t
-        WHERE t.id = $1
+      SELECT *
+      FROM "packing_list" as pl
+      JOIN "together_packing_list" tpl on pl.id = tpl.id
+      WHERE tpl.id = $1 and pl.is_deleted = false
         `,
       [categoryCreateDto.listId],
     );
@@ -67,9 +68,10 @@ const updateCategory = async (
     const { rows: existList } = await client.query(
       `
         SELECT *
-        FROM "packing_list" as t
-        WHERE t.id = $1
-        `,
+        FROM "packing_list" as pl
+        JOIN "together_packing_list" tpl on pl.id = tpl.id
+        WHERE tpl.id = $1 and pl.is_deleted = false
+      `,
       [categoryUpdateDto.listId],
     );
     if (existList.length === 0) {
@@ -139,9 +141,10 @@ const deleteCategory = async (
     const { rows: existList } = await client.query(
       `
         SELECT *
-        FROM "packing_list" as t
-        WHERE t.id = $1
-        `,
+        FROM "packing_list" as pl
+        JOIN "together_packing_list" tpl on pl.id = tpl.id
+        WHERE tpl.id = $1 and pl.is_deleted = false
+      `,
       [categoryDeleteDto.listId],
     );
     if (existList.length === 0) {
