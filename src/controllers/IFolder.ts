@@ -9,14 +9,14 @@ export interface AloneListInFolderResponseDto {
       name: string;
     },
   ];
-  listNum: number;
+  listNum: string;
   alonePackingList: [
     {
       id: string;
       title: string;
       departureDate: string;
-      packTotalNum: number;
-      packRemainNum: number;
+      packTotalNum: string;
+      packRemainNum: string;
     },
   ];
 }
