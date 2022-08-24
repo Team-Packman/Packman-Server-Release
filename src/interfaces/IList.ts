@@ -17,3 +17,9 @@ export interface TitleUpdateDto {
   title: string;
   isAloned?: boolean;
 }
+
+export interface DateUpdateDto {
+  id: string;
+  departureDate: string;
+  isAloned?: boolean;
+}

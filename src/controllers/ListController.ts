@@ -5,6 +5,7 @@ import util from '../modules/util';
 import { ListService } from '../services';
 import db from '../loaders/db';
 import { validationResult } from 'express-validator';
+import { DateUpdateDto } from '../interfaces/IList';
 import { TitleUpdateDto } from '../interfaces/IList';
 
 /**
@@ -81,7 +82,48 @@ const updateTitle = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @route PATCH /list/departureDate
+ *  @desc update packing list departure Date
+ *  @access private
+ **/
+
+const updateDate = async (req: Request, res: Response) => {
+  let client;
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res
+      .status(statusCode.BAD_REQUEST)
+      .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
+  }
+
+  const dateUpdateDto: DateUpdateDto = req.body;
+
+  try {
+    client = await db.connect(req);
+
+    const data = await ListService.updateDate(client, dateUpdateDto);
+
+    if (data === 'no_list')
+      res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, message.NO_PACKINGLIST));
+    else
+      res
+        .status(statusCode.OK)
+        .send(util.success(statusCode.OK, message.UPDATE_PACKINGLIST_DATE_SUCCESS, data));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    if (client !== undefined) client.release();
+  }
+};
+
 export default {
   inviteList,
+  updateDate,
   updateTitle,
 };

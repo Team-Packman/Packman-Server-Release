@@ -7,6 +7,12 @@ const router = Router();
 
 router.get('/invite/:inviteCode', auth, ListController.inviteList);
 router.patch(
+  '/departureDate',
+  [body('id').notEmpty(), body('departureDate').notEmpty(), body('isAloned').notEmpty()],
+  auth,
+  ListController.updateDate,
+);
+router.patch(
   '/title',
   [body('id').notEmpty(), body('title').notEmpty(), body('isAloned').notEmpty()],
   auth,
