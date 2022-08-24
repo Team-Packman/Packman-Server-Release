@@ -33,6 +33,7 @@ const message = {
   SUCCESS_UPDATE_FOLDER: '폴더 수정 성공',
   SUCCESS_DELETE_FOLDER: '폴더 수정 성공',
   SUCCESS_GET_FOLDERS: '폴더 조회 성공',
+  SUCCESS_GET_TOGETHER_FOLDERS: '함께 패킹리스트 폴더 조회 성공',
   SUCCESS_GET_ALONE_FOLDERS: '혼자 패킹리스트 폴더 조회 성공',
   NO_FOLDER: '존재하지 않는 Folder입니다',
   SUCCESS_GET_TOGETHER_PACKINGLIST_IN_FOLDER: '폴더 속 함께 패킹리스트 조회 성공',

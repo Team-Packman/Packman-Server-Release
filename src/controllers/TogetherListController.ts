@@ -3,9 +3,10 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import { PackerUpdateDto, TogetherListCreateDto } from '../interfaces/ITogetherList';
+import { PackerUpdateDto } from '../interfaces/ITogetherList';
 import TogetherListService from '../services/TogetherListService';
 import db from '../loaders/db';
+import { ListCreateDto } from '../interfaces/IList';
 
 /**
  *  @route POST /list/together
@@ -22,7 +23,7 @@ const createTogetherList = async (req: Request, res: Response) => {
   }
 
   const userId: number = req.body.user.id;
-  const togetherListCreateDto: TogetherListCreateDto = req.body;
+  const togetherListCreateDto: ListCreateDto = req.body;
 
   try {
     client = await db.connect(req);

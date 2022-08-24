@@ -1,12 +1,6 @@
 import { AloneListCategoryResponseDto } from './IAloneList';
 import { TogetherCategoryResponseDto } from './ICategory';
 
-export interface TogetherListCreateDto {
-  departureDate: string;
-  folderId: string;
-  title: string;
-  templateId: string;
-}
 export interface TogetherListResponseDto {
   id: string;
   title: string;
