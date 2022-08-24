@@ -5,6 +5,12 @@ import auth from '../middlewares/auth';
 
 const router: Router = Router();
 
+router.post(
+  '/',
+  [body('name').notEmpty(), body('listId').notEmpty()],
+  auth,
+  AloneListCategoryController.createCategory,
+);
 
 router.patch(
     '/',
@@ -12,6 +18,4 @@ router.patch(
     auth,
     AloneListCategoryController.updateCategory,
   );
-
-
 export default router;

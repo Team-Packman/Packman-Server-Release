@@ -15,5 +15,5 @@ export {
   ListService,
   TogetherListPackService,
   LandingService,
-  AloneListCategoryService
+  AloneListCategoryService,
 };
