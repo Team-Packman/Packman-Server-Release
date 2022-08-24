@@ -12,4 +12,10 @@ router.post(
   AloneListCategoryController.createCategory,
 );
 
+router.patch(
+    '/',
+    [body('id').notEmpty(), body('name').notEmpty(), body('listId').notEmpty()],
+    auth,
+    AloneListCategoryController.updateCategory,
+  );
 export default router;
