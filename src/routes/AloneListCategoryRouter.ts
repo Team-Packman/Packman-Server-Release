@@ -9,7 +9,7 @@ const router: Router = Router();
 router.patch(
     '/',
     [body('id').notEmpty(), body('name').notEmpty(), body('listId').notEmpty()],
- 
+    auth,
     AloneListCategoryController.updateCategory,
   );
 
