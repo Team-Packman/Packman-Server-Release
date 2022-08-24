@@ -7,6 +7,7 @@ import TogetherListPackController from './TogetherListPackController';
 import FolderController from './FolderController';
 import LandingController from './LandingController';
 import AloneListController from './AloneListController';
+import AloneListCategoryController from './AloneListCategoryController';
 
 export {
   UserController,
@@ -18,4 +19,5 @@ export {
   TogetherListPackController,
   LandingController,
   AloneListController,
+  AloneListCategoryController,
 };
