@@ -118,7 +118,7 @@ const getTogetherListInFolder = async (
       SELECT f.id::text, f.name
       FROM "folder" f
       WHERE f.user_id = $1 and f.is_aloned = false
-      ORDER BY f.id
+      ORDER BY f.id DESC
       `,
       [userId],
     );
@@ -146,7 +146,7 @@ const getTogetherListInFolder = async (
       LEFT JOIN pack p ON c.id = p.category_id
       WHERE fpl.folder_id = $1 and pl.is_deleted = false
       GROUP BY tapl.together_packing_list_id, pl.title, pl.departure_date
-      ORDER BY tapl.together_packing_list_id
+      ORDER BY tapl.together_packing_list_id DESC
       `,
       [folderId],
     );
