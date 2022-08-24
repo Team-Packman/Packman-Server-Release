@@ -2,6 +2,7 @@ import { RecentCreatedListResponseDto } from '../interfaces/IList';
 import { AllFolderResponseDto, FolderCreateDto } from '../interfaces/IFolder';
 import { folderResponse } from '../modules/folderResponse';
 import dayjs from 'dayjs';
+import { FolderResponseDto } from '../interfaces/IFolder';
 import { folderResponse } from '../modules/folderResponse';
 import { AllFolderResponseDto } from '../interfaces/IFolder';
 
@@ -123,8 +124,30 @@ const getFolders = async (client: any, userId: string): Promise<AllFolderRespons
   }
 };
 
+const getTogetherFolders = async (client: any, userId: string): Promise<FolderResponseDto[]> => {
+  try {
+    const { rows: togetherFolders } = await client.query(
+      `
+      SELECT f.id::text, f.name
+      FROM "folder" f
+      WHERE f.user_id = $1 and f.is_aloned = false
+      ORDER BY f.id DESC
+      `,
+      [userId],
+    );
+
+    const data: FolderResponseDto[] = togetherFolders;
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export default {
   getRecentCreatedList,
   createFolder,
   getFolders,
+  getTogetherFolders,
 };

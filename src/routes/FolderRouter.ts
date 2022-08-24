@@ -13,5 +13,6 @@ router.post(
   FolderController.createFolder,
 );
 router.get('/', auth, FolderController.getFolders);
+router.get('/together', auth, FolderController.getTogetherFolders);
 
 export default router;

@@ -41,7 +41,6 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
  *  @desc create folder
  *  @access private
  **/
-
  const createFolder = async (req: Request, res: Response) => {
   const error = validationResult(req);
   if (!error.isEmpty()) {
@@ -80,7 +79,6 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
  *  @desc read user folder
  *  @access private
  **/
-
  const getFolders = async (req: Request, res: Response) => {
   let client;
   const userId = req.body.user.id;
@@ -98,8 +96,38 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @route GET /folder/together
+ *  @desc read togetherFolders
+ *  @access private
+ **/
+const getTogetherFolders = async (req: Request, res: Response) => {
+  let client;
+
+  const userId = req.body.user.id;
+
+  try {
+    client = await db.connect(req);
+    const data = await FolderService.getTogetherFolders(client, userId);
+
+    res.status(statusCode.OK).send(
+      util.success(statusCode.OK, message.SUCCESS_GET_TOGETHER_FOLDERS, {
+        togetherFolder: data,
+      }),
+    );
+  } catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    if (client !== undefined) client.release();
+  }
+};
+
 export default {
   getRecentCreatedList,
   createFolder,
   getFolders,
+  getTogetherFolders,
 };

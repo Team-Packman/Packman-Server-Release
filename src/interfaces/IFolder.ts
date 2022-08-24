@@ -26,3 +26,8 @@ export interface AllFolderResponseDto {
     },
   ];
 }
+
+export interface FolderResponseDto {
+  id: string;
+  name: string;
+}
