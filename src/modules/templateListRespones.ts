@@ -12,7 +12,7 @@ async function templateListResponse(
       FROM template t
       WHERE user_id IS NULL AND is_deleted=false
       ORDER BY t.id
-			`,
+      `,
     );
 
     const { rows: myTemplateList } = await client.query(
@@ -21,7 +21,7 @@ async function templateListResponse(
       FROM template t
       WHERE user_id=$1 AND is_aloned=${isAloned} AND is_deleted=false
       ORDER BY t.id
-			`,
+      `,
       [userId],
     );
 
