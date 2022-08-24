@@ -55,7 +55,7 @@ const updateCategory = async (
       }
     }
 
-    const { rows } = await client.query(
+    await client.query(
       `
         UPDATE "category" as c
         SET name = $2
