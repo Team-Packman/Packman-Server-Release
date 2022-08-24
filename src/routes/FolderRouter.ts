@@ -4,7 +4,7 @@ import auth from '../middlewares/auth';
 
 const router = Router();
 
-router.get('/recentCreatedList', FolderController.getRecentCreatedList);
-router.get('/together', FolderController.getTogetherFolders);
+router.get('/recentCreatedList', auth, FolderController.getRecentCreatedList);
+router.get('/together', auth, FolderController.getTogetherFolders);
 
 export default router;
