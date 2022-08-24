@@ -12,4 +12,6 @@ router.post(
   auth,
   FolderController.createFolder,
 );
+router.get('/', auth, FolderController.getFolders);
+
 export default router;

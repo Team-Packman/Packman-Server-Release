@@ -2,6 +2,8 @@ import { RecentCreatedListResponseDto } from '../interfaces/IList';
 import { AllFolderResponseDto, FolderCreateDto } from '../interfaces/IFolder';
 import { folderResponse } from '../modules/folderResponse';
 import dayjs from 'dayjs';
+import { folderResponse } from '../modules/folderResponse';
+import { AllFolderResponseDto } from '../interfaces/IFolder';
 
 const getRecentCreatedList = async (
   client: any,
@@ -111,7 +113,18 @@ const createFolder = async (
   }
 };
 
+const getFolders = async (client: any, userId: string): Promise<AllFolderResponseDto> => {
+  try {
+    const data = await folderResponse(client, userId);
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export default {
   getRecentCreatedList,
   createFolder,
+  getFolders,
 };
