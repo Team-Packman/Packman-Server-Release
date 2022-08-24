@@ -15,7 +15,7 @@ const createCategory = async (
         SELECT *
         FROM "packing_list" as pl
         WHERE pl.id = $1 AND pl.is_deleted = false
-        `,
+     `,
       [categoryCreateDto.listId],
     );
     if (existList.length === 0) {
@@ -24,10 +24,10 @@ const createCategory = async (
 
     const { rows: existCategory } = await client.query(
       `
-          SELECT * 
-          FROM "category" as c 
-          WHERE c.list_id = $1 AND c.name = $2
-          `,
+        SELECT * 
+        FROM "category" as c 
+        WHERE c.list_id = $1 AND c.name = $2
+     `,
       [categoryCreateDto.listId, categoryCreateDto.name],
     );
     if (existCategory.length > 0) {
@@ -38,7 +38,7 @@ const createCategory = async (
       `
         INSERT INTO "category" (list_id, name)
         VALUES ($1, $2)
-        `,
+     `,
       [categoryCreateDto.listId, categoryCreateDto.name],
     );
 
