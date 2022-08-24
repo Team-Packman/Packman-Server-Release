@@ -8,6 +8,7 @@ import FolderController from './FolderController';
 import LandingController from './LandingController';
 import AloneListController from './AloneListController';
 import AloneListCategoryController from './AloneListCategoryController';
+import AloneListPackController from './AloneListPackController';
 
 export {
   UserController,
@@ -20,4 +21,5 @@ export {
   LandingController,
   AloneListController,
   AloneListCategoryController,
+  AloneListPackController,
 };

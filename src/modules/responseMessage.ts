@@ -44,6 +44,7 @@ const message = {
 
   //패킹리스트 공통
   NO_PACKINGLIST: '존재하지 않는 패킹리스트입니다',
+  NO_ALONE_LIST: '존재하지 않는 혼자 패킹리스트입니다',
   NO_USER_LIST: '유저가 생성한 리스트가 없습니다',
   DUPLICATION_PACKINGLIST: '중복된 리스트 이름입니다',
   NO_UPDATEDTITLE: '존재하지 않는 UpdatedTitle입니다',
