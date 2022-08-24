@@ -1,4 +1,4 @@
-import { PackCreateDto, PackUpdateDto, packDeleteDto } from '../interfaces/IPack';
+import { PackCreateDto, PackUpdateDto, PackDeleteDto } from '../interfaces/IPack';
 import { AloneListCategoryResponseDto } from '../interfaces/IAloneList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 

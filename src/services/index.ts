@@ -8,6 +8,7 @@ import LandingService from './LandingService';
 import AloneListCategoryService from './AloneListCategoryService';
 import FolderService from './FolderService';
 import AloneListPackService from './AloneListPackService';
+import AloneListService from './AloneListService';
 
 export {
   UserService,
