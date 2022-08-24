@@ -10,7 +10,6 @@ export interface PackUpdateDto {
   isChecked: boolean;
   listId: string;
   categoryId: string;
-  packId: string;
 }
 
 export interface PackDeleteDto {

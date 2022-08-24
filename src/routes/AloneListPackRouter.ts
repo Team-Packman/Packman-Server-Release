@@ -11,4 +11,17 @@ router.post(
   AloneListPackController.createPack,
 );
 
+router.patch(
+  '/',
+  [
+    body('id').notEmpty(),
+    body('name').notEmpty(),
+    body('isChecked').notEmpty(),
+    body('listId').notEmpty(),
+    body('categoryId').notEmpty(),
+  ],
+  auth,
+  AloneListPackController.updatePack,
+);
+
 export default router;
