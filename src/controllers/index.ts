@@ -9,6 +9,7 @@ import LandingController from './LandingController';
 import AloneListController from './AloneListController';
 import AloneListCategoryController from './AloneListCategoryController';
 import AloneListPackController from './AloneListPackController';
+import TemplateController from './TemplateController';
 
 export {
   UserController,
@@ -22,4 +23,5 @@ export {
   AloneListController,
   AloneListCategoryController,
   AloneListPackController,
+  TemplateController,
 };
