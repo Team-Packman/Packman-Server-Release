@@ -8,11 +8,12 @@ const deleteCategory = async (
   ): Promise<AloneListCategoryResponseDto | string> => {
     try {
       const { rows: existList } = await client.query(
-        `
-          SELECT *
-          FROM "packing_list" as pl
-          WHERE pl.id = $1 AND pl.is_deleted = false
-          `,
+      `
+        SELECT *
+        FROM "packing_list" as pl
+        JOIN alone_packing_list apl on pl.id = apl.id
+        WHERE apl.id = $1 and pl.is_deleted = false
+      `,
         [categoryDeleteDto.listId],
       );
       if (existList.length === 0) {
