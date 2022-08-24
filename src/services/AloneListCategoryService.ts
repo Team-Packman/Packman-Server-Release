@@ -1,5 +1,5 @@
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
-import { CategoryCreateDto, categoryUpdateDto, CategoryDeleteDto } from '../interfaces/ICategory';
+import { CategoryCreateDto, CategoryUpdateDto, CategoryDeleteDto } from '../interfaces/ICategory';
 import { AloneListCategoryResponseDto } from '../interfaces/IAloneList';
 
 const createCategory = async (
@@ -169,9 +169,9 @@ const deleteCategory = async (
       const { rows } = await client.query(
         `
         DELETE FROM "category" as c
-        WHERE c.id = $1  AND c.list_id = $2
+        WHERE c.id = $1 
         `,
-        [categoryDeleteDto.categoryId, categoryDeleteDto.listId],
+        [categoryDeleteDto.categoryId],
       );
   
       const category = await aloneCategoryResponse(client, categoryDeleteDto.listId);
