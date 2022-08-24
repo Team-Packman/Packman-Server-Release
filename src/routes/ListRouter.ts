@@ -12,5 +12,11 @@ router.patch(
   auth,
   ListController.updateDate,
 );
+router.patch(
+  '/title',
+  [body('id').notEmpty(), body('title').notEmpty(), body('isAloned').notEmpty()],
+  auth,
+  ListController.updateTitle,
+);
 
 export default router;

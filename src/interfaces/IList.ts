@@ -12,6 +12,12 @@ export interface ListInviteResponseDto {
   title: string;
 }
 
+export interface TitleUpdateDto {
+  id: string;
+  title: string;
+  isAloned?: boolean;
+}
+
 export interface DateUpdateDto {
   id: string;
   departureDate: string;
