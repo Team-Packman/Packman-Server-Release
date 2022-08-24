@@ -12,6 +12,13 @@ export interface ListInviteResponseDto {
   title: string;
 }
 
+export interface ListCreateDto {
+  departureDate: string;
+  folderId: string;
+  title: string;
+  templateId: string;
+}
+
 export interface TitleUpdateDto {
   id: string;
   title: string;
@@ -21,5 +28,11 @@ export interface TitleUpdateDto {
 export interface DateUpdateDto {
   id: string;
   departureDate: string;
+  isAloned?: boolean;
+}
+
+export interface MyTemplateUpdateDto {
+  id: string;
+  isSaved: boolean;
   isAloned?: boolean;
 }
