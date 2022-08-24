@@ -87,7 +87,7 @@ const createFolder = async (
   folderCreateDto: FolderCreateDto,
 ): Promise<AllFolderResponseDto | string> => {
   try {
-    if (folderCreateDto.name.length > 12) return 'exceed_len';
+    if (folderCreateDto.name.length > 8) return 'exceed_len';
 
     const { rows: newFolder } = await client.query(
       `
