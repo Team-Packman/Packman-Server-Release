@@ -1,5 +1,5 @@
 import { TemplateListResponseDto } from '../interfaces/ITemplate';
-import { templateListResponse } from '../modules/templateListRespones';
+import { templateListResponse } from '../modules/templateListResponse';
 
 const getAloneTemplateList = async (
   client: any,
