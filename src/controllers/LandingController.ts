@@ -3,16 +3,15 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import UserService from '../services/UserService';
-import { UserCreateDto } from '../interfaces/IUser';
 import db from '../loaders/db';
+import { LandingService } from '../services';
 
 /**
- *  @route POST /user/profile
- *  @desc create user
+ *  @route POST /landing
+ *  @desc create landing user
  *  @access public
  **/
-const createUser = async (req: Request, res: Response) => {
+const createLandingUser = async (req: Request, res: Response) => {
   let client;
   const error = validationResult(req);
   if (!error.isEmpty()) {
@@ -21,21 +20,21 @@ const createUser = async (req: Request, res: Response) => {
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
 
-  const userCreateDto: UserCreateDto = req.body;
+  const phone = req.body.phone;
 
   try {
     client = await db.connect(req);
 
-    const data = await UserService.createUser(client, userCreateDto);
+    const data = await LandingService.createLandingUser(client, phone);
 
-    if (data === 'exceed_len')
+    if (data === 'duplicate_phone')
       res
         .status(statusCode.BAD_REQUEST)
-        .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
+        .send(util.success(statusCode.BAD_REQUEST, message.DUPLICATED_PHONE));
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.SUCCESS_CREATE_USER, data));
+        .send(util.success(statusCode.OK, message.SUCCESS_CREATE_LANDING_USER, data));
   } catch (error) {
     console.log(error);
     res
@@ -47,5 +46,5 @@ const createUser = async (req: Request, res: Response) => {
 };
 
 export default {
-  createUser,
+  createLandingUser,
 };

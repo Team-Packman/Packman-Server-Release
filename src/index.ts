@@ -2,8 +2,17 @@ import express, { Request, Response, NextFunction } from 'express';
 const app = express();
 import routes from './routes';
 import dotenv from 'dotenv';
+import cors from 'cors';
+import config from './config';
 
 dotenv.config();
+
+app.use(
+  cors({
+    credentials: true,
+    origin: ['http://localhost:3000', 'https://www.packman-notification.ml', config.baseUrl],
+  }),
+);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

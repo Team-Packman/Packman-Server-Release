@@ -5,8 +5,7 @@ import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import { PackerUpdateDto, TogetherListCreateDto } from '../interfaces/ITogetherList';
 import TogetherListService from '../services/TogetherListService';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const db = require('../loaders/db');
+import db from '../loaders/db';
 
 /**
  *  @route POST /list/together
@@ -48,7 +47,7 @@ const createTogetherList = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 
@@ -81,7 +80,7 @@ const readTogetherList = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 
@@ -116,6 +115,8 @@ const updatePacker = async (req: Request, res: Response) => {
       res
         .status(statusCode.NOT_FOUND)
         .send(util.success(statusCode.NOT_FOUND, message.NO_LIST_PACK));
+    else if (data === 'no_user')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_USER));
     else
       res
         .status(statusCode.OK)
@@ -126,7 +127,7 @@ const updatePacker = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 
@@ -145,9 +146,10 @@ const addMember = async (req: Request, res: Response) => {
 
   let client;
   const listId = req.body.listId;
+  const userId = req.body.user.id;
   try {
     client = await db.connect(req);
-    const data = await TogetherListService.addMember(client, listId, '2'); // "4"는 user_id, 토큰 관련해서 생성되면 req.body.user로 받아올거
+    const data = await TogetherListService.addMember(client, listId, userId);
     if (data === 'no_list') {
       res
         .status(statusCode.NOT_FOUND)
@@ -164,7 +166,7 @@ const addMember = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 

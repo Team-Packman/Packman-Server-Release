@@ -17,6 +17,6 @@ router.patch(
   auth,
   TogetherListController.updatePacker,
 );
-router.post('/add-member', [body('listId').notEmpty()], TogetherListController.addMember);
+router.post('/add-member', auth, [body('listId').notEmpty()], TogetherListController.addMember);
 
 export default router;

@@ -21,10 +21,15 @@ export default {
    */
   port: parseInt(process.env.PORT as string, 10) as number,
 
-  user: process.env.DEV_DB_USER,
-  host: process.env.DEV_DB_HOST,
-  database: process.env.DEV_DB_DB,
-  password: process.env.DEV_DB_PASSWORD,
+  user: process.env.PROD_DB_USER,
+  host: process.env.PROD_DB_HOST,
+  database: process.env.PROD_DB_DB,
+  password: process.env.PROD_DB_PASSWORD,
+
+  /**
+   * baseUrl
+   */
+  baseUrl: process.env.BASE_URL as string,
 
   /**
    * jwt Secret
@@ -33,7 +38,17 @@ export default {
   jwtSecret: process.env.JWT_SECRET as string,
 
   /**
-   * jwt Algorithm
+   * jwt issuer
    */
-  jwtAlgo: process.env.JWT_ALGO as string,
+  jwtIssuer: process.env.JWT_ISSUER as string,
+
+  /**
+   * jwt accessToken expire time
+   */
+  jwtAcExpires: process.env.JWT_AC_EXPIRES as string,
+
+  /**
+   * jwt refreshToken expire time
+   */
+  jwtRfExpires: process.env.JWT_RF_EXPIRES as string,
 };
