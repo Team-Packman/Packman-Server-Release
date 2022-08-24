@@ -9,14 +9,14 @@ export interface TogetherListInFolderResponseDto {
       name: string;
     },
   ];
-  listNum: number;
+  listNum: string;
   togetherPackingList: [
     {
       id: string;
       title: string;
       departureDate: string;
-      packTotalNum: number;
-      packRemainNum: number;
+      packTotalNum: string;
+      packRemainNum: string;
     },
   ];
 }
