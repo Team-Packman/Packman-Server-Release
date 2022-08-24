@@ -34,7 +34,7 @@ const createCategory = async (
       return 'duplicate_category';
     }
 
-    const { rows } = await client.query(
+    await client.query(
       `
         INSERT INTO "category" (list_id, name)
         VALUES ($1, $2)
