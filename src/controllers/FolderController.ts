@@ -3,8 +3,7 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import FolderService from '../services/FolderService';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const db = require('../loaders/db');
+import db from '../loaders/db';
 
 /**
  *  @route GET /folder/recentCreatedList
@@ -13,8 +12,7 @@ const db = require('../loaders/db');
  **/
 const getRecentCreatedList = async (req: Request, res: Response) => {
   let client;
-
-  const userId = '1'; // 추후 소셜 로그인 연결 후 바꾸기
+  const userId = req.body.user.id;
 
   try {
     client = await db.connect(req);
@@ -32,7 +30,7 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   } finally {
-    client.release();
+    if (client !== undefined) client.release();
   }
 };
 
