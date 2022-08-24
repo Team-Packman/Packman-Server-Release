@@ -188,6 +188,42 @@ const getTogetherListInFolder = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @route GET /folder/list/alone/:folderId
+ *  @desc read aloneLists in Folder
+ *  @access private
+ **/
+const getAloneListInFolder = async (req: Request, res: Response) => {
+  let client;
+
+  const userId = req.body.user.id;
+  const { folderId } = req.params;
+
+  try {
+    client = await db.connect(req);
+    const data = await FolderService.getAloneListInFolder(client, userId, folderId);
+
+    if (data === 'no_folder') {
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_FOLDER));
+    } else if (data === 'no_user_folder') {
+      res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, message.NO_USER_FOLDER));
+    } else {
+      res
+        .status(statusCode.OK)
+        .send(util.success(statusCode.OK, message.SUCCESS_GET_ALONE_LIST_IN_FOLDER, data));
+    }
+  } catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    if (client !== undefined) client.release();
+  }
+};
+
 export default {
   getRecentCreatedList,
   createFolder,
@@ -195,4 +231,5 @@ export default {
   getTogetherFolders,
   getAloneFolders,
   getTogetherListInFolder,
+  getAloneListInFolder,
 };
