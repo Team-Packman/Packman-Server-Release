@@ -100,7 +100,7 @@ const message = {
   ALREADY_EXIST_MEMBER: '이미 추가된 멤버입니다',
 
   // 랜딩
-  DUPLICATED_PHONE: '이미 존재하는 핸드폰 번호입니다',
+  DUPLICATED_PHONE: '이미 제출되었습니다!',
   SUCCESS_CREATE_LANDING_USER: '랜딩페이지 유저 생성 성공',
 };
 

@@ -7,7 +7,8 @@ import ListRouter from './ListRouter';
 import TogetherListPackRouter from './TogetherListPackRouter';
 import FolderRouter from './FolderRouter';
 import LandingRouter from './LandingRouter';
-import AloneListCategoryRouter from './AloneListCategoryRouter'
+import AloneListCategoryRouter from './AloneListCategoryRouter';
+
 
 const router = Router();
 
