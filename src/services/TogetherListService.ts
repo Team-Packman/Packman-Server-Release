@@ -22,7 +22,7 @@ const createTogetherList = async (
       `
       INSERT INTO "packing_list" (title, departure_date)
       VALUES ($1, $2), ($1, $2)
-      RETURNING id
+      RETURNING id, is_saved
       `,
       [togetherListCreateDto.title, togetherListCreateDto.departureDate],
     );
@@ -133,7 +133,7 @@ const createTogetherList = async (
 
     const { rows: etcDataArray } = await client.query(
       `
-      SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY.MM.DD') AS "departureDate", p.is_templated AS "isSaved",
+      SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY.MM.DD') AS "departureDate",
         t.group_id AS "groupId", t.invite_code AS "inviteCode"
       FROM "packing_list" p
       JOIN "together_packing_list" t ON p.id=t.id 
@@ -155,7 +155,7 @@ const createTogetherList = async (
         groupId: etcData.groupId.toString(),
         category: togetherCategory,
         inviteCode: etcData.inviteCode,
-        isSaved: etcData.isSaved,
+        isSaved: listIdArray[1].is_saved,
       },
       myPackingList: {
         id: myListId.toString(),
@@ -182,6 +182,7 @@ const readTogetherList = async (
       FROM "together_alone_packing_list" as l
       JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
       WHERE l.id=$1 AND p.is_deleted=false
+      ORDER BY p.id
       `,
       [listId],
     );
@@ -191,7 +192,7 @@ const readTogetherList = async (
       `
       SELECT ta.together_packing_list_id::text AS "togetherListId", ta.my_packing_list_id::text AS "myListId",
         t.group_id::text AS "groupId", t.invite_code AS "inviteCode",
-        p.title AS "title", TO_CHAR(p.departure_date,'YYYY.MM.DD') AS "departureDate", p.is_templated AS "isSaved"
+        p.title AS "title", TO_CHAR(p.departure_date,'YYYY.MM.DD') AS "departureDate"
       FROM (SELECT * FROM "together_alone_packing_list" WHERE id=$1) ta
       JOIN "together_packing_list" t ON ta.together_packing_list_id=t.id
       JOIN "packing_list" p ON t.id=p.id
@@ -239,7 +240,7 @@ const readTogetherList = async (
         groupId: etcData.groupId,
         category: togetherCategory,
         inviteCode: etcData.inviteCode,
-        isSaved: etcData.isSaved,
+        isSaved: existList[1].is_saved,
       },
       myPackingList: {
         id: etcData.myListId,
