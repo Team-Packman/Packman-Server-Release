@@ -97,6 +97,45 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
 };
 
 /**
+ *  @route DELETE /folder
+ *  @desc delete folder
+ *  @access private
+ **/
+ const deleteFolder = async (req: Request, res: Response) => {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res
+      .status(statusCode.BAD_REQUEST)
+      .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
+  }
+  let client;
+  const userId = '1';
+  const { folderId } = req.params;
+
+  try {
+    client = await db.connect(req);
+    const data = await FolderService.deleteFolder(client, userId, folderId);
+    if (data === 'exceed_len') {
+      res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.fail(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
+    } else {
+    res
+      .status(statusCode.OK)
+      .send(util.success(statusCode.OK, message.SUCCESS_DELETE_FOLDER, data));
+    }
+  } catch (error) {
+    
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    if (client !== undefined) client.release();
+  }
+};
+
+/**
  *  @route GET /folder/together
  *  @desc read togetherFolders
  *  @access private
@@ -227,6 +266,7 @@ const getAloneListInFolder = async (req: Request, res: Response) => {
 export default {
   getRecentCreatedList,
   createFolder,
+  deleteFolder,
   getFolders,
   getTogetherFolders,
   getAloneFolders,
