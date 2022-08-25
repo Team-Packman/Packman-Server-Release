@@ -20,9 +20,9 @@ const createTogetherList = async (
 
     const { rows: listIdArray } = await client.query(
       `
-      INSERT INTO "packing_list" (title, departure_date)
-      VALUES ($1, $2), ($1, $2)
-      RETURNING id, is_saved
+        INSERT INTO "packing_list" (title, departure_date)
+        VALUES ($1, $2), ($1, $2)
+        RETURNING id, is_saved
       `,
       [togetherListCreateDto.title, togetherListCreateDto.departureDate],
     );
@@ -31,50 +31,50 @@ const createTogetherList = async (
 
     const { rows: group } = await client.query(
       `
-      INSERT INTO "group" (id)
-      VALUES (DEFAULT)
-      RETURNING id
+        INSERT INTO "group" (id)
+        VALUES (DEFAULT)
+        RETURNING id
       `,
     );
     const groupId = group[0].id;
 
     await client.query(
       `
-      INSERT INTO "user_group" (user_id, group_id)
-      VALUES ($1, $2)
+        INSERT INTO "user_group" (user_id, group_id)
+        VALUES ($1, $2)
       `,
       [userId, groupId],
     );
 
     await client.query(
       `
-      INSERT INTO "together_packing_list" (id, group_id, invite_code)
-      VALUES ($1, $2, $3)
+        INSERT INTO "together_packing_list" (id, group_id, invite_code)
+        VALUES ($1, $2, $3)
       `,
       [togetherListId, groupId, inviteCode],
     );
 
     await client.query(
       `
-      INSERT INTO "alone_packing_list" (id, is_aloned)
-      VALUES ($1, false)
+        INSERT INTO "alone_packing_list" (id, is_aloned)
+        VALUES ($1, false)
       `,
       [myListId],
     );
 
     await client.query(
       `
-      INSERT INTO "folder_packing_list" (folder_id, list_id)
-      VALUES ($1, $2)
+        INSERT INTO "folder_packing_list" (folder_id, list_id)
+        VALUES ($1, $2)
       `,
       [togetherListCreateDto.folderId, myListId],
     );
 
     const { rows: togetherMyIdArray } = await client.query(
       `
-      INSERT INTO "together_alone_packing_list" (together_packing_list_id, my_packing_list_id)
-      VALUES ($1, $2)
-      RETURNING id
+        INSERT INTO "together_alone_packing_list" (together_packing_list_id, my_packing_list_id)
+        VALUES ($1, $2)
+        RETURNING id
       `,
       [togetherListId, myListId],
     );
@@ -82,8 +82,8 @@ const createTogetherList = async (
 
     await client.query(
       `
-      INSERT INTO "category" (list_id, name)
-      VALUES ($1, '기본')
+        INSERT INTO "category" (list_id, name)
+        VALUES ($1, '기본')
       `,
       [myListId],
     );
@@ -91,17 +91,17 @@ const createTogetherList = async (
     if (!togetherListCreateDto.templateId) {
       await client.query(
         `
-        INSERT INTO "category" (list_id, name)
-        VALUES ($1, '기본')
+          INSERT INTO "category" (list_id, name)
+          VALUES ($1, '기본')
         `,
         [togetherListId],
       );
     } else {
       const { rows: templateCategoryIdArray } = await client.query(
         `
-        SELECT c.id
-        FROM "template_category" c
-        WHERE c.template_id=$1 
+          SELECT c.id
+          FROM "template_category" c
+          WHERE c.template_id=$1 
         `,
         [togetherListCreateDto.templateId],
       );
@@ -111,9 +111,9 @@ const createTogetherList = async (
 
         const { rows: categoryIdArray } = await client.query(
           `
-          INSERT INTO "category" (list_id, name)
-          VALUES($1, (SELECT name FROM "template_category" WHERE id=$2))
-          RETURNING id
+            INSERT INTO "category" (list_id, name)
+            VALUES($1, (SELECT name FROM "template_category" WHERE id=$2))
+            RETURNING id
           `,
           [togetherListId, templateCategoryId],
         );
@@ -121,10 +121,10 @@ const createTogetherList = async (
 
         await client.query(
           `
-          INSERT INTO "pack" (category_id, name)
-          SELECT c.id, p.name
-          FROM "category" c, "template_pack" p
-          WHERE c.id=$1 AND p.category_id=$2
+            INSERT INTO "pack" (category_id, name)
+            SELECT c.id, p.name
+            FROM "category" c, "template_pack" p
+            WHERE c.id=$1 AND p.category_id=$2
           `,
           [categoryId, templateCategoryId],
         );
@@ -133,11 +133,11 @@ const createTogetherList = async (
 
     const { rows: etcDataArray } = await client.query(
       `
-      SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate",
-        t.group_id AS "groupId", t.invite_code AS "inviteCode"
-      FROM "packing_list" p
-      JOIN "together_packing_list" t ON p.id=t.id 
-      WHERE t.id=$1
+        SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate",
+          t.group_id AS "groupId", t.invite_code AS "inviteCode"
+        FROM "packing_list" p
+        JOIN "together_packing_list" t ON p.id=t.id 
+        WHERE t.id=$1
       `,
       [togetherListId],
     );
@@ -178,11 +178,11 @@ const readTogetherList = async (
   try {
     const { rows: existList } = await client.query(
       `
-      SELECT *
-      FROM "together_alone_packing_list" as l
-      JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
-      WHERE l.id=$1 AND p.is_deleted=false
-      ORDER BY p.id
+        SELECT *
+        FROM "together_alone_packing_list" as l
+        JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
+        WHERE l.id=$1 AND p.is_deleted=false
+        ORDER BY p.id
       `,
       [listId],
     );
@@ -190,12 +190,12 @@ const readTogetherList = async (
 
     const { rows: etcDataArray } = await client.query(
       `
-      SELECT ta.together_packing_list_id::text AS "togetherListId", ta.my_packing_list_id::text AS "myListId",
-        t.group_id::text AS "groupId", t.invite_code AS "inviteCode",
-        p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate"
-      FROM (SELECT * FROM "together_alone_packing_list" WHERE id=$1) ta
-      JOIN "together_packing_list" t ON ta.together_packing_list_id=t.id
-      JOIN "packing_list" p ON t.id=p.id
+        SELECT ta.together_packing_list_id::text AS "togetherListId", ta.my_packing_list_id::text AS "myListId",
+          t.group_id::text AS "groupId", t.invite_code AS "inviteCode",
+          p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate"
+        FROM (SELECT * FROM "together_alone_packing_list" WHERE id=$1) ta
+        JOIN "together_packing_list" t ON ta.together_packing_list_id=t.id
+        JOIN "packing_list" p ON t.id=p.id
       `,
       [listId],
     );
@@ -206,27 +206,27 @@ const readTogetherList = async (
 
     const { rows: groupInfo } = await client.query(
       `
-      SELECT g.id::text AS "id",
-        COALESCE(json_agg(json_build_object(
-            'id', u.id::text,
-            'nickname', u.nickname,
-            'profileImage',u.profile_image
-            ) ORDER BY ug.id) FILTER(WHERE u.id IS NOT NULL AND u.is_deleted=false),'[]') AS "member"
-      FROM "user_group" ug
-      JOIN "user" u ON ug.user_id=u.id
-      RIGHT JOIN "group" g ON ug.group_id=g.id
-      WHERE g.id=$1
-      GROUP BY g.id
+        SELECT g.id::text AS "id",
+          COALESCE(json_agg(json_build_object(
+              'id', u.id::text,
+              'nickname', u.nickname,
+              'profileImage',u.profile_image
+              ) ORDER BY ug.id) FILTER(WHERE u.id IS NOT NULL AND u.is_deleted=false),'[]') AS "member"
+        FROM "user_group" ug
+        JOIN "user" u ON ug.user_id=u.id
+        RIGHT JOIN "group" g ON ug.group_id=g.id
+        WHERE g.id=$1
+        GROUP BY g.id
       `,
       [etcData.groupId],
     );
 
     const { rows: isMember } = await client.query(
       `
-      SELECT EXISTS(
-      SELECT *
-      FROM "user_group" ug
-      WHERE ug.group_id=$1 AND ug.user_id=$2)
+        SELECT EXISTS(
+        SELECT *
+        FROM "user_group" ug
+        WHERE ug.group_id=$1 AND ug.user_id=$2)
       `,
       [etcData.groupId, userId],
     );
@@ -264,9 +264,9 @@ const updatePacker = async (
   try {
     const { rows: existList } = await client.query(
       `
-      SELECT *
-      FROM "packing_list" pl
-      WHERE pl.id =$1  AND pl.is_deleted=false
+        SELECT *
+        FROM "packing_list" pl
+        WHERE pl.id =$1  AND pl.is_deleted=false
       `,
       [packerUpdateDto.listId],
     );
@@ -274,9 +274,9 @@ const updatePacker = async (
 
     const { rows: existPack } = await client.query(
       `
-      SELECT *
-      FROM "pack" p
-      WHERE p.id = $1 
+        SELECT *
+        FROM "pack" p
+        WHERE p.id = $1 
       `,
       [packerUpdateDto.packId],
     );
@@ -284,32 +284,32 @@ const updatePacker = async (
 
     const { rows: existListPack } = await client.query(
       `
-      SELECT *
-      FROM "packing_list" pl
-      JOIN "category" c ON pl.id=c.list_id
-      JOIN "pack" p ON c.id=p.category_id
-      WHERE pl.id=$1 AND p.id =$2
-    `,
+        SELECT *
+        FROM "packing_list" pl
+        JOIN "category" c ON pl.id=c.list_id
+        JOIN "pack" p ON c.id=p.category_id
+        WHERE pl.id=$1 AND p.id =$2
+      `,
       [packerUpdateDto.listId, packerUpdateDto.packId],
     );
     if (existListPack.length === 0) return 'no_list_pack';
 
     const { rows: existUser } = await client.query(
       `
-      SELECT *
-      FROM "user" u
-      WHERE u.id=$1 AND u.is_deleted = false
-    `,
+        SELECT *
+        FROM "user" u
+        WHERE u.id=$1 AND u.is_deleted = false
+     `,
       [packerUpdateDto.packerId],
     );
     if (existUser.length === 0) return 'no_user';
 
     await client.query(
       `
-      UPDATE "pack"
-      SET packer_id=$1
-      WHERE id=$2
-    `,
+        UPDATE "pack"
+        SET packer_id=$1
+        WHERE id=$2
+      `,
       [packerUpdateDto.packerId, packerUpdateDto.packId],
     );
 
@@ -346,16 +346,16 @@ const addMember = async (client: any, listId: string, userId: string): Promise<s
         SELECT *
         FROM "user_group" as ug
         WHERE ug.user_id = $1 AND ug.group_id = $2
-        `,
+      `,
       [userId, togetherList[0].group_id],
     );
     if (existMember.length > 0) return 'already_exist_member';
 
-    const { rows: userGroup } = await client.query(
+    await client.query(
       `
         INSERT INTO "user_group" (user_id, group_id)
         VALUES ($1, $2)
-        `,
+      `,
       [userId, togetherList[0].group_id],
     );
 
@@ -365,7 +365,7 @@ const addMember = async (client: any, listId: string, userId: string): Promise<s
         SELECT * 
         FROM "folder" as f
         WHERE f.name = '기본' AND f.user_id = $1 AND f.is_aloned = false
-        `,
+      `,
       [userId],
     );
 
@@ -376,7 +376,7 @@ const addMember = async (client: any, listId: string, userId: string): Promise<s
           INSERT INTO "folder" (user_id, name, is_aloned)
           VALUES ($1, '기본', false)
           RETURNING *
-          `,
+        `,
         [userId],
       );
       folderId = newFolder[0].id;
@@ -390,7 +390,7 @@ const addMember = async (client: any, listId: string, userId: string): Promise<s
         INSERT INTO "packing_list" (title, departure_date)
         VALUES ($1, $2)
         RETURNING *
-        `,
+      `,
       [togetherList[0].title, togetherList[0].departure_date],
     );
 
@@ -399,23 +399,23 @@ const addMember = async (client: any, listId: string, userId: string): Promise<s
         INSERT INTO "alone_packing_list" (id, is_aloned)
         VALUES ($1, false)
         RETURNING *
-        `,
+      `,
       [packingList[0].id],
     );
 
-    const { rows: togetherAloneList } = await client.query(
+    await client.query(
       `
         INSERT INTO "together_alone_packing_list" (my_packing_list_id, together_packing_list_id)
         VALUES ($1, $2)
-        `,
+      `,
       [aloneList[0].id, togetherList[0].id],
     );
 
-    const { rows: folderList } = await client.query(
+    await client.query(
       `
         INSERT INTO "folder_packing_list" (folder_id, list_id)
         VALUES ($1, $2)
-        `,
+      `,
       [folderId, aloneList[0].id],
     );
   } catch (error) {
