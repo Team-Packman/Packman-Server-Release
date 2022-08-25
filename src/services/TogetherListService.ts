@@ -246,7 +246,7 @@ const readTogetherList = async (
         id: etcData.myListId,
         category: myCategory,
       },
-      group: groupInfo,
+      group: groupInfo[0],
       isMember: isMember[0].exists,
     };
 
