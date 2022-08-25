@@ -11,10 +11,10 @@ const createPack = async (
 
     const { rows: existList } = await client.query(
       `
-      SELECT *
-      FROM "packing_list" as pl
-      JOIN alone_packing_list apl on pl.id = apl.id
-      WHERE apl.id = $1 and pl.is_deleted = false
+        SELECT *
+        FROM "packing_list" as pl
+        JOIN alone_packing_list apl on pl.id = apl.id
+        WHERE apl.id = $1 and pl.is_deleted = false
       `,
       [packCreateDto.listId],
     );
@@ -23,9 +23,9 @@ const createPack = async (
 
     const { rows: existCategory } = await client.query(
       `
-      SELECT *
-      FROM "category" as c
-      WHERE c.id = $1
+        SELECT *
+        FROM "category" as c
+        WHERE c.id = $1
       `,
       [packCreateDto.categoryId],
     );
@@ -35,8 +35,8 @@ const createPack = async (
 
     await client.query(
       `
-      INSERT INTO "pack" (category_id, name)
-      VALUES ($1, $2)
+        INSERT INTO "pack" (category_id, name)
+        VALUES ($1, $2)
       `,
       [packCreateDto.categoryId, packCreateDto.name],
     );
@@ -63,9 +63,9 @@ const updatePack = async (
 
     const { rows: existPack } = await client.query(
       `
-      SELECT *
-      FROM "pack" as p
-      WHERE p.id = $1
+        SELECT *
+        FROM "pack" as p
+        WHERE p.id = $1
       `,
       [packUpdateDto.id],
     );
@@ -76,10 +76,10 @@ const updatePack = async (
 
     const { rows: existList } = await client.query(
       `
-      SELECT *
-      FROM "packing_list" as pl
-      JOIN alone_packing_list apl on pl.id = apl.id
-      WHERE apl.id = $1 and pl.is_deleted = false
+        SELECT *
+        FROM "packing_list" as pl
+        JOIN alone_packing_list apl on pl.id = apl.id
+        WHERE apl.id = $1 and pl.is_deleted = false
       `,
       [packUpdateDto.listId],
     );
@@ -88,9 +88,9 @@ const updatePack = async (
 
     const { rows: existCategory } = await client.query(
       `
-      SELECT *
-      FROM "category" as c
-      WHERE c.id = $1
+        SELECT *
+        FROM "category" as c
+        WHERE c.id = $1
       `,
       [packUpdateDto.categoryId],
     );
@@ -101,9 +101,9 @@ const updatePack = async (
 
     await client.query(
       `
-      UPDATE "pack"
-      SET name = $1, is_checked = $2
-      WHERE id = $3
+        UPDATE "pack"
+        SET name = $1, is_checked = $2
+        WHERE id = $3
       `,
       [packUpdateDto.name, packUpdateDto.isChecked, packUpdateDto.id],
     );
@@ -128,10 +128,10 @@ const deletePack = async (
   try {
     const { rows: existList } = await client.query(
       `
-      SELECT *
-      FROM "packing_list" as pl
-      JOIN alone_packing_list apl on pl.id = apl.id
-      WHERE apl.id = $1 and pl.is_deleted = false
+        SELECT *
+        FROM "packing_list" as pl
+        JOIN alone_packing_list apl on pl.id = apl.id
+        WHERE apl.id = $1 and pl.is_deleted = false
       `,
       [packDeleteDto.listId],
     );
@@ -140,9 +140,9 @@ const deletePack = async (
 
     const { rows: existCategory } = await client.query(
       `
-      SELECT *
-      FROM "category" as c
-      WHERE c.id = $1
+        SELECT *
+        FROM "category" as c
+        WHERE c.id = $1
       `,
       [packDeleteDto.categoryId],
     );
@@ -153,9 +153,9 @@ const deletePack = async (
 
     const { rows: existPack } = await client.query(
       `
-      SELECT *
-      FROM "pack" as p
-      WHERE p.id = $1
+        SELECT *
+        FROM "pack" as p
+        WHERE p.id = $1
       `,
       [packDeleteDto.packId],
     );
@@ -166,8 +166,8 @@ const deletePack = async (
 
     await client.query(
       `
-      DELETE FROM "pack"
-      WHERE id = $1
+        DELETE FROM "pack"
+        WHERE id = $1
       `,
       [packDeleteDto.packId],
     );
