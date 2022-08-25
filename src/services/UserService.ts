@@ -44,7 +44,7 @@ const createUser = async (
   }
 };
 
-const deleteUser = async (client: any, userEmail: string) => {
+const dropUser = async (client: any, userEmail: string) => {
   await client.query(
     `
       DELETE 
