@@ -15,14 +15,14 @@ export interface AllFolderResponseDto {
     {
       id: string;
       name: string;
-      listNum: number;
+      listNum: string;
     },
   ];
   togetherFolder: [
     {
       id: string;
       name: string;
-      listNum: number;
+      listNum: string;
     },
   ];
 }
