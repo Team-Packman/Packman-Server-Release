@@ -10,7 +10,7 @@ async function templateListResponse(
       `
       SELECT t.id::text, t.title
       FROM template t
-      WHERE user_id IS NULL AND is_deleted=false
+      WHERE user_id IS NULL AND is_aloned=${isAloned} AND is_deleted=false
       ORDER BY t.id
       `,
     );
