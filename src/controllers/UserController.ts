@@ -49,7 +49,7 @@ const createUser = async (req: Request, res: Response) => {
 /**
  *  @route GET /user
  *  @desc get user
- *  @access public
+ *  @access private
  **/
 const getUser = async (req: Request, res: Response) => {
   let client;
