@@ -10,7 +10,7 @@ import db from '../loaders/db';
 
 /**
  *  @route POST /list/together
- *  @desc create together packinglist
+ *  @desc create together list
  *  @access private
  **/
 const createTogetherList = async (req: Request, res: Response) => {
@@ -54,7 +54,7 @@ const createTogetherList = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /list/together/:listId
- *  @desc read together packinglist
+ *  @desc read together list
  *  @access private
  **/
 const readTogetherList = async (req: Request, res: Response) => {

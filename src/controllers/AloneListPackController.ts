@@ -9,7 +9,7 @@ import db from '../loaders/db';
 
 /**
  *  @route POST /list/alone/pack
- *  @desc create Pack
+ *  @desc create alone Pack
  *  @access private
  **/
 const createPack = async (req: Request, res: Response) => {
@@ -57,7 +57,7 @@ const createPack = async (req: Request, res: Response) => {
 
 /**
  *  @route PATCH /list/alone/pack
- *  @desc update Pack
+ *  @desc update alone Pack
  *  @access private
  **/
 const updatePack = async (req: Request, res: Response) => {
@@ -110,7 +110,7 @@ const updatePack = async (req: Request, res: Response) => {
 
 /**
  *  @route DELETE /list/alone/pack/:listId/:categoryId/:packId
- *  @desc delete Pack
+ *  @desc delete alone Pack
  *  @access private
  **/
 const deletePack = async (req: Request, res: Response) => {

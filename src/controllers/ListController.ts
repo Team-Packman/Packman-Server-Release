@@ -9,7 +9,7 @@ import db from '../loaders/db';
 
 /**
  *  @route GET /invite/:inviteCode
- *  @desc invite packing list
+ *  @desc invite list
  *  @access private
  **/
 const inviteList = async (req: Request, res: Response) => {
@@ -39,7 +39,7 @@ const inviteList = async (req: Request, res: Response) => {
 
 /**
  *  @route PATCH /list/title
- *  @desc update packing list title
+ *  @desc update list title
  *  @access private
  **/
 
@@ -83,7 +83,7 @@ const updateTitle = async (req: Request, res: Response) => {
 
 /**
  *  @route PATCH /list/departureDate
- *  @desc update packing list departure Date
+ *  @desc update list departure date
  *  @access private
  **/
 
@@ -123,7 +123,7 @@ const updateDate = async (req: Request, res: Response) => {
 
 /**
  *  @route PATCH /list/myTemplate
- *  @desc update packing list my template
+ *  @desc update list my template
  *  @access private
  **/
 

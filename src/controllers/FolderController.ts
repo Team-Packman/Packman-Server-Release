@@ -8,7 +8,7 @@ import db from '../loaders/db';
 
 /**
  *  @route GET /folder/recentCreatedList
- *  @desc read recentCreatedList
+ *  @desc read recently created list
  *  @access private
  **/
 const getRecentCreatedList = async (req: Request, res: Response) => {
@@ -74,7 +74,7 @@ const createFolder = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /folder
- *  @desc read user folder
+ *  @desc read folder
  *  @access private
  **/
 const getFolders = async (req: Request, res: Response) => {
@@ -96,7 +96,7 @@ const getFolders = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /folder/together
- *  @desc read togetherFolders
+ *  @desc read together folders
  *  @access private
  **/
 const getTogetherFolders = async (req: Request, res: Response) => {
@@ -125,7 +125,7 @@ const getTogetherFolders = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /folder/alone
- *  @desc read aloneFolders
+ *  @desc read alone folders
  *  @access private
  **/
 const getAloneFolders = async (req: Request, res: Response) => {
@@ -152,7 +152,7 @@ const getAloneFolders = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /folder/list/together/:folderId
- *  @desc read togetherLists in Folder
+ *  @desc read together lists in folder
  *  @access private
  **/
 const getTogetherListInFolder = async (req: Request, res: Response) => {
@@ -188,7 +188,7 @@ const getTogetherListInFolder = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /folder/list/alone/:folderId
- *  @desc read aloneLists in Folder
+ *  @desc read alone lists in folder
  *  @access private
  **/
 const getAloneListInFolder = async (req: Request, res: Response) => {

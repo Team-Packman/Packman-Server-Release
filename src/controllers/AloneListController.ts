@@ -9,7 +9,7 @@ import db from '../loaders/db';
 
 /**
  *  @route POST /list/alone
- *  @desc create alone packinglist
+ *  @desc create alone list
  *  @access private
  **/
 const createAloneList = async (req: Request, res: Response) => {
@@ -48,7 +48,7 @@ const createAloneList = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /list/alone/:listId
- *  @desc read alone packinglist
+ *  @desc read alone list
  *  @access private
  **/
 const readAloneList = async (req: Request, res: Response) => {

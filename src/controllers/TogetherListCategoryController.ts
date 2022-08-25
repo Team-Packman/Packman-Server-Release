@@ -9,7 +9,7 @@ import db from '../loaders/db';
 
 /**
  *  @route POST /category
- *  @desc create category
+ *  @desc create together category
  *  @access private
  **/
 const createCategory = async (req: Request, res: Response) => {
@@ -55,7 +55,7 @@ const createCategory = async (req: Request, res: Response) => {
 
 /**
  *  @route PATCH /category
- *  @desc update category
+ *  @desc update together category
  *  @access private
  **/
 const updateCategory = async (req: Request, res: Response) => {
@@ -107,7 +107,7 @@ const updateCategory = async (req: Request, res: Response) => {
 
 /**
  *  @route DELETE /category
- *  @desc delete category
+ *  @desc delete together category
  *  @access private
  **/
 const deleteCategory = async (req: Request, res: Response) => {
