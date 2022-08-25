@@ -16,10 +16,11 @@ const getRecentCreatedList = async (
   try {
     const { rows: list } = await client.query(
       `
-        SELECT *
-        FROM "folder" f
-        JOIN folder_packing_list fpl ON f.id = fpl.folder_id
-        WHERE f.user_id = $1
+      SELECT *
+      FROM "folder" f
+      JOIN folder_packing_list fpl ON f.id = fpl.folder_id
+      JOIN packing_list pl on fpl.list_id = pl.id
+      WHERE f.user_id = $1 AND pl.is_deleted = false
       `,
       [userId],
     );
