@@ -2,12 +2,10 @@ import { Request, Response } from 'express';
 import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
+import { validationResult } from 'express-validator';
+import { TitleUpdateDto, DateUpdateDto, MyTemplateUpdateDto } from '../interfaces/IList';
 import { ListService } from '../services';
 import db from '../loaders/db';
-import { validationResult } from 'express-validator';
-import { TitleUpdateDto } from '../interfaces/IList';
-import { DateUpdateDto } from '../interfaces/IList';
-import { MyTemplateUpdateDto } from '../interfaces/IList';
 
 /**
  *  @route GET /invite/:inviteCode

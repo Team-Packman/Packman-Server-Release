@@ -4,9 +4,9 @@ import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import { PackerUpdateDto } from '../interfaces/ITogetherList';
+import { ListCreateDto } from '../interfaces/IList';
 import TogetherListService from '../services/TogetherListService';
 import db from '../loaders/db';
-import { ListCreateDto } from '../interfaces/IList';
 
 /**
  *  @route POST /list/together

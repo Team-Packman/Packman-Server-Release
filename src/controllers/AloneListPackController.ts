@@ -4,8 +4,8 @@ import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import { PackCreateDto, PackUpdateDto, PackDeleteDto } from '../interfaces/IPack';
-import db from '../loaders/db';
 import { AloneListPackService } from '../services';
+import db from '../loaders/db';
 
 /**
  *  @route POST /list/alone/pack

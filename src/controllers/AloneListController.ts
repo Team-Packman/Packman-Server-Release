@@ -3,9 +3,9 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import db from '../loaders/db';
 import { ListCreateDto } from '../interfaces/IList';
 import { AloneListService } from '../services';
+import db from '../loaders/db';
 
 /**
  *  @route POST /list/alone

@@ -3,8 +3,8 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import { TogetherListPackService } from '../services';
 import { PackCreateDto, PackUpdateDto, PackDeleteDto } from '../interfaces/IPack';
+import { TogetherListPackService } from '../services';
 import db from '../loaders/db';
 
 /**
