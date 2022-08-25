@@ -83,9 +83,10 @@ const message = {
   DUPLICATED_CATEGORY: '중복된 카테고리 명입니다',
 
   //템플릿
-  NO_TEMPLATE: '존재하지 않는 Template입니다',
+  NO_TEMPLATE: '존재하지 않는 템플릿입니다',
   GET_ALONE_TEMPLATE_SUCCESS: '혼자 패킹 템플릿 리스트 조회 성공',
   GET_TOGETHER_TEMPLATE_SUCCESS: '함께 패킹 템플릿 리스트 조회 성공',
+  NO_TEMPLATE_TYPE: '존재하지 않는 템플릿 형식입니다',
 
   // 초대 코드 관련
   SUCCESS_INVITE_TOGETHER_PACKING: '함께 패킹리스트 초대 성공',
