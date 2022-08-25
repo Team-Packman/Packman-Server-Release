@@ -221,8 +221,8 @@ const getTogetherListInFolder = async (
     const { rows: togetherList } = await client.query(
       `
         SELECT tapl.together_packing_list_id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
-          Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum",
-          Count(p.id) AS "packTotalNum"
+          Count(p.id) AS "packTotalNum",
+          Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum"
         FROM folder_packing_list fpl
         JOIN together_alone_packing_list tapl on fpl.list_id = tapl.my_packing_list_id
         JOIN packing_list pl on tapl.together_packing_list_id = pl.id
@@ -300,8 +300,8 @@ const getAloneListInFolder = async (
     const { rows: aloneList } = await client.query(
       `
         SELECT apl.id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
-          Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum",
-          Count(p.id) AS "packTotalNum"
+          Count(p.id) AS "packTotalNum",
+          Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum"
         FROM folder_packing_list fpl
         JOIN packing_list pl on fpl.list_id = pl.id
         JOIN alone_packing_list apl on pl.id = apl.id
