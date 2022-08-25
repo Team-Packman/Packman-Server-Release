@@ -93,7 +93,9 @@ const deleteAloneList = async (req: Request, res: Response) => {
 
     const data = await AloneListService.deleteAloneList(client, folderId, listId);
 
-    if (data === 'no_list')
+    if (data === 'no_folder')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_FOLDER));
+    else if (data === 'no_list')
       res
         .status(statusCode.NOT_FOUND)
         .send(util.success(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
