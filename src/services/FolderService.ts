@@ -55,7 +55,7 @@ const getRecentCreatedList = async (
 
     const { rows: recentList } = await client.query(
       `
-      SELECT  pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as departure_date,
+      SELECT  pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
         Count(CASE WHEN p.is_checked = false THEN p.id END) AS remain,
         Count(p.id) AS total
       FROM   "packing_list" pl
@@ -67,7 +67,7 @@ const getRecentCreatedList = async (
       [recentListId],
     );
 
-    const remainDay = dayjs(recentList[0].departure_date).diff(dayjs().format('YYYY-MM-DD'), 'day');
+    const remainDay = dayjs(recentList[0].departureDate).diff(dayjs().format('YYYY-MM-DD'), 'day');
     let url = '';
 
     if (aloneList[0].is_aloned === true) {
@@ -220,7 +220,7 @@ const getTogetherListInFolder = async (
 
     const { rows: togetherList } = await client.query(
       `
-      SELECT tapl.together_packing_list_id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY.MM.DD') as "departureDate",
+      SELECT tapl.together_packing_list_id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
         Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum",
         Count(p.id) AS "packTotalNum"
       FROM folder_packing_list fpl
@@ -299,7 +299,7 @@ const getAloneListInFolder = async (
 
     const { rows: aloneList } = await client.query(
       `
-      SELECT apl.id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY.MM.DD') as "departureDate",
+      SELECT apl.id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
         Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum",
         Count(p.id) AS "packTotalNum"
       FROM folder_packing_list fpl

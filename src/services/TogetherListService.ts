@@ -133,7 +133,7 @@ const createTogetherList = async (
 
     const { rows: etcDataArray } = await client.query(
       `
-      SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY.MM.DD') AS "departureDate",
+      SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate",
         t.group_id AS "groupId", t.invite_code AS "inviteCode"
       FROM "packing_list" p
       JOIN "together_packing_list" t ON p.id=t.id 
@@ -192,7 +192,7 @@ const readTogetherList = async (
       `
       SELECT ta.together_packing_list_id::text AS "togetherListId", ta.my_packing_list_id::text AS "myListId",
         t.group_id::text AS "groupId", t.invite_code AS "inviteCode",
-        p.title AS "title", TO_CHAR(p.departure_date,'YYYY.MM.DD') AS "departureDate"
+        p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate"
       FROM (SELECT * FROM "together_alone_packing_list" WHERE id=$1) ta
       JOIN "together_packing_list" t ON ta.together_packing_list_id=t.id
       JOIN "packing_list" p ON t.id=p.id

@@ -124,7 +124,7 @@ const updateDate = async (
         UPDATE "packing_list"
         SET departure_date=$1
         WHERE id=$2
-        RETURNING TO_CHAR(departure_date,'YYYY.MM.DD') AS "departureDate"
+        RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
         `,
         [dateUpdateDto.departureDate, dateUpdateDto.id],
       );
@@ -149,7 +149,7 @@ const updateDate = async (
         UPDATE "packing_list"
         SET departure_date=$1
         WHERE id=$2 OR id=$3
-        RETURNING TO_CHAR(departure_date,'YYYY.MM.DD') AS "departureDate"
+        RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
         `,
         [dateUpdateDto.departureDate, togetherListId, aloneListId],
       );
