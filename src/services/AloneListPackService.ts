@@ -61,19 +61,6 @@ const updatePack = async (
   try {
     if (packUpdateDto.name.length > 12) return 'exceed_len';
 
-    const { rows: existPack } = await client.query(
-      `
-        SELECT *
-        FROM "pack" as p
-        WHERE p.id = $1
-      `,
-      [packUpdateDto.id],
-    );
-
-    if (existPack.length === 0) return 'no_pack';
-
-    if (existPack[0].category_id != packUpdateDto.categoryId) return 'no_category_pack';
-
     const { rows: existList } = await client.query(
       `
         SELECT *
@@ -98,6 +85,19 @@ const updatePack = async (
     if (existCategory.length === 0) return 'no_category';
 
     if (existCategory[0].list_id != packUpdateDto.listId) return 'no_list_category';
+
+    const { rows: existPack } = await client.query(
+      `
+        SELECT *
+        FROM "pack" as p
+        WHERE p.id = $1
+      `,
+      [packUpdateDto.id],
+    );
+
+    if (existPack.length === 0) return 'no_pack';
+
+    if (existPack[0].category_id != packUpdateDto.categoryId) return 'no_category_pack';
 
     await client.query(
       `
