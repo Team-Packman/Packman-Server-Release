@@ -2,7 +2,10 @@ export interface FolderCreateDto {
   name: string;
   isAloned: boolean;
 }
-
+export interface FolderUpdateDto {
+  id: string;
+  name: string;
+}
 export interface FolderInfoDto {
   id: string;
   name: string;
