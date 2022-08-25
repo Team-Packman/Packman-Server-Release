@@ -165,9 +165,47 @@ const addMember = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @route DELETE /list/together/:folderId/:listId
+ *  @desc delete together list
+ *  @access private
+ **/
+const deleteTogetherList = async (req: Request, res: Response) => {
+  let client;
+  const { folderId } = req.params;
+  const { listId } = req.params;
+
+  try {
+    client = await db.connect(req);
+
+    const data = await TogetherListService.deleteTogetherList(client, folderId, listId);
+
+    if (data === 'no_folder')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_FOLDER));
+    else if (data === 'no_list')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
+    else if (data === 'no_folder_list')
+      res
+        .status(statusCode.NOT_FOUND)
+        .send(util.success(statusCode.NOT_FOUND, message.NO_FOLDER_LIST));
+    else
+      res
+        .status(statusCode.OK)
+        .send(util.success(statusCode.OK, message.DELETE_TOGETHER_LIST_SUCCESS, data));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    if (client !== undefined) client.release();
+  }
+};
+
 export default {
   createTogetherList,
   readTogetherList,
   updatePacker,
   addMember,
+  deleteTogetherList,
 };

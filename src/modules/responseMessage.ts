@@ -44,6 +44,7 @@ const message = {
   NO_LIST: '존재하지 않는 패킹리스트입니다',
   NO_ALONE_LIST: '존재하지 않는 혼자 패킹리스트입니다',
   NO_USER_LIST: '유저가 생성한 리스트가 없습니다',
+  NO_FOLDER_LIST: '폴더에 존재하지 않는 패킹리스트입니다',
   DUPLICATION_LIST: '중복된 리스트 이름입니다',
   UPDATE_LIST_TITLE_SUCCESS: '패킹리스트 제목 수정 성공',
   UPDATE_LIST_DATE_SUCCESS: '패킹리스트 출발 날짜 수정 성공',
