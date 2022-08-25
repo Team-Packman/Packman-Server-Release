@@ -117,6 +117,71 @@ const createFolder = async (
   }
 };
 
+const deleteFolder = async (
+  client: any,
+  userId: string,
+  folderId: string,
+): Promise<AllFolderResponseDto | string> => {
+  try {
+
+    const { rows: existFolder } = await client.query(
+      `
+        SELECT *
+        FROM "folder" f
+        WHERE f.user_id = $1 AND f.id = $2
+      `,
+      [userId, folderId],
+    );
+    if (existFolder.length === 0) return 'no_folder';
+
+    if(existFolder[0].is_aloned) {
+      await client.query(
+        `
+          UPDATE "packing_list" pl
+          SET is_deleted = true
+          WHERE pl.id IN ( 
+                            SELECT fl.list_id
+                            FROM "folder_packing_list" fl
+                            WHERE fl.folder_id = $1
+                          )
+        `,
+        [folderId]
+      );
+    } else {
+    await client.query(
+        `
+          UPDATE "packing_list" pl
+          SET is_deleted = true
+          WHERE pl.id IN ( 
+                            SELECT sub_pl.id
+                            FROM "folder_packing_list" fl
+                            LEFT JOIN "together_alone_packing_list" tal ON fl.list_id = tal.my_packing_list_id
+                            JOIN "packing_list" sub_pl ON sub_pl.id = tal.together_packing_list_id OR  sub_pl.id = tal.my_packing_list_id
+                            WHERE fl.folder_id = $1
+                          )
+        `,
+        [folderId]
+      );
+    }
+    
+    await client.query(
+      `
+        DELETE FROM "folder" f
+        WHERE f.id = $1 
+      `,
+      [folderId]
+    );
+
+    const folder = await folderResponse(client, userId);
+
+    return folder;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+
 const getFolders = async (client: any, userId: string): Promise<AllFolderResponseDto> => {
   try {
     const data = await folderResponse(client, userId);
@@ -331,6 +396,7 @@ const getAloneListInFolder = async (
 export default {
   getRecentCreatedList,
   createFolder,
+  deleteFolder,
   getFolders,
   getTogetherFolders,
   getAloneFolders,
