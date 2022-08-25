@@ -15,7 +15,7 @@ router.post(
 router.patch(
   '/',
   [body('id').notEmpty(), body('name').notEmpty()],
-
+  auth,
   FolderController.updateFolder,
 );
 router.get('/', auth, FolderController.getFolders);
