@@ -31,16 +31,7 @@ const createPack = async (
 
     if (existCategory.length === 0) return 'no_category';
 
-    const { rows: existListCategory } = await client.query(
-      `
-        SELECT *
-        FROM "category" as c
-        WHERE c.id = $1 AND c.list_id = $2
-      `,
-      [packCreateDto.categoryId, packCreateDto.listId],
-    );
-
-    if (existListCategory.length === 0) return 'no_list_category';
+    if (existCategory[0].list_id != packCreateDto.listId) return 'no_list_category';
 
     await client.query(
       `
@@ -81,6 +72,8 @@ const updatePack = async (
 
     if (existPack.length === 0) return 'no_pack';
 
+    if (existPack[0].category_id != packUpdateDto.categoryId) return 'no_category_pack';
+
     const { rows: existList } = await client.query(
       `
         SELECT *
@@ -103,26 +96,7 @@ const updatePack = async (
 
     if (existCategory.length === 0) return 'no_category';
 
-    const { rows: existListCategory } = await client.query(
-      `
-        SELECT *
-        FROM "category" as c
-        WHERE c.id = $1 AND c.list_id = $2
-      `,
-      [packUpdateDto.categoryId, packUpdateDto.listId],
-    );
-
-    if (existListCategory.length === 0) return 'no_list_category';
-    const { rows: existCategoryPack } = await client.query(
-      `
-        SELECT *
-        FROM "pack" as p
-        WHERE p.id = $1 AND p.category_id = $2
-      `,
-      [packUpdateDto.id, packUpdateDto.categoryId],
-    );
-
-    if (existCategoryPack.length === 0) return 'no_category_pack';
+    if (existCategory[0].list_id != packUpdateDto.listId) return 'no_list_category';
 
     await client.query(
       `
@@ -173,6 +147,8 @@ const deletePack = async (
 
     if (existCategory.length === 0) return 'no_category';
 
+    if (existCategory[0].list_id != packDeleteDto.listId) return 'no_list_category';
+
     const { rows: existPack } = await client.query(
       `
         SELECT *
@@ -184,27 +160,7 @@ const deletePack = async (
 
     if (existPack.length === 0) return 'no_pack';
 
-    const { rows: existListCategory } = await client.query(
-      `
-        SELECT *
-        FROM "category" as c
-        WHERE c.id = $1 AND c.list_id = $2
-      `,
-      [packDeleteDto.categoryId, packDeleteDto.listId],
-    );
-
-    if (existListCategory.length === 0) return 'no_list_category';
-    const { rows: existCategoryPack } = await client.query(
-      `
-        SELECT *
-        FROM "pack" as p
-        WHERE p.id = $1 AND p.category_id = $2
-      `,
-      [packDeleteDto.packId, packDeleteDto.categoryId],
-    );
-
-    if (existCategoryPack.length === 0) return 'no_category_pack';
-
+    if (existPack[0].category_id != packDeleteDto.categoryId) return 'no_category_pack';
     await client.query(
       `
         DELETE FROM "pack"
