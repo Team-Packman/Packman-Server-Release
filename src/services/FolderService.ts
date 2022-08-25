@@ -24,7 +24,7 @@ const getRecentCreatedList = async (
       [userId],
     );
 
-    if (!list[0]) return 'no_list';
+    if (list.length === 0) return 'no_list';
 
     const { rows: aloneList } = await client.query(
       `
