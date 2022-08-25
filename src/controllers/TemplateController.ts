@@ -21,7 +21,7 @@ const getAloneTemplateList = async (req: Request, res: Response) => {
 
     res
       .status(statusCode.OK)
-      .send(util.success(statusCode.OK, message.GET_ALONETEMPLATE_SUCCESS, data));
+      .send(util.success(statusCode.OK, message.GET_ALONE_TEMPLATE_SUCCESS, data));
   } catch (error) {
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
@@ -47,7 +47,7 @@ const getTogetherTemplateList = async (req: Request, res: Response) => {
 
     res
       .status(statusCode.OK)
-      .send(util.success(statusCode.OK, message.GET_TOGETHERTEMPLATE_SUCCESS, data));
+      .send(util.success(statusCode.OK, message.GET_TOGETHER_TEMPLATE_SUCCESS, data));
   } catch (error) {
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
