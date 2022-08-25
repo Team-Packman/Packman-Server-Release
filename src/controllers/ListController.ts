@@ -20,9 +20,7 @@ const inviteList = async (req: Request, res: Response) => {
     client = await db.connect(req);
     const data = await ListService.getPackingByInviteCode(client, inviteCode);
     if (data === 'no_list') {
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     } else {
       res
         .status(statusCode.OK)
@@ -64,13 +62,11 @@ const updateTitle = async (req: Request, res: Response) => {
         .status(statusCode.BAD_REQUEST)
         .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
     else if (data === 'no_list')
-      res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.fail(statusCode.BAD_REQUEST, message.NO_PACKINGLIST));
+      res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.NO_LIST));
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.UPDATE_PACKINGLIST_TITLE_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.UPDATE_LIST_TITLE_SUCCESS, data));
   } catch (error) {
     console.log(error);
     res
@@ -104,13 +100,11 @@ const updateDate = async (req: Request, res: Response) => {
     const data = await ListService.updateDate(client, dateUpdateDto);
 
     if (data === 'no_list')
-      res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.fail(statusCode.BAD_REQUEST, message.NO_PACKINGLIST));
+      res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.NO_LIST));
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.UPDATE_PACKINGLIST_DATE_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.UPDATE_LIST_DATE_SUCCESS, data));
   } catch (error) {
     console.log(error);
     res
@@ -145,15 +139,13 @@ const updateMyTemplate = async (req: Request, res: Response) => {
     const data = await ListService.updateMyTemplate(client, userId, myTemplateUpdateDto);
 
     if (data === 'no_list')
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     else if (data === 'no_template')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_TEMPLATE));
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.UPDATE_PACKINGLIST_MYTEMPLATE_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.UPDATE_LIST_MY_TEMPLATE_SUCCESS, data));
   } catch (error) {
     console.log(error);
     res

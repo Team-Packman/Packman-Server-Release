@@ -35,7 +35,7 @@ const createAloneList = async (req: Request, res: Response) => {
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.CREATE_ALONEPACKINGLIST_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.CREATE_ALONE_LIST_SUCCESS, data));
   } catch (error) {
     console.log(error);
     res
@@ -61,13 +61,11 @@ const readAloneList = async (req: Request, res: Response) => {
     const data = await AloneListService.readAloneList(client, listId);
 
     if (data === 'no_list')
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.success(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.READ_ALONEPACKINGLIST_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.READ_ALONE_LIST_SUCCESS, data));
   } catch (error) {
     console.log(error);
     res

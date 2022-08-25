@@ -41,7 +41,7 @@ const createTogetherList = async (req: Request, res: Response) => {
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.CREATE_TOGETHERPACKINGLIST_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.CREATE_TOGETHER_LIST_SUCCESS, data));
   } catch (error) {
     console.log(error);
     res
@@ -68,13 +68,11 @@ const readTogetherList = async (req: Request, res: Response) => {
     const data = await TogetherListService.readTogetherList(client, listId, userId);
 
     if (data === 'no_list')
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.success(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.READ_TOGETHERPACKINGLIST_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.READ_TOGETHER_LIST_SUCCESS, data));
   } catch (error) {
     console.log(error);
     res
@@ -107,9 +105,7 @@ const updatePacker = async (req: Request, res: Response) => {
     const data = await TogetherListService.updatePacker(client, packerUpdateDto);
 
     if (data === 'no_list')
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.success(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
     else if (data === 'no_pack')
       res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_PACK));
     else if (data === 'no_list_pack')
@@ -152,9 +148,7 @@ const addMember = async (req: Request, res: Response) => {
     client = await db.connect(req);
     const data = await TogetherListService.addMember(client, listId, userId);
     if (data === 'no_list') {
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     } else if (data === 'already_exist_member') {
       res
         .status(statusCode.BAD_REQUEST)
