@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import LandingController from '../controllers/LandingController';
+import { LandingController } from '../controllers';
 
 const router = Router();
 

@@ -20,9 +20,9 @@ const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthRespon
 
     const { rows: userInfo } = await client.query(
       `
-      SELECT *
-      FROM "user"
-      WHERE email=$1
+        SELECT *
+        FROM "user"
+        WHERE email=$1
       `,
       [userEmail],
     );
@@ -42,9 +42,9 @@ const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthRespon
 
         await client.query(
           `
-          UPDATE "user"
-          SET refresh_token = $1
-          WHERE id = $2
+            UPDATE "user"
+            SET refresh_token = $1
+            WHERE id = $2
           `,
           [refreshToken, userInfo[0].id],
         );
@@ -84,9 +84,9 @@ const getNewToken = async (
 
     const { rows: existUser } = await client.query(
       `
-      SELECT *
-      FROM "user" u
-      WHERE u.id = $1 and is_deleted = false
+        SELECT *
+        FROM "user" u
+        WHERE u.id = $1 and is_deleted = false
       `,
       [userId],
     );
@@ -95,9 +95,9 @@ const getNewToken = async (
 
     const { rows: refresh } = await client.query(
       `
-      SELECT u.refresh_token
-      FROM "user" u
-      WHERE u.id = $1
+        SELECT u.refresh_token
+        FROM "user" u
+        WHERE u.id = $1
     `,
       [userId],
     );

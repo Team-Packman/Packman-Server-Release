@@ -25,21 +25,21 @@ const createCategory = async (
 
     const { rows: existCategory } = await client.query(
       `
-          SELECT * 
-          FROM "category" as c 
-          WHERE c.list_id = $1 AND c.name = $2
-          `,
+        SELECT * 
+        FROM "category" as c 
+        WHERE c.list_id = $1 AND c.name = $2
+      `,
       [categoryCreateDto.listId, categoryCreateDto.name],
     );
     if (existCategory.length > 0) {
       return 'duplicate_category';
     }
 
-    const { rows } = await client.query(
+    await client.query(
       `
         INSERT INTO "category" (list_id, name)
         VALUES ($1, $2)
-        `,
+      `,
       [categoryCreateDto.listId, categoryCreateDto.name],
     );
 
@@ -82,7 +82,7 @@ const updateCategory = async (
         SELECT *
         FROM "category" as c
         WHERE c.id = $1
-        `,
+      `,
       [categoryUpdateDto.id],
     );
 
@@ -95,10 +95,10 @@ const updateCategory = async (
 
     const { rows: duplicatedCategory } = await client.query(
       `
-          SELECT * 
-          FROM "category" as c 
-          WHERE c.list_id = $1 AND c.name = $2
-          `,
+        SELECT * 
+        FROM "category" as c 
+        WHERE c.list_id = $1 AND c.name = $2
+      `,
       [categoryUpdateDto.listId, categoryUpdateDto.name],
     );
 
@@ -110,11 +110,11 @@ const updateCategory = async (
       }
     }
 
-    const { rows } = await client.query(
+    await client.query(
       `
-      UPDATE "category" as c
-      SET name = $2
-      WHERE c.id = $1
+        UPDATE "category" as c
+        SET name = $2
+        WHERE c.id = $1
       `,
       [categoryUpdateDto.id, categoryUpdateDto.name],
     );
@@ -155,7 +155,7 @@ const deleteCategory = async (
         SELECT *
         FROM "category" as c
         WHERE c.id = $1
-        `,
+      `,
       [categoryDeleteDto.categoryId],
     );
 
@@ -166,10 +166,10 @@ const deleteCategory = async (
       return 'no_list_category';
     }
 
-    const { rows } = await client.query(
+    await client.query(
       `
-      DELETE FROM "category" as c
-      WHERE c.id = $1  AND c.list_id = $2
+        DELETE FROM "category" as c
+        WHERE c.id = $1  AND c.list_id = $2
       `,
       [categoryDeleteDto.categoryId, categoryDeleteDto.listId],
     );
