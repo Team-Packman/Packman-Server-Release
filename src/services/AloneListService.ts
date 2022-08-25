@@ -188,9 +188,9 @@ const deleteAloneList = async (
 
     await client.query(
       `
-        DELETE
-        FROM "packing_list" p
-        WHERE p.id IN (${aloneListIdArray})
+        UPDATE "packing_list"
+        SET is_deleted=true
+        WHERE id IN (${aloneListIdArray})
       `,
     );
 
@@ -202,7 +202,7 @@ const deleteAloneList = async (
         JOIN "packing_list" pl ON fpl.list_id=pl.id
         LEFT JOIN "category" c ON pl.id=c.list_id
         LEFT JOIN "pack" p ON c.id=p.category_id
-        WHERE fpl.folder_id=$1
+        WHERE fpl.folder_id=$1 AND pl.is_deleted=false
         GROUP BY pl.id
         ORDER BY pl.id DESC
       `,
