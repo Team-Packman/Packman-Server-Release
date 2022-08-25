@@ -156,6 +156,16 @@ const deleteAloneList = async (
   try {
     const aloneListIdArray: string[] = aloneListId.split(',');
 
+    const { rows: existFolder } = await client.query(
+      `
+        SELECT *
+        FROM "folder" as f
+        WHERE f.id=$1 AND f.is_aloned=true
+      `,
+      [folderId],
+    );
+    if (existFolder.length === 0) return 'no_folder';
+
     const { rows: existList } = await client.query(
       `
         SELECT *
