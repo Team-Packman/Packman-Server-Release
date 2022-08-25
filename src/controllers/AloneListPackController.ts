@@ -4,12 +4,12 @@ import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import { PackCreateDto, PackUpdateDto, PackDeleteDto } from '../interfaces/IPack';
-import { TogetherListPackService } from '../services';
+import { AloneListPackService } from '../services';
 import db from '../loaders/db';
 
 /**
- *  @route POST /list/together/pack
- *  @desc create together pack
+ *  @route POST /list/alone/pack
+ *  @desc create alone Pack
  *  @access private
  **/
 const createPack = async (req: Request, res: Response) => {
@@ -26,14 +26,14 @@ const createPack = async (req: Request, res: Response) => {
   try {
     client = await db.connect(req);
 
-    const data = await TogetherListPackService.createPack(client, packCreateDto);
+    const data = await AloneListPackService.createPack(client, packCreateDto);
 
     if (data === 'exceed_len')
       res
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
     else if (data === 'no_list')
-      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_ALONE_LIST));
     else if (data === 'no_category')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
     else if (data === 'no_list_category')
@@ -43,7 +43,7 @@ const createPack = async (req: Request, res: Response) => {
     else {
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.CREATE_TOGETHER_PACK_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.CREATE_ALONE_PACK_SUCCESS, data));
     }
   } catch (error) {
     console.log(error);
@@ -56,8 +56,8 @@ const createPack = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route PATCH /list/together/pack
- *  @desc update together pack
+ *  @route PATCH /list/alone/pack
+ *  @desc update alone Pack
  *  @access private
  **/
 const updatePack = async (req: Request, res: Response) => {
@@ -73,7 +73,7 @@ const updatePack = async (req: Request, res: Response) => {
   try {
     client = await db.connect(req);
 
-    const data = await TogetherListPackService.updatePack(client, packUpdateDto);
+    const data = await AloneListPackService.updatePack(client, packUpdateDto);
 
     if (data === 'exceed_len')
       res
@@ -82,7 +82,7 @@ const updatePack = async (req: Request, res: Response) => {
     else if (data === 'no_pack')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_PACK));
     else if (data === 'no_list')
-      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_ALONE_LIST));
     else if (data === 'no_category')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
     else if (data === 'no_list_category')
@@ -96,7 +96,7 @@ const updatePack = async (req: Request, res: Response) => {
     else {
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.UPDATE_TOGETHER_PACK_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.UPDATE_ALONE_PACK_SUCCESS, data));
     }
   } catch (error) {
     console.log(error);
@@ -109,8 +109,8 @@ const updatePack = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route DELETE /list/together/pack
- *  @desc delete together pack
+ *  @route DELETE /list/alone/pack/:listId/:categoryId/:packId
+ *  @desc delete alone Pack
  *  @access private
  **/
 const deletePack = async (req: Request, res: Response) => {
@@ -126,10 +126,10 @@ const deletePack = async (req: Request, res: Response) => {
 
   try {
     client = await db.connect(req);
-    const data = await TogetherListPackService.deletePack(client, packDeleteDto);
+    const data = await AloneListPackService.deletePack(client, packDeleteDto);
 
     if (data === 'no_list')
-      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_ALONE_LIST));
     else if (data === 'no_category')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
     else if (data === 'no_pack')
@@ -145,7 +145,7 @@ const deletePack = async (req: Request, res: Response) => {
     else {
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.DELETE_TOGETHER_PACK_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.DELETE_ALONE_PACK_SUCCESS, data));
     }
   } catch (error) {
     console.log(error);
