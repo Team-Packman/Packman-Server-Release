@@ -30,7 +30,7 @@ const getRecentCreatedList = async (
       `
       SELECT pl.id::text, apl.is_aloned
       FROM "folder" f
-      LEFT JOIN folder_packing_list fpl ON f.id = fpl.folder_id
+      JOIN folder_packing_list fpl ON f.id = fpl.folder_id
       LEFT JOIN packing_list pl ON fpl.list_id = pl.id
       LEFT JOIN alone_packing_list apl ON pl.id = apl.id
       WHERE f.user_id = $1
