@@ -3,13 +3,13 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import db from '../loaders/db';
 import { ListCreateDto } from '../interfaces/IList';
 import { AloneListService } from '../services';
+import db from '../loaders/db';
 
 /**
  *  @route POST /list/alone
- *  @desc create alone packinglist
+ *  @desc create alone list
  *  @access private
  **/
 const createAloneList = async (req: Request, res: Response) => {
@@ -35,7 +35,7 @@ const createAloneList = async (req: Request, res: Response) => {
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.CREATE_ALONEPACKINGLIST_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.CREATE_ALONE_LIST_SUCCESS, data));
   } catch (error) {
     console.log(error);
     res
@@ -48,7 +48,7 @@ const createAloneList = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /list/alone/:listId
- *  @desc read alone packinglist
+ *  @desc read alone list
  *  @access private
  **/
 const readAloneList = async (req: Request, res: Response) => {
@@ -61,13 +61,11 @@ const readAloneList = async (req: Request, res: Response) => {
     const data = await AloneListService.readAloneList(client, listId);
 
     if (data === 'no_list')
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.success(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.READ_ALONEPACKINGLIST_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.READ_ALONE_LIST_SUCCESS, data));
   } catch (error) {
     console.log(error);
     res

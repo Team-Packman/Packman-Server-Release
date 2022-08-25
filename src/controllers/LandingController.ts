@@ -3,8 +3,8 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import db from '../loaders/db';
 import { LandingService } from '../services';
+import db from '../loaders/db';
 
 /**
  *  @route POST /landing

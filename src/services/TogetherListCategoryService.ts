@@ -12,9 +12,10 @@ const createCategory = async (
     }
     const { rows: existList } = await client.query(
       `
-        SELECT *
-        FROM "packing_list" as t
-        WHERE t.id = $1
+      SELECT *
+      FROM "packing_list" as pl
+      JOIN "together_packing_list" tpl on pl.id = tpl.id
+      WHERE tpl.id = $1 and pl.is_deleted = false
         `,
       [categoryCreateDto.listId],
     );
@@ -24,21 +25,21 @@ const createCategory = async (
 
     const { rows: existCategory } = await client.query(
       `
-          SELECT * 
-          FROM "category" as c 
-          WHERE c.list_id = $1 AND c.name = $2
-          `,
+        SELECT * 
+        FROM "category" as c 
+        WHERE c.list_id = $1 AND c.name = $2
+      `,
       [categoryCreateDto.listId, categoryCreateDto.name],
     );
     if (existCategory.length > 0) {
       return 'duplicate_category';
     }
 
-    const { rows } = await client.query(
+    await client.query(
       `
         INSERT INTO "category" (list_id, name)
         VALUES ($1, $2)
-        `,
+      `,
       [categoryCreateDto.listId, categoryCreateDto.name],
     );
 
@@ -67,9 +68,10 @@ const updateCategory = async (
     const { rows: existList } = await client.query(
       `
         SELECT *
-        FROM "packing_list" as t
-        WHERE t.id = $1
-        `,
+        FROM "packing_list" as pl
+        JOIN "together_packing_list" tpl on pl.id = tpl.id
+        WHERE tpl.id = $1 and pl.is_deleted = false
+      `,
       [categoryUpdateDto.listId],
     );
     if (existList.length === 0) {
@@ -80,7 +82,7 @@ const updateCategory = async (
         SELECT *
         FROM "category" as c
         WHERE c.id = $1
-        `,
+      `,
       [categoryUpdateDto.id],
     );
 
@@ -93,10 +95,10 @@ const updateCategory = async (
 
     const { rows: duplicatedCategory } = await client.query(
       `
-          SELECT * 
-          FROM "category" as c 
-          WHERE c.list_id = $1 AND c.name = $2
-          `,
+        SELECT * 
+        FROM "category" as c 
+        WHERE c.list_id = $1 AND c.name = $2
+      `,
       [categoryUpdateDto.listId, categoryUpdateDto.name],
     );
 
@@ -108,11 +110,11 @@ const updateCategory = async (
       }
     }
 
-    const { rows } = await client.query(
+    await client.query(
       `
-      UPDATE "category" as c
-      SET name = $2
-      WHERE c.id = $1
+        UPDATE "category" as c
+        SET name = $2
+        WHERE c.id = $1
       `,
       [categoryUpdateDto.id, categoryUpdateDto.name],
     );
@@ -139,9 +141,10 @@ const deleteCategory = async (
     const { rows: existList } = await client.query(
       `
         SELECT *
-        FROM "packing_list" as t
-        WHERE t.id = $1
-        `,
+        FROM "packing_list" as pl
+        JOIN "together_packing_list" tpl on pl.id = tpl.id
+        WHERE tpl.id = $1 and pl.is_deleted = false
+      `,
       [categoryDeleteDto.listId],
     );
     if (existList.length === 0) {
@@ -152,7 +155,7 @@ const deleteCategory = async (
         SELECT *
         FROM "category" as c
         WHERE c.id = $1
-        `,
+      `,
       [categoryDeleteDto.categoryId],
     );
 
@@ -163,10 +166,10 @@ const deleteCategory = async (
       return 'no_list_category';
     }
 
-    const { rows } = await client.query(
+    await client.query(
       `
-      DELETE FROM "category" as c
-      WHERE c.id = $1  AND c.list_id = $2
+        DELETE FROM "category" as c
+        WHERE c.id = $1  AND c.list_id = $2
       `,
       [categoryDeleteDto.categoryId, categoryDeleteDto.listId],
     );

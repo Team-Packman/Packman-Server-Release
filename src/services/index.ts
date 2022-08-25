@@ -9,6 +9,8 @@ import AloneListService from './AloneListService';
 import AloneListCategoryService from './AloneListCategoryService';
 import FolderService from './FolderService';
 import AloneListPackService from './AloneListPackService';
+import AloneListService from './AloneListService';
+import AloneListCategoryService from './AloneListCategoryService';
 import TemplateService from './TemplateService';
 
 export {
