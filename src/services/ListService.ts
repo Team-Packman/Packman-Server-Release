@@ -12,11 +12,10 @@ const getPackingByInviteCode = async (
   try {
     const { rows: packingList } = await client.query(
       `
-      SELECT tapl.id::text, pl.title
-      FROM "together_packing_list" as t
-      JOIN together_alone_packing_list tapl on t.id = tapl.together_packing_list_id
-      JOIN packing_list pl on t.id = pl.id
-      WHERE t.invite_code = $1 and pl.is_deleted = false
+        SELECT pl.id::text, pl.title
+        FROM "together_packing_list" as t
+        JOIN "packing_list" as pl ON pl.id = t.id
+        WHERE t.invite_code = $1 AND pl.is_deleted = false
       `,
       [inviteCode],
     );
