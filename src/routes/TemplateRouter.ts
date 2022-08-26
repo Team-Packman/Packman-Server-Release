@@ -4,6 +4,6 @@ import auth from '../middlewares/auth';
 
 const router = Router();
 
-router.get('/:templateId/:type', auth, TemplateController.getTemplate);
+router.get('/:templateId', auth, TemplateController.getTemplate);
 
 export default router;

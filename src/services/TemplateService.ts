@@ -3,26 +3,20 @@ import { DetailedTemplateResponseDto } from "../interfaces/ITemplate";
 const getTemplate = async (
     client: any,
     templateId: string,
-    type: string,
   ): Promise<DetailedTemplateResponseDto | string> => {
     try {
-        let templateTitle;
-        if (type === 'basic' || type === 'alone' || type === 'together') {
-            const { rows: template } = await client.query(
-                `
-                    SELECT t.title
-                    FROM "template" t
-                    WHERE t.id = $1 AND t.is_deleted = false
-                `,
-                [templateId]
-            );
-            if(template.length === 0) {
-                return 'no_template';
-            }
-            templateTitle = template[0].title;
-        } else {
-            return 'no_type';
+        const { rows: template } = await client.query(
+            `
+                SELECT t.title
+                FROM "template" t
+                WHERE t.id = $1 AND t.is_deleted = false
+            `,
+            [templateId]
+        );
+        if(template.length === 0) {
+            return 'no_template';
         }
+        const templateTitle = template[0].title;
 
 
         const { rows: category } = await client.query(

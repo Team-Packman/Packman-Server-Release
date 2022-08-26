@@ -7,30 +7,26 @@ import db from '../loaders/db';
 import { TemplateService } from '../services';
 
 /**
- *  @route GET /template/:templateId/:isAloned
- *  @desc Get togther Template
+ *  @route GET /template/:templateId
+ *  @desc Get Template
  *  @access private
  **/
 
 const getTemplate = async (req: Request, res: Response) => {
   let client;
-  const { templateId, type } = req.params;
+  const { templateId } = req.params;
   try {
     client = await db.connect(req);
-    const data = await TemplateService.getTemplate(client, templateId, type);
+    const data = await TemplateService.getTemplate(client, templateId);
 
     if (data == 'no_template') {
       res
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, message.NO_TEMPLATE));
-    } else if (data == 'no_type') {
-      res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.fail(statusCode.BAD_REQUEST, message.NO_TEMPLATE_TYPE));
     } else {
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.READ_DETAILEDTEMPLTATE_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.READ_DETAILED_TEMPLATE_SUCCESS, data));
     }
   } catch (error) {
     console.log(error);
