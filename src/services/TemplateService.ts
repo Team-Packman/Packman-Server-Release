@@ -12,7 +12,7 @@ const getTemplate = async (
                 `
                     SELECT t.title
                     FROM "template" t
-                    WHERE t.id = $1 AND t.is_deleted = false
+                    WHERE t.id = $1 AND t.is_deleted = false AND t.user_id IS NULL
                 `,
                 [templateId]
             );
@@ -25,9 +25,8 @@ const getTemplate = async (
                 `
                     SELECT t.title
                     FROM "template" t
-                    JOIN "packing_list" pl ON t.packing_list_id = pl.id
-                    JOIN "alone_packing_list" al ON pl.id  = al.id
-                    WHERE t.id = $1 AND pl.is_deleted = false AND al.is_aloned = true
+                    JOIN "alone_packing_list" al ON t.packing_list_id  = al.id
+                    WHERE t.id = $1 AND t.is_deleted = false AND al.is_aloned = true
                 `,
                 [templateId]
             );
@@ -40,9 +39,8 @@ const getTemplate = async (
                 `
                     SELECT t.title
                     FROM "template" t
-                    JOIN "packing_list" pl ON t.packing_list_id = pl.id
-                    JOIN "together_packing_list" tl ON pl.id  = tl.id
-                    WHERE t.id = $1 AND pl.is_deleted = false
+                    JOIN "together_packing_list" tl ON t.packing_list_id  = tl.id
+                    WHERE t.id = $1 AND t.is_deleted = false
                 `,
                 [templateId]
             );
@@ -64,7 +62,7 @@ const getTemplate = async (
                 ) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
                 FROM "template_category" c
                 LEFT JOIN "template_pack" p ON c.id = p.category_id
-                WHERE c.template_id = $1
+                WHERE c.template_id=$1
                 GROUP BY c.id
                 ORDER BY c.id
             `,
