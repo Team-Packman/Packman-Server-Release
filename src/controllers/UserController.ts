@@ -3,7 +3,7 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import { UserCreateDto } from '../interfaces/IUser';
+import { UserCreateDto, UserUpdateDto } from '../interfaces/IUser';
 import { UserService } from '../services';
 import db from '../loaders/db';
 
@@ -59,7 +59,7 @@ const createUser = async (req: Request, res: Response) => {
       .status(statusCode.BAD_REQUEST)
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
-  const userId = '1';
+  const userId = req.body.user.id;
   const userUpdateDto: UserUpdateDto = req.body;
 
   try {

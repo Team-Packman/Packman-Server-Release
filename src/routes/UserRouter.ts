@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 import { UserController } from '../controllers';
+import auth from '../middlewares/auth';
 
 const router = Router();
 
@@ -18,7 +19,7 @@ router.post(
 router.patch(
   '/profile',
   [body('nickname').notEmpty(), body('profileImage').notEmpty()],
-  
+  auth,
   UserController.updateUser,
 );
 export default router;
