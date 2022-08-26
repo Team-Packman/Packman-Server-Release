@@ -16,6 +16,13 @@ router.post(
   UserController.createUser,
 );
 
+router.patch(
+  '/profile',
+  [body('nickname').notEmpty(), body('profileImage').notEmpty()],
+  auth,
+  UserController.updateUser,
+);
+
 router.get('/', auth, UserController.getUser);
 
 export default router;

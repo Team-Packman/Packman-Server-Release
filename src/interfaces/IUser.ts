@@ -13,3 +13,8 @@ export interface UserResponseDto {
   accessToken?: string;
   refreshToken?: string;
 }
+
+export interface UserUpdateDto {
+  nickname: string;
+  profileImage: string;
+}
