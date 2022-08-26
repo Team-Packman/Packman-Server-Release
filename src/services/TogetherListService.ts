@@ -2,6 +2,7 @@ import {
   PackerUpdateDto,
   TogetherListResponseDto,
   TogetherListCategoryResponseDto,
+  TogetherAloneResponseDto,
 } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
@@ -327,7 +328,7 @@ const updatePacker = async (
   }
 };
 
-const addMember = async (client: any, listId: string, userId: string): Promise<string | void> => {
+const addMember = async (client: any, listId: string, userId: string): Promise<string | TogetherAloneResponseDto> => {
   try {
     const { rows: togetherList } = await client.query(
       `
@@ -403,10 +404,11 @@ const addMember = async (client: any, listId: string, userId: string): Promise<s
       [packingList[0].id],
     );
 
-    await client.query(
+    const { rows: aloneTogether } = await client.query(
       `
         INSERT INTO "together_alone_packing_list" (my_packing_list_id, together_packing_list_id)
         VALUES ($1, $2)
+        RETURNING id::text
       `,
       [aloneList[0].id, togetherList[0].id],
     );
@@ -418,6 +420,12 @@ const addMember = async (client: any, listId: string, userId: string): Promise<s
       `,
       [folderId, aloneList[0].id],
     );
+    
+    const data = {
+      listId: aloneTogether[0].id
+    }
+
+    return data;
   } catch (error) {
     console.log(error);
     throw error;
