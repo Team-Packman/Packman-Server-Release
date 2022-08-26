@@ -35,3 +35,7 @@ export interface TogetherListCategoryResponseDto {
   id: string;
   category: TogetherCategoryResponseDto[];
 }
+
+export interface TogetherAloneResponseDto {
+  listId: string;
+}
