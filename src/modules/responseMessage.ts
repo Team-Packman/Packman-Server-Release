@@ -97,6 +97,7 @@ const message = {
 
   // 멤버
   SUCCESS_GET_MEMBERS: '멤버 조회 성공',
+  NO_MEMBER_USER: '멤버에 유저가 존재하지 않습니다',
   ALREADY_EXIST_MEMBER: '이미 추가된 멤버입니다',
 
   // 랜딩
