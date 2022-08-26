@@ -22,4 +22,7 @@ router.patch(
   auth,
   UserController.updateUser,
 );
+
+router.get('/', auth, UserController.getUser);
+
 export default router;

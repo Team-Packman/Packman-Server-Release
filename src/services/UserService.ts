@@ -44,6 +44,24 @@ const createUser = async (
   }
 };
 
+const getUser = async (client: any, userId: string): Promise<UserResponseDto | string> => {
+  try {
+    const { rows: existUser } = await client.query(
+      `
+        SELECT u.id::TEXT, u.nickname, u.email, u.profile_image AS "profileImage"
+        FROM "user" u
+        WHERE u.id = $1 and u.is_deleted = false
+      `,
+      [userId],
+    );
+
+    return existUser[0];
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 const deleteUser = async (client: any, userEmail: string) => {
   await client.query(
     `
@@ -110,6 +128,7 @@ const updateUser = async (
 };
 export default {
   createUser,
+  getUser,
   deleteUser,
   checkUser,
   updateUser,
