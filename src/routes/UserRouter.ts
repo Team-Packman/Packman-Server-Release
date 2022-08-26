@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 import { UserController } from '../controllers';
+import auth from '../middlewares/auth';
 
 const router = Router();
 
@@ -14,4 +15,7 @@ router.post(
   ],
   UserController.createUser,
 );
+
+router.get('/', auth, UserController.getUser);
+
 export default router;
