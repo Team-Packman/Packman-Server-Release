@@ -11,7 +11,7 @@ const createUser = async (
     const refreshToken = jwtHandler.getRefreshToken();
     userCreateDto.refreshToken = refreshToken;
 
-    const { rows } = await client.query(
+    const { rows: user } = await client.query(
       `
         INSERT INTO "user" (email, name, nickname, profile_image, refresh_token)
         VALUES ($1, $2, $3, $4, $5)
@@ -74,7 +74,7 @@ const deleteUser = async (client: any, userEmail: string) => {
 };
 
 const checkUser = async (client: any, userId: string) => {
-  const { rows } = await client.query(
+  const { rows: user } = await client.query(
     `
       SELECT *
       FROM "user" u
@@ -89,7 +89,7 @@ const checkUser = async (client: any, userId: string) => {
 const updateUser = async (
   client: any,
   userUpdateDto: UserUpdateDto,
-  userId: string
+  userId: string,
 ): Promise<UserResponseDto | string> => {
   try {
     if (userUpdateDto.nickname.length > 4) return 'exceed_len';
@@ -99,9 +99,9 @@ const updateUser = async (
         FROM "user"
         WHERE id = $1 AND is_deleted = false
       `,
-      [userId]
+      [userId],
     );
-    if( existUser.length === 0) return 'no_user';
+    if (existUser.length === 0) return 'no_user';
     const { rows: user } = await client.query(
       `
         UPDATE "user" 
@@ -109,9 +109,8 @@ const updateUser = async (
         WHERE id = $3
         RETURNING *
       `,
-      [ userUpdateDto.nickname, userUpdateDto.profileImage, userId ],
+      [userUpdateDto.nickname, userUpdateDto.profileImage, userId],
     );
-
 
     const data: UserResponseDto = {
       id: userId,

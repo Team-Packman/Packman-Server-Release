@@ -10,8 +10,6 @@ import AloneListCategoryService from './AloneListCategoryService';
 import FolderService from './FolderService';
 import AloneListPackService from './AloneListPackService';
 import TemplateService from './TemplateService';
-import AloneListService from './AloneListService';
-import TemplateService from './TemplateService';
 
 export {
   UserService,
