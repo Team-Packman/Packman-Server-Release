@@ -7,39 +7,11 @@ const getTemplate = async (
   ): Promise<DetailedTemplateResponseDto | string> => {
     try {
         let templateTitle;
-        if (type === 'basic') {
+        if (type === 'basic' || type === 'alone' || type === 'together') {
             const { rows: template } = await client.query(
                 `
                     SELECT t.title
                     FROM "template" t
-                    WHERE t.id = $1 AND t.is_deleted = false AND t.user_id IS NULL
-                `,
-                [templateId]
-            );
-            if(template.length === 0) {
-                return 'no_template';
-            }
-            templateTitle = template[0].title;
-        } else if (type === 'alone') {
-            const { rows: template } = await client.query(
-                `
-                    SELECT t.title
-                    FROM "template" t
-                    JOIN "alone_packing_list" al ON t.packing_list_id  = al.id
-                    WHERE t.id = $1 AND t.is_deleted = false AND al.is_aloned = true
-                `,
-                [templateId]
-            );
-            if(template.length === 0) {
-                return 'no_template';
-            }
-            templateTitle = template[0].title;
-        } else if (type === 'together') {
-            const { rows: template } = await client.query(
-                `
-                    SELECT t.title
-                    FROM "template" t
-                    JOIN "together_packing_list" tl ON t.packing_list_id  = tl.id
                     WHERE t.id = $1 AND t.is_deleted = false
                 `,
                 [templateId]
