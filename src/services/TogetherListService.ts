@@ -456,6 +456,7 @@ const deleteTogetherList = async (
       `,
     );
     if (existList.length !== listMappingIdArray.length * 2) return 'no_list';
+
     //listIdArray = 삭제할 모든 together, alone list id 담김
     const listIdArray = await existList.map((element: UseForMapInDeleteDto) => element.id);
     //aloneListIdArray = 삭제할 alone list id 담김
@@ -500,15 +501,26 @@ const deleteTogetherList = async (
       `,
     );
 
-    // user_group의 개수가 1이기에 삭제해야 하는 together_packing_list와 해당 패킹리스트의 group id 선별
+    // 기본 - user_group에서 지울 together list의 group과 userId가 연관된 튜플 삭제
+    await client.query(
+      `
+        DELETE
+        FROM "user_group" ug
+        USING "together_packing_list" tpl
+        WHERE tpl.id IN (${togetherListIdArray}) AND ug.group_id=tpl.group_id AND ug.user_id=$1
+      `,
+      [userId],
+    );
+
+    // 기본 - user_group의 개수가 0인 together_packing_list와 해당 패킹리스트의 group id 선별
     const { rows: deleteItemArray } = await client.query(
       `
-      SELECT tpl.id, tpl.group_id as "groupId"
-      FROM "together_packing_list" tpl
-      JOIN "user_group" ug ON tpl.group_id=ug.group_id
-      WHERE tpl.id IN (${togetherListIdArray})
-      GROUP BY tpl.id
-      HAVING count(ug.id)=1
+        SELECT tpl.id, tpl.group_id as "groupId"
+        FROM "together_packing_list" tpl
+        LEFT JOIN "user_group" ug ON tpl.group_id=ug.group_id
+        WHERE tpl.id IN (${togetherListIdArray})
+        GROUP BY tpl.id
+        HAVING count(ug.id)=0
       `,
     );
 
@@ -518,6 +530,7 @@ const deleteTogetherList = async (
       deleteTogetherListIdArray = await deleteItemArray.map(
         (element: UseForMapInDeleteDto) => element.id,
       );
+
       // 삭제해야 할 together_packing_list group의 id 배열
       const deleteGroupIdArray = await deleteItemArray.map(
         (element: UseForMapInDeleteDto) => element.groupId,
@@ -536,7 +549,7 @@ const deleteTogetherList = async (
     // 기본 - is_deleted 처리할 패킹리스트 모음(모든 alone_packing_list + user_group 수가 1이라 삭제할 together_packing_list)
     const deleteListArray = aloneListIdArray.concat(deleteTogetherListIdArray);
 
-    // 기본 - 위에서 모은 packing_list is_deleted 처리
+    // 기본 - 위에서 종합한 packing_list is_deleted 처리
     await client.query(
       `
         UPDATE "packing_list"
