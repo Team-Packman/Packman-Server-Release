@@ -40,3 +40,8 @@ export interface TogetherListCategoryResponseDto {
 export interface TogetherListInfoResponseDto {
   togetherPackingList: ListInfoResponseDto[];
 }
+
+export interface UseForMapInDeleteDto {
+  id: number;
+  groupId?: number;
+}

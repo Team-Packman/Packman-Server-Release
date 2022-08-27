@@ -2,6 +2,8 @@ import {
   PackerUpdateDto,
   TogetherListResponseDto,
   TogetherListCategoryResponseDto,
+  TogetherListInfoResponseDto,
+  UseForMapInDeleteDto,
 } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
@@ -423,9 +425,156 @@ const addMember = async (client: any, listId: string, userId: string): Promise<s
     throw error;
   }
 };
+
+const deleteTogetherList = async (
+  client: any,
+  userId: number,
+  folderId: string,
+  listMappingId: string,
+): Promise<TogetherListInfoResponseDto | string> => {
+  try {
+    // listMappingIdArray는 혼자-함께 패킹리스트 연결 id를 의미(together_alone_packing_list table의 id)
+    const listMappingIdArray: string[] = listMappingId.split(',');
+
+    const { rows: existFolder } = await client.query(
+      `
+        SELECT *
+        FROM "folder" as f
+        WHERE f.id=$1 AND f.is_aloned=false AND f.user_id=$2
+      `,
+      [folderId, userId],
+    );
+    if (existFolder.length === 0) return 'no_folder';
+
+    const { rows: existList } = await client.query(
+      `
+        SELECT p.id
+        FROM "together_alone_packing_list" as l
+        JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
+        WHERE l.id IN (${listMappingIdArray}) AND p.is_deleted=false
+        ORDER BY p.id
+      `,
+    );
+    if (existList.length !== listMappingIdArray.length * 2) return 'no_list';
+    //listIdArray = 삭제할 모든 together, alone list id 담김
+    const listIdArray = await existList.map((element: UseForMapInDeleteDto) => element.id);
+    //aloneListIdArray = 삭제할 alone list id 담김
+    const aloneListIdArray = await listIdArray.filter(
+      (element: number, index: number) => index % 2 === 1,
+    );
+    //togetherListIdArray = 삭제할 together list id 담김, together list는 상황에 따라 삭제여부 결정
+    const togetherListIdArray = await listIdArray.filter(
+      (element: number, index: number) => index % 2 === 0,
+    );
+
+    const { rows: existFolderList } = await client.query(
+      `
+        SELECT *
+        FROM "folder_packing_list" as f
+        WHERE f.folder_id=$1 AND f.list_id IN (${aloneListIdArray})
+      `,
+      [folderId],
+    );
+    if (existFolderList.length !== aloneListIdArray.length) return 'no_folder_list';
+
+    /**
+     * 주석 앞의 '기본'은 들어온 모든 리스트가 해야 하는 동작을 의미
+     * '기본'이 없다면 user_group의 개수가 1이기에 together까지 삭제하는 경우 행하는 동작
+     **/
+
+    // 기본 - folder_packing_list table에서 지울 alonelist가 속한 튜플 삭제
+    await client.query(
+      `
+        DELETE
+        FROM "folder_packing_list" fpl
+        WHERE fpl.list_id IN (${aloneListIdArray})
+      `,
+    );
+
+    // 기본 - together_alone_packing_list에서 지울 alonelist가 속한 튜플 삭제
+    await client.query(
+      `
+        DELETE
+        FROM "together_alone_packing_list" tapl
+        WHERE tapl.my_packing_list_id IN (${aloneListIdArray})
+      `,
+    );
+
+    // user_group의 개수가 1이기에 삭제해야 하는 together_packing_list와 해당 패킹리스트의 group id 선별
+    const { rows: deleteItemArray } = await client.query(
+      `
+      SELECT tpl.id, tpl.group_id as "groupId"
+      FROM "together_packing_list" tpl
+      JOIN "user_group" ug ON tpl.group_id=ug.group_id
+      WHERE tpl.id IN (${togetherListIdArray})
+      GROUP BY tpl.id
+      HAVING count(ug.id)=1
+      `,
+    );
+
+    let deleteTogetherListIdArray: number[] = [];
+    if (deleteItemArray.length !== 0) {
+      // 삭제해야 할 together_packing_list의 id 배열
+      deleteTogetherListIdArray = await deleteItemArray.map(
+        (element: UseForMapInDeleteDto) => element.id,
+      );
+      // 삭제해야 할 together_packing_list group의 id 배열
+      const deleteGroupIdArray = await deleteItemArray.map(
+        (element: UseForMapInDeleteDto) => element.groupId,
+      );
+
+      //together_packing_list를 삭제 하는 경우 group도 삭제
+      await client.query(
+        `
+          DELETE
+          FROM "group" g
+          WHERE g.id IN (${deleteGroupIdArray})
+      `,
+      );
+    }
+
+    // 기본 - is_deleted 처리할 패킹리스트 모음(모든 alone_packing_list + user_group 수가 1이라 삭제할 together_packing_list)
+    const deleteListArray = aloneListIdArray.concat(deleteTogetherListIdArray);
+
+    // 기본 - 위에서 모은 packing_list is_deleted 처리
+    await client.query(
+      `
+        UPDATE "packing_list"
+        SET is_deleted=true
+        WHERE id IN (${deleteListArray})
+      `,
+    );
+
+    const { rows: togetherPackingListInfoArray } = await client.query(
+      `
+        SELECT tapl.id::text, pl.title, pl.departure_date as "departureDate",
+              count(p.id)::text as "packTotalNum", count(p.id) FILTER ( WHERE p.is_checked=false )::text as "packRemainNum"
+        FROM "folder_packing_list" fpl
+        JOIN "together_alone_packing_list" tapl ON fpl.list_id=tapl.my_packing_list_id
+        JOIN "packing_list" pl ON tapl.together_packing_list_id= pl.id
+        LEFT JOIN "category" c ON pl.id=c.list_id
+        LEFT JOIN "pack" p ON c.id=p.category_id
+        WHERE fpl.folder_id=$1 AND pl.is_deleted=false
+        GROUP BY tapl.id, pl.id
+        ORDER BY pl.id DESC
+      `,
+      [folderId],
+    );
+
+    const data: TogetherListInfoResponseDto = {
+      togetherPackingList: togetherPackingListInfoArray,
+    };
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export default {
   createTogetherList,
   readTogetherList,
   updatePacker,
   addMember,
+  deleteTogetherList,
 };
