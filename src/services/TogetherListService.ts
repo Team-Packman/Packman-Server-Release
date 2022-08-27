@@ -512,7 +512,8 @@ const deleteTogetherList = async (
       [userId],
     );
 
-    // 기본 - user_group의 개수가 0인 together_packing_list와 해당 패킹리스트의 group id 선별
+    // 기본 - 함께 리스트 group의  user_group 수가 0인 together_packing_list와 해당 패킹리스트의 group id 선별
+    // user_group의 수가 0이라는 것은 해당 함께 패킹리스트에 속하는 멤버 없다는 의미-> 함께 리스트 삭제
     const { rows: deleteItemArray } = await client.query(
       `
         SELECT tpl.id, tpl.group_id as "groupId"
@@ -546,7 +547,7 @@ const deleteTogetherList = async (
       );
     }
 
-    // 기본 - is_deleted 처리할 패킹리스트 모음(모든 alone_packing_list + user_group 수가 1이라 삭제할 together_packing_list)
+    // 기본 - is_deleted 처리할 패킹리스트 모음(모든 alone_packing_list + user_group 수가 0이라 삭제할 together_packing_list)
     const deleteListArray = aloneListIdArray.concat(deleteTogetherListIdArray);
 
     // 기본 - 위에서 종합한 packing_list is_deleted 처리
