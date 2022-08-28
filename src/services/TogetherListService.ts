@@ -483,6 +483,18 @@ const deleteTogetherList = async (
      * '공통'이 없다면 user_group의 개수가 0이기에 together까지 삭제하는 경우 행하는 동작
      **/
 
+    // 공통 - together list의 pack에 현재 user가 packer로 등록되어 있을 경우packer_id를 null로 변경
+    await client.query(
+      `
+        UPDATE "pack" p
+        SET packer_id= null
+        FROM together_packing_list tpl
+        JOIN category c ON tpl.id=c.list_id
+        WHERE tpl.id IN (${togetherListIdArray}) AND p.category_id=c.id AND p.packer_id=$1
+      `,
+      [userId],
+    );
+
     // 공통 - folder_packing_list table에서 지울 alonelist가 속한 튜플 삭제
     await client.query(
       `
@@ -492,7 +504,7 @@ const deleteTogetherList = async (
       `,
     );
 
-    // 공통 - together_alone_packing_list에서 지울 alonelist가 속한 튜플 삭제
+    // 공통 - together_alone_packing_list table에서 지울 alonelist가 속한 튜플 삭제
     await client.query(
       `
         DELETE
@@ -501,7 +513,7 @@ const deleteTogetherList = async (
       `,
     );
 
-    // 공통 - user_group에서 지울 together list의 group과 userId가 연관된 튜플 삭제
+    // 공통 - user_group table에서 지울 together list의 group과 userId가 연관된 튜플 삭제
     await client.query(
       `
         DELETE
