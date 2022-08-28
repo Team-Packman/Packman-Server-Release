@@ -479,11 +479,11 @@ const deleteTogetherList = async (
     if (existFolderList.length !== aloneListIdArray.length) return 'no_folder_list';
 
     /**
-     * 주석 앞의 '기본'은 들어온 모든 리스트가 해야 하는 동작을 의미
-     * '기본'이 없다면 user_group의 개수가 1이기에 together까지 삭제하는 경우 행하는 동작
+     * 주석 앞의 '공통'은 들어온 모든 리스트가 해야 하는 동작을 의미
+     * '공통'이 없다면 user_group의 개수가 0이기에 together까지 삭제하는 경우 행하는 동작
      **/
 
-    // 기본 - folder_packing_list table에서 지울 alonelist가 속한 튜플 삭제
+    // 공통 - folder_packing_list table에서 지울 alonelist가 속한 튜플 삭제
     await client.query(
       `
         DELETE
@@ -492,7 +492,7 @@ const deleteTogetherList = async (
       `,
     );
 
-    // 기본 - together_alone_packing_list에서 지울 alonelist가 속한 튜플 삭제
+    // 공통 - together_alone_packing_list에서 지울 alonelist가 속한 튜플 삭제
     await client.query(
       `
         DELETE
@@ -501,7 +501,7 @@ const deleteTogetherList = async (
       `,
     );
 
-    // 기본 - user_group에서 지울 together list의 group과 userId가 연관된 튜플 삭제
+    // 공통 - user_group에서 지울 together list의 group과 userId가 연관된 튜플 삭제
     await client.query(
       `
         DELETE
@@ -512,7 +512,7 @@ const deleteTogetherList = async (
       [userId],
     );
 
-    // 기본 - 함께 리스트 group의  user_group 수가 0인 together_packing_list와 해당 패킹리스트의 group id 선별
+    // 공통 - 함께 리스트 group의  user_group 수가 0인 together_packing_list와 해당 패킹리스트의 group id 선별
     // user_group의 수가 0이라는 것은 해당 함께 패킹리스트에 속하는 멤버 없다는 의미-> 함께 리스트 삭제
     const { rows: deleteItemArray } = await client.query(
       `
@@ -547,10 +547,10 @@ const deleteTogetherList = async (
       );
     }
 
-    // 기본 - is_deleted 처리할 패킹리스트 모음(모든 alone_packing_list + user_group 수가 0이라 삭제할 together_packing_list)
+    // 공통 - is_deleted 처리할 패킹리스트 종합하기(모든 alone_packing_list + user_group 수가 0이라 삭제할 together_packing_list)
     const deleteListArray = aloneListIdArray.concat(deleteTogetherListIdArray);
 
-    // 기본 - 위에서 종합한 packing_list is_deleted 처리
+    // 공통 - 위에서 종합한 packing_list is_deleted 처리
     await client.query(
       `
         UPDATE "packing_list"
