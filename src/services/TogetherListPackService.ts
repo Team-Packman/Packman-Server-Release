@@ -13,7 +13,8 @@ const createPack = async (
       `
       SELECT *
       FROM "packing_list" as pl
-      WHERE pl.id = $1
+      JOIN together_packing_list tpl on pl.id = tpl.id
+      WHERE tpl.id = $1 and pl.is_deleted = false
       `,
       [packCreateDto.listId],
     );
@@ -22,30 +23,21 @@ const createPack = async (
 
     const { rows: existCategory } = await client.query(
       `
-      SELECT *
-      FROM "category" as c
-      WHERE c.id = $1
+        SELECT *
+        FROM "category" as c
+        WHERE c.id = $1
       `,
       [packCreateDto.categoryId],
     );
 
     if (existCategory.length === 0) return 'no_category';
 
-    const { rows: existListCategory } = await client.query(
-      `
-      SELECT *
-      FROM "category" as c
-      WHERE c.id = $1 AND c.list_id = $2
-      `,
-      [packCreateDto.categoryId, packCreateDto.listId],
-    );
+    if (existCategory[0].list_id != packCreateDto.listId) return 'no_list_category';
 
-    if (existListCategory.length === 0) return 'no_list_category';
-
-    const { rows } = await client.query(
+    await client.query(
       `
-      INSERT INTO "pack" (category_id, name)
-      VALUES ($1, $2)
+        INSERT INTO "pack" (category_id, name)
+        VALUES ($1, $2)
       `,
       [packCreateDto.categoryId, packCreateDto.name],
     );
@@ -70,22 +62,12 @@ const updatePack = async (
   try {
     if (packUpdateDto.name.length > 12) return 'exceed_len';
 
-    const { rows: existPack } = await client.query(
-      `
-      SELECT *
-      FROM "pack" as p
-      WHERE p.id = $1
-      `,
-      [packUpdateDto.id],
-    );
-
-    if (existPack.length === 0) return 'no_pack';
-
     const { rows: existList } = await client.query(
       `
       SELECT *
       FROM "packing_list" as pl
-      WHERE pl.id = $1
+      JOIN together_packing_list tpl on pl.id = tpl.id
+      WHERE tpl.id = $1 and pl.is_deleted = false
       `,
       [packUpdateDto.listId],
     );
@@ -94,41 +76,35 @@ const updatePack = async (
 
     const { rows: existCategory } = await client.query(
       `
-      SELECT *
-      FROM "category" as c
-      WHERE c.id = $1
+        SELECT *
+        FROM "category" as c
+        WHERE c.id = $1
       `,
       [packUpdateDto.categoryId],
     );
 
     if (existCategory.length === 0) return 'no_category';
 
-    const { rows: existListCategory } = await client.query(
+    if (existCategory[0].list_id != packUpdateDto.listId) return 'no_list_category';
+
+    const { rows: existPack } = await client.query(
       `
-      SELECT *
-      FROM "category" as c
-      WHERE c.id = $1 AND c.list_id = $2
+        SELECT *
+        FROM "pack" as p
+        WHERE p.id = $1
       `,
-      [packUpdateDto.categoryId, packUpdateDto.listId],
+      [packUpdateDto.id],
     );
 
-    if (existListCategory.length === 0) return 'no_list_category';
-    const { rows: existCategoryPack } = await client.query(
-      `
-      SELECT *
-      FROM "pack" as p
-      WHERE p.id = $1 AND p.category_id = $2
-      `,
-      [packUpdateDto.id, packUpdateDto.categoryId],
-    );
+    if (existPack.length === 0) return 'no_pack';
 
-    if (existCategoryPack.length === 0) return 'no_category_pack';
+    if (existPack[0].category_id != packUpdateDto.categoryId) return 'no_category_pack';
 
-    const { rows } = await client.query(
+    await client.query(
       `
-      UPDATE "pack"
-      SET name = $1, is_checked = $2
-      WHERE id = $3
+        UPDATE "pack"
+        SET name = $1, is_checked = $2
+        WHERE id = $3
       `,
       [packUpdateDto.name, packUpdateDto.isChecked, packUpdateDto.id],
     );
@@ -155,7 +131,8 @@ const deletePack = async (
       `
       SELECT *
       FROM "packing_list" as pl
-      WHERE pl.id = $1
+      JOIN together_packing_list tpl on pl.id = tpl.id
+      WHERE tpl.id = $1 and pl.is_deleted = false
       `,
       [packDeleteDto.listId],
     );
@@ -164,51 +141,34 @@ const deletePack = async (
 
     const { rows: existCategory } = await client.query(
       `
-      SELECT *
-      FROM "category" as c
-      WHERE c.id = $1
+        SELECT *  
+        FROM "category" as c
+        WHERE c.id = $1
       `,
       [packDeleteDto.categoryId],
     );
 
     if (existCategory.length === 0) return 'no_category';
 
+    if (existCategory[0].list_id != packDeleteDto.listId) return 'no_list_category';
+
     const { rows: existPack } = await client.query(
       `
-      SELECT *
-      FROM "pack" as p
-      WHERE p.id = $1
+        SELECT *
+        FROM "pack" as p
+        WHERE p.id = $1
       `,
       [packDeleteDto.packId],
     );
 
     if (existPack.length === 0) return 'no_pack';
 
-    const { rows: existListCategory } = await client.query(
-      `
-      SELECT *
-      FROM "category" as c
-      WHERE c.id = $1 AND c.list_id = $2
-      `,
-      [packDeleteDto.categoryId, packDeleteDto.listId],
-    );
+    if (existPack[0].category_id != packDeleteDto.categoryId) return 'no_category_pack';
 
-    if (existListCategory.length === 0) return 'no_list_category';
-    const { rows: existCategoryPack } = await client.query(
+    await client.query(
       `
-      SELECT *
-      FROM "pack" as p
-      WHERE p.id = $1 AND p.category_id = $2
-      `,
-      [packDeleteDto.packId, packDeleteDto.categoryId],
-    );
-
-    if (existCategoryPack.length === 0) return 'no_category_pack';
-
-    const { rows } = await client.query(
-      `
-      DELETE FROM "pack"
-      WHERE id = $1
+        DELETE FROM "pack"
+        WHERE id = $1
       `,
       [packDeleteDto.packId],
     );

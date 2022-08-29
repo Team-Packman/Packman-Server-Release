@@ -12,11 +12,11 @@ router.post(
   AloneListCategoryController.createCategory,
 );
 router.patch(
-    '/',
-    [body('id').notEmpty(), body('name').notEmpty(), body('listId').notEmpty()],
-    auth,
-    AloneListCategoryController.updateCategory,
-  );
+  '/',
+  [body('id').notEmpty(), body('name').notEmpty(), body('listId').notEmpty()],
+  auth,
+  AloneListCategoryController.updateCategory,
+);
 router.delete('/:listId/:categoryId', auth, AloneListCategoryController.deleteCategory);
 
 export default router;

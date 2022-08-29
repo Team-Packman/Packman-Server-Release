@@ -3,12 +3,12 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import FolderService from '../services/FolderService';
+import { FolderService } from '../services';
 import db from '../loaders/db';
 
 /**
  *  @route GET /folder/recentCreatedList
- *  @desc read recentCreatedList
+ *  @desc read recently created list
  *  @access private
  **/
 const getRecentCreatedList = async (req: Request, res: Response) => {
@@ -35,13 +35,12 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
   }
 };
 
-
 /**
  *  @route POST /folder
  *  @desc create folder
  *  @access private
  **/
- const createFolder = async (req: Request, res: Response) => {
+const createFolder = async (req: Request, res: Response) => {
   const error = validationResult(req);
   if (!error.isEmpty()) {
     return res
@@ -59,12 +58,11 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
     } else {
-    res
-      .status(statusCode.OK)
-      .send(util.success(statusCode.OK, message.SUCCESS_CREATE_FOLDER, data));
+      res
+        .status(statusCode.OK)
+        .send(util.success(statusCode.OK, message.SUCCESS_CREATE_FOLDER, data));
     }
   } catch (error) {
-    
     console.log(error);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
@@ -76,10 +74,10 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /folder
- *  @desc read user folder
+ *  @desc read folder
  *  @access private
  **/
- const getFolders = async (req: Request, res: Response) => {
+const getFolders = async (req: Request, res: Response) => {
   let client;
   const userId = req.body.user.id;
   try {
@@ -137,7 +135,7 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /folder/together
- *  @desc read togetherFolders
+ *  @desc read together folders
  *  @access private
  **/
 const getTogetherFolders = async (req: Request, res: Response) => {
@@ -166,7 +164,7 @@ const getTogetherFolders = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /folder/alone
- *  @desc read aloneFolders
+ *  @desc read alone folders
  *  @access private
  **/
 const getAloneFolders = async (req: Request, res: Response) => {
@@ -193,7 +191,7 @@ const getAloneFolders = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /folder/list/together/:folderId
- *  @desc read togetherLists in Folder
+ *  @desc read together lists in folder
  *  @access private
  **/
 const getTogetherListInFolder = async (req: Request, res: Response) => {
@@ -229,7 +227,7 @@ const getTogetherListInFolder = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /folder/list/alone/:folderId
- *  @desc read aloneLists in Folder
+ *  @desc read alone lists in folder
  *  @access private
  **/
 const getAloneListInFolder = async (req: Request, res: Response) => {

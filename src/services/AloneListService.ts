@@ -11,9 +11,9 @@ const createAloneList = async (
 
     const { rows: listId } = await client.query(
       `
-      INSERT INTO "packing_list" (title, departure_date)
-      VALUES ($1, $2)
-      RETURNING id
+        INSERT INTO "packing_list" (title, departure_date)
+        VALUES ($1, $2)
+        RETURNING id
       `,
       [aloneListCreateDto.title, aloneListCreateDto.departureDate],
     );
@@ -21,16 +21,16 @@ const createAloneList = async (
 
     await client.query(
       `
-      INSERT INTO "alone_packing_list" (id)
-      VALUES ($1)
+        INSERT INTO "alone_packing_list" (id)
+        VALUES ($1)
       `,
       [aloneListId],
     );
 
     await client.query(
       `
-      INSERT INTO "folder_packing_list" (folder_id, list_id)
-      VALUES ($1, $2)
+        INSERT INTO "folder_packing_list" (folder_id, list_id)
+        VALUES ($1, $2)
       `,
       [aloneListCreateDto.folderId, aloneListId],
     );
@@ -38,17 +38,17 @@ const createAloneList = async (
     if (!aloneListCreateDto.templateId) {
       await client.query(
         `
-        INSERT INTO "category" (list_id, name)
-        VALUES ($1, '기본')
+          INSERT INTO "category" (list_id, name)
+          VALUES ($1, '기본')
         `,
         [aloneListId],
       );
     } else {
       const { rows: templateCategoryIdArray } = await client.query(
         `
-        SELECT c.id
-        FROM "template_category" c
-        WHERE c.template_id=$1 
+          SELECT c.id
+          FROM "template_category" c
+          WHERE c.template_id=$1 
         `,
         [aloneListCreateDto.templateId],
       );
@@ -58,9 +58,9 @@ const createAloneList = async (
 
         const { rows: categoryIdArray } = await client.query(
           `
-          INSERT INTO "category" (list_id, name)
-          VALUES($1, (SELECT name FROM "template_category" WHERE id=$2))
-          RETURNING id
+            INSERT INTO "category" (list_id, name)
+            VALUES($1, (SELECT name FROM "template_category" WHERE id=$2))
+            RETURNING id
           `,
           [aloneListId, templateCategoryId],
         );
@@ -68,10 +68,10 @@ const createAloneList = async (
 
         await client.query(
           `
-          INSERT INTO "pack" (category_id, name)
-          SELECT c.id, p.name
-          FROM "category" c, "template_pack" p
-          WHERE c.id=$1 AND p.category_id=$2
+            INSERT INTO "pack" (category_id, name)
+            SELECT c.id, p.name
+            FROM "category" c, "template_pack" p
+            WHERE c.id=$1 AND p.category_id=$2
           `,
           [categoryId, templateCategoryId],
         );
@@ -80,9 +80,9 @@ const createAloneList = async (
 
     const { rows: etcDataArray } = await client.query(
       `
-      SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY.MM.DD') AS "departureDate", p.is_saved AS "isSaved"
-      FROM "packing_list" p
-      WHERE p.id=$1
+        SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate", p.is_saved AS "isSaved"
+        FROM "packing_list" p
+        WHERE p.id=$1
       `,
       [aloneListId],
     );
@@ -112,10 +112,10 @@ const readAloneList = async (
   try {
     const { rows: existList } = await client.query(
       `
-      SELECT *
-      FROM "alone_packing_list" as l
-      JOIN "packing_list" p ON l.id=p.id
-      WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
+        SELECT *
+        FROM "alone_packing_list" as l
+        JOIN "packing_list" p ON l.id=p.id
+        WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
       `,
       [aloneListId],
     );
@@ -123,9 +123,9 @@ const readAloneList = async (
 
     const { rows: etcDataArray } = await client.query(
       `
-      SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY.MM.DD') AS "departureDate", p.is_saved AS "isSaved"
-      FROM "packing_list" p
-      WHERE p.id=$1
+        SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate", p.is_saved AS "isSaved"
+        FROM "packing_list" p
+        WHERE p.id=$1
       `,
       [aloneListId],
     );

@@ -3,13 +3,13 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
-import { TogetherListPackService } from '../services';
 import { PackCreateDto, PackUpdateDto, PackDeleteDto } from '../interfaces/IPack';
+import { TogetherListPackService } from '../services';
 import db from '../loaders/db';
 
 /**
  *  @route POST /list/together/pack
- *  @desc create Pack
+ *  @desc create together pack
  *  @access private
  **/
 const createPack = async (req: Request, res: Response) => {
@@ -33,9 +33,7 @@ const createPack = async (req: Request, res: Response) => {
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
     else if (data === 'no_list')
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     else if (data === 'no_category')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
     else if (data === 'no_list_category')
@@ -58,8 +56,8 @@ const createPack = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route PATCH /packingList/together/pack
- *  @desc update Pack
+ *  @route PATCH /list/together/pack
+ *  @desc update together pack
  *  @access private
  **/
 const updatePack = async (req: Request, res: Response) => {
@@ -84,9 +82,7 @@ const updatePack = async (req: Request, res: Response) => {
     else if (data === 'no_pack')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_PACK));
     else if (data === 'no_list')
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     else if (data === 'no_category')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
     else if (data === 'no_list_category')
@@ -113,8 +109,8 @@ const updatePack = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route DELETE /packingList/together/pack
- *  @desc delete Pack
+ *  @route DELETE /list/together/pack
+ *  @desc delete together pack
  *  @access private
  **/
 const deletePack = async (req: Request, res: Response) => {
@@ -133,9 +129,7 @@ const deletePack = async (req: Request, res: Response) => {
     const data = await TogetherListPackService.deletePack(client, packDeleteDto);
 
     if (data === 'no_list')
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     else if (data === 'no_category')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
     else if (data === 'no_pack')

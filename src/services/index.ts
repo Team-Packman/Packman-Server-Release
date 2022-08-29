@@ -5,10 +5,11 @@ import TogetherListService from './TogetherListService';
 import ListService from './ListService';
 import TogetherListPackService from './TogetherListPackService';
 import LandingService from './LandingService';
+import AloneListService from './AloneListService';
 import AloneListCategoryService from './AloneListCategoryService';
 import FolderService from './FolderService';
 import AloneListPackService from './AloneListPackService';
-import AloneListService from './AloneListService';
+import TemplateService from './TemplateService';
 
 export {
   UserService,
@@ -22,4 +23,5 @@ export {
   AloneListCategoryService,
   FolderService,
   AloneListPackService,
+  TemplateService,
 };
