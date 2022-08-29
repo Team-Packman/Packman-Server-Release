@@ -45,3 +45,8 @@ export interface UseForMapInDeleteDto {
   id: number;
   groupId?: number;
 }
+
+export interface UseForReduceInDeleteDto {
+  myListId: number;
+  togetherListId: number;
+}
