@@ -89,7 +89,7 @@ const createTogetherList = async (
       [myListId],
     );
 
-    if (!togetherListCreateDto.templateId) {
+    if (togetherListCreateDto.templateId === "''") {
       await client.query(
         `
           INSERT INTO "category" (list_id, name)
@@ -328,7 +328,11 @@ const updatePacker = async (
   }
 };
 
-const addMember = async (client: any, listId: string, userId: string): Promise<string | TogetherAloneResponseDto> => {
+const addMember = async (
+  client: any,
+  listId: string,
+  userId: string,
+): Promise<string | TogetherAloneResponseDto> => {
   try {
     const { rows: togetherList } = await client.query(
       `
@@ -420,10 +424,10 @@ const addMember = async (client: any, listId: string, userId: string): Promise<s
       `,
       [folderId, aloneList[0].id],
     );
-    
+
     const data = {
-      listId: aloneTogether[0].id
-    }
+      listId: aloneTogether[0].id,
+    };
 
     return data;
   } catch (error) {
