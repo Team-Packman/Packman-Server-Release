@@ -4,6 +4,7 @@ import {
   TogetherListCategoryResponseDto,
   TogetherListInfoResponseDto,
   UseForMapInDeleteDto,
+  UseForReduceInDeleteDto,
 } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
@@ -448,7 +449,7 @@ const deleteTogetherList = async (
 
     const { rows: existList } = await client.query(
       `
-        SELECT p.id
+        SELECT my_packing_list_id as "myListId", together_packing_list_id as "togetherListId"
         FROM "together_alone_packing_list" as l
         JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
         WHERE l.id IN (${listMappingIdArray}) AND p.is_deleted=false
@@ -457,15 +458,18 @@ const deleteTogetherList = async (
     );
     if (existList.length !== listMappingIdArray.length * 2) return 'no_list';
 
-    //listIdArray = 삭제할 모든 together, alone list id 담김
-    const listIdArray = await existList.map((element: UseForMapInDeleteDto) => element.id);
     //aloneListIdArray = 삭제할 alone list id 담김
-    const aloneListIdArray = await listIdArray.filter(
-      (element: number, index: number) => index % 2 === 1,
+    const aloneListIdArray = existList.reduce(
+      (acc: number[], element: UseForReduceInDeleteDto) =>
+        acc.includes(element.myListId) ? acc : [...acc, element.myListId],
+      [],
     );
+
     //togetherListIdArray = 삭제할 together list id 담김, together list는 상황에 따라 삭제여부 결정
-    const togetherListIdArray = await listIdArray.filter(
-      (element: number, index: number) => index % 2 === 0,
+    const togetherListIdArray = existList.reduce(
+      (acc: number[], element: UseForReduceInDeleteDto) =>
+        acc.includes(element.togetherListId) ? acc : [...acc, element.togetherListId],
+      [],
     );
 
     const { rows: existFolderList } = await client.query(
