@@ -164,4 +164,5 @@ export default {
   dropUser,
   checkUser,
   updateUser,
+  deleteUser,
 };

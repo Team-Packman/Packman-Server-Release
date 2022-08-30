@@ -94,9 +94,7 @@ const deleteAloneList = async (req: Request, res: Response) => {
     if (data === 'no_folder')
       res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_FOLDER));
     else if (data === 'no_list')
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.success(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
     else if (data === 'no_folder_list')
       res
         .status(statusCode.NOT_FOUND)
@@ -104,7 +102,7 @@ const deleteAloneList = async (req: Request, res: Response) => {
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.DELETE_ALONEPACKINGLIST_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.DELETE_ALONE_LIST_SUCCESS, data));
   } catch (error) {
     console.log(error);
     res

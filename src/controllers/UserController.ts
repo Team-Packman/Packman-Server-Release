@@ -51,7 +51,7 @@ const createUser = async (req: Request, res: Response) => {
  *  @desc update user
  *  @access private
  **/
- const updateUser = async (req: Request, res: Response) => {
+const updateUser = async (req: Request, res: Response) => {
   let client;
   const error = validationResult(req);
   if (!error.isEmpty()) {
@@ -73,8 +73,8 @@ const createUser = async (req: Request, res: Response) => {
         .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
     } else if (data === 'no_user') {
       res
-      .status(statusCode.BAD_REQUEST)
-      .send(util.success(statusCode.BAD_REQUEST, message.NO_USER));
+        .status(statusCode.BAD_REQUEST)
+        .send(util.success(statusCode.BAD_REQUEST, message.NO_USER));
     } else {
       res
         .status(statusCode.OK)
