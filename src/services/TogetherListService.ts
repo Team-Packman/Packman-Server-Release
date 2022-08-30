@@ -577,7 +577,7 @@ const deleteTogetherList = async (
 
     const { rows: togetherPackingListInfoArray } = await client.query(
       `
-        SELECT tapl.id::text, pl.title, pl.departure_date::text as "departureDate",
+        SELECT tapl.id::text, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate",
               count(p.id)::text as "packTotalNum", count(p.id) FILTER ( WHERE p.is_checked=false )::text as "packRemainNum"
         FROM "folder_packing_list" fpl
         JOIN "together_alone_packing_list" tapl ON fpl.list_id=tapl.my_packing_list_id
