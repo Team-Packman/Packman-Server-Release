@@ -75,7 +75,6 @@ const deleteUser = async (client: any, userId: string) => {
     UPDATE "user" 
     SET is_deleted = true
     WHERE id = $1
-    RETURNING id::TEXT
     `,
     [userId],
   );
