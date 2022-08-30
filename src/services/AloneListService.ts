@@ -196,7 +196,7 @@ const deleteAloneList = async (
 
     const { rows: alonePackingListInfoArray } = await client.query(
       `
-        SELECT pl.id::text, pl.title, pl.departure_date::text as "departureDate",
+        SELECT pl.id::text, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate",
               count(p.id)::text as "packTotalNum", count(p.id) FILTER ( WHERE p.is_checked=false )::text as "packRemainNum"
         FROM "folder_packing_list" fpl
         JOIN "packing_list" pl ON fpl.list_id=pl.id
