@@ -107,7 +107,7 @@ const getFolders = async (req: Request, res: Response) => {
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
   let client;
-  const userId = '1';
+  const userId = req.body.user.id;
   const { folderId } = req.params;
 
   try {
