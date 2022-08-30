@@ -9,7 +9,7 @@ import db from '../loaders/db';
 
 /**
  *  @route POST /category
- *  @desc create category
+ *  @desc create together category
  *  @access private
  **/
 const createCategory = async (req: Request, res: Response) => {
@@ -31,9 +31,7 @@ const createCategory = async (req: Request, res: Response) => {
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
     } else if (data === 'no_list') {
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     } else if (data === 'duplicate_category') {
       res
         .status(statusCode.BAD_REQUEST)
@@ -55,7 +53,7 @@ const createCategory = async (req: Request, res: Response) => {
 
 /**
  *  @route PATCH /category
- *  @desc update category
+ *  @desc update together category
  *  @access private
  **/
 const updateCategory = async (req: Request, res: Response) => {
@@ -73,9 +71,7 @@ const updateCategory = async (req: Request, res: Response) => {
     const data = await TogetherListCategoryService.updateCategory(client, categoryUpdateDto);
 
     if (data === 'no_list') {
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     } else if (data === 'no_category') {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
     } else if (data === 'no_list_category') {
@@ -107,7 +103,7 @@ const updateCategory = async (req: Request, res: Response) => {
 
 /**
  *  @route DELETE /category
- *  @desc delete category
+ *  @desc delete together category
  *  @access private
  **/
 const deleteCategory = async (req: Request, res: Response) => {
@@ -122,9 +118,7 @@ const deleteCategory = async (req: Request, res: Response) => {
     client = await db.connect(req);
     const data = await TogetherListCategoryService.deleteCategory(client, categoryDeleteDto);
     if (data === 'no_list') {
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     } else if (data === 'no_category') {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_CATEGORY));
     } else if (data === 'no_list_category') {

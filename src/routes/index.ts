@@ -10,6 +10,8 @@ import LandingRouter from './LandingRouter';
 import AloneListRouter from './AloneListRouter';
 import AloneListCategoryRouter from './AloneListCategoryRouter';
 import AloneListPackRouter from './AloneListPackRouter';
+import TemplateRouter from './TemplateRouter';
+import MemberRouter from './MemberRouter';
 
 const router = Router();
 
@@ -24,5 +26,7 @@ router.use('/landing', LandingRouter);
 router.use('/list/alone', AloneListRouter);
 router.use('/list/alone/category', AloneListCategoryRouter);
 router.use('/list/alone/pack', AloneListPackRouter);
+router.use('/template', TemplateRouter);
+router.use('/member', MemberRouter);
 
 export default router;

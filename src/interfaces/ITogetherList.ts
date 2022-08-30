@@ -37,6 +37,19 @@ export interface TogetherListCategoryResponseDto {
   category: TogetherCategoryResponseDto[];
 }
 
+export interface TogetherAloneResponseDto {
+  listId: string;
+}
 export interface TogetherListInfoResponseDto {
   togetherPackingList: ListInfoResponseDto[];
+}
+
+export interface UseForMapInDeleteDto {
+  id: number;
+  groupId?: number;
+}
+
+export interface UseForReduceInDeleteDto {
+  myListId: number;
+  togetherListId: number;
 }

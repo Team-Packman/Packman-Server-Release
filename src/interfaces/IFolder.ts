@@ -4,7 +4,10 @@ export interface FolderCreateDto {
   name: string;
   isAloned: boolean;
 }
-
+export interface FolderUpdateDto {
+  id: string;
+  name: string;
+}
 export interface FolderInfoDto {
   id: string;
   name: string;
@@ -17,14 +20,14 @@ export interface AllFolderResponseDto {
     {
       id: string;
       name: string;
-      listNum: number;
+      listNum: string;
     },
   ];
   togetherFolder: [
     {
       id: string;
       name: string;
-      listNum: number;
+      listNum: string;
     },
   ];
 }

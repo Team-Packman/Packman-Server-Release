@@ -4,13 +4,13 @@ import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import { PackerUpdateDto } from '../interfaces/ITogetherList';
+import { ListCreateDto } from '../interfaces/IList';
 import TogetherListService from '../services/TogetherListService';
 import db from '../loaders/db';
-import { ListCreateDto } from '../interfaces/IList';
 
 /**
  *  @route POST /list/together
- *  @desc create together packinglist
+ *  @desc create together list
  *  @access private
  **/
 const createTogetherList = async (req: Request, res: Response) => {
@@ -41,7 +41,7 @@ const createTogetherList = async (req: Request, res: Response) => {
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.CREATE_TOGETHERPACKINGLIST_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.CREATE_TOGETHER_LIST_SUCCESS, data));
   } catch (error) {
     console.log(error);
     res
@@ -54,7 +54,7 @@ const createTogetherList = async (req: Request, res: Response) => {
 
 /**
  *  @route GET /list/together/:listId
- *  @desc read together packinglist
+ *  @desc read together list
  *  @access private
  **/
 const readTogetherList = async (req: Request, res: Response) => {
@@ -68,13 +68,11 @@ const readTogetherList = async (req: Request, res: Response) => {
     const data = await TogetherListService.readTogetherList(client, listId, userId);
 
     if (data === 'no_list')
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.success(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
     else
       res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.READ_TOGETHERPACKINGLIST_SUCCESS, data));
+        .send(util.success(statusCode.OK, message.READ_TOGETHER_LIST_SUCCESS, data));
   } catch (error) {
     console.log(error);
     res
@@ -107,9 +105,7 @@ const updatePacker = async (req: Request, res: Response) => {
     const data = await TogetherListService.updatePacker(client, packerUpdateDto);
 
     if (data === 'no_list')
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.success(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
     else if (data === 'no_pack')
       res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_PACK));
     else if (data === 'no_list_pack')
@@ -152,9 +148,7 @@ const addMember = async (req: Request, res: Response) => {
     client = await db.connect(req);
     const data = await TogetherListService.addMember(client, listId, userId);
     if (data === 'no_list') {
-      res
-        .status(statusCode.NOT_FOUND)
-        .send(util.fail(statusCode.NOT_FOUND, message.NO_PACKINGLIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     } else if (data === 'already_exist_member') {
       res
         .status(statusCode.BAD_REQUEST)
@@ -171,9 +165,48 @@ const addMember = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @route DELETE /list/together/:folderId/:listId
+ *  @desc delete together list
+ *  @access private
+ **/
+const deleteTogetherList = async (req: Request, res: Response) => {
+  let client;
+  const userId: number = req.body.user.id;
+  const { folderId } = req.params;
+  const { listId } = req.params;
+
+  try {
+    client = await db.connect(req);
+
+    const data = await TogetherListService.deleteTogetherList(client, userId, folderId, listId);
+
+    if (data === 'no_folder')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_FOLDER));
+    else if (data === 'no_list')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
+    else if (data === 'no_folder_list')
+      res
+        .status(statusCode.NOT_FOUND)
+        .send(util.success(statusCode.NOT_FOUND, message.NO_FOLDER_LIST));
+    else
+      res
+        .status(statusCode.OK)
+        .send(util.success(statusCode.OK, message.DELETE_TOGETHER_LIST_SUCCESS, data));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    if (client !== undefined) client.release();
+  }
+};
+
 export default {
   createTogetherList,
   readTogetherList,
   updatePacker,
   addMember,
+  deleteTogetherList,
 };
