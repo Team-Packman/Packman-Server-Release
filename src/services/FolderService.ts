@@ -8,6 +8,7 @@ import {
 } from '../interfaces/IFolder';
 import { folderResponse } from '../modules/folderResponse';
 import dayjs from 'dayjs';
+import TogetherListService from './TogetherListService';
 
 const getRecentCreatedList = async (
   client: any,
@@ -117,6 +118,72 @@ const createFolder = async (
     throw error;
   }
 };
+
+const deleteFolder = async (
+  client: any,
+  userId: string,
+  folderId: string,
+): Promise<AllFolderResponseDto | string> => {
+  try {
+
+    const { rows: existFolder } = await client.query(
+      `
+        SELECT *
+        FROM "folder" f
+        WHERE f.user_id = $1 AND f.id = $2
+      `,
+      [userId, folderId],
+    );
+    if (existFolder.length === 0) return 'no_folder';
+
+    if(existFolder[0].is_aloned) {
+      await client.query(
+        `
+          UPDATE "packing_list" pl
+          SET is_deleted = true
+          WHERE pl.id IN ( 
+                            SELECT fl.list_id
+                            FROM "folder_packing_list" fl
+                            WHERE fl.folder_id = $1
+                          )
+        `,
+        [folderId]
+      );
+    } else {
+
+    const { rows: togetherList } = await client.query(
+        `
+          SELECT tal.id AS id
+          FROM "folder_packing_list" fl
+          JOIN "together_alone_packing_list" tal ON tal.my_packing_list_id = fl.list_id
+          WHERE fl.folder_id = $1
+        `,
+        [folderId]
+      );
+      if (togetherList.length > 0) {
+        const togetherIdArray = togetherList.map((list: { id: string } ) => list.id);
+        const data = await TogetherListService.deleteTogetherList(client,Number(userId), folderId, togetherIdArray.join(','));
+        if (data === 'no_folder') return 'no_folder';
+      }
+    }
+    
+    await client.query( 
+      `
+        DELETE FROM "folder" f
+        WHERE f.id = $1 
+      `,
+      [folderId]
+    );
+
+    const folder = await folderResponse(client, userId);
+
+    return folder;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 
 const getFolders = async (client: any, userId: string): Promise<AllFolderResponseDto> => {
   try {
@@ -331,6 +398,7 @@ const getAloneListInFolder = async (
 export default {
   getRecentCreatedList,
   createFolder,
+  deleteFolder,
   getFolders,
   getTogetherFolders,
   getAloneFolders,
