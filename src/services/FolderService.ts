@@ -8,6 +8,7 @@ import {
 } from '../interfaces/IFolder';
 import { folderResponse } from '../modules/folderResponse';
 import dayjs from 'dayjs';
+import TogetherListService from './TogetherListService';
 
 const getRecentCreatedList = async (
   client: any,
@@ -149,23 +150,24 @@ const deleteFolder = async (
         [folderId]
       );
     } else {
-    await client.query(
+
+    const { rows: togetherList } = await client.query(
         `
-          UPDATE "packing_list" pl
-          SET is_deleted = true
-          WHERE pl.id IN ( 
-                            SELECT sub_pl.id
-                            FROM "folder_packing_list" fl
-                            LEFT JOIN "together_alone_packing_list" tal ON fl.list_id = tal.my_packing_list_id
-                            JOIN "packing_list" sub_pl ON sub_pl.id = tal.together_packing_list_id OR  sub_pl.id = tal.my_packing_list_id
-                            WHERE fl.folder_id = $1
-                          )
+          SELECT tal.id AS id
+          FROM "folder_packing_list" fl
+          JOIN "together_alone_packing_list" tal ON tal.my_packing_list_id = fl.list_id
+          WHERE fl.folder_id = $1
         `,
         [folderId]
       );
+      if (togetherList.length > 0) {
+        const togetherIdArray = togetherList.map((list: { id: string } ) => list.id);
+        const data = await TogetherListService.deleteTogetherList(client,Number(userId), folderId, togetherIdArray.join(','));
+        if (data === 'no_folder') return 'no_folder';
+      }
     }
     
-    await client.query(
+    await client.query( 
       `
         DELETE FROM "folder" f
         WHERE f.id = $1 
