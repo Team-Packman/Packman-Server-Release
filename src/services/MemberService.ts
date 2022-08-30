@@ -1,26 +1,26 @@
 import { MemberResponseDto } from '../interfaces/IMember';
 import dayjs from 'dayjs';
 
-const getMember = async (client: any, listId: string): Promise<MemberResponseDto | string> => {
+const getMember = async (
+  client: any,
+  userId: number,
+  groupId: string,
+): Promise<MemberResponseDto | string> => {
   try {
-    const { rows: list } = await client.query(
+    const { rows: existGroup } = await client.query(
       `
-      SELECT pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate", tpl.group_id AS "groupId"
-      FROM "packing_list" pl
-      JOIN together_packing_list tpl on pl.id = tpl.id
-      WHERE tpl.id = $1 and pl.is_deleted = false
-      `,
-      [listId],
+      SELECT *
+      FROM "group" g
+      WHERE g.id = $1
+    `,
+      [groupId],
     );
 
-    if (list.length === 0) return 'no_list';
-
-    const groupId = list[0].groupId;
-    const remainDay = dayjs(list[0].departureDate).diff(dayjs().format('YYYY-MM-DD'), 'day');
+    if (existGroup.length === 0) return 'no_group';
 
     const { rows: member } = await client.query(
       `
-      SELECT u.id, u.nickname, u.profile_image AS "profileImage"
+      SELECT u.id::TEXT, u.nickname, u.profile_image AS "profileImage"
       FROM "user_group" ug
       JOIN "user" u on ug.user_id = u.id
       WHERE ug.group_id = $1 and u.is_deleted = false
@@ -29,7 +29,25 @@ const getMember = async (client: any, listId: string): Promise<MemberResponseDto
       [groupId],
     );
 
-    if (member.length === 0) return 'no_member_user';
+    if (member.length === 0) return 'empty_member';
+
+    const memberArr = member.map((list: { id: string }) => list.id);
+    if (!memberArr.includes(userId.toString())) return 'no_member_user';
+
+    const { rows: list } = await client.query(
+      `
+      SELECT pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate"
+      FROM "group" g
+      JOIN together_packing_list tpl on g.id = tpl.group_id
+      JOIN packing_list pl on tpl.id = pl.id
+      WHERE g.id = $1 AND pl.is_deleted = false
+      `,
+      [groupId],
+    );
+
+    if (list.length === 0) return 'no_list';
+
+    const remainDay = dayjs(list[0].departureDate).diff(dayjs().format('YYYY-MM-DD'), 'day');
 
     const data: MemberResponseDto = {
       title: list[0].title,
