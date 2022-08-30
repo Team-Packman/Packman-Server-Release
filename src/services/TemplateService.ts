@@ -3,7 +3,7 @@ import { templateListResponse } from '../modules/templateListResponse';
 
 const getAloneTemplateList = async (
   client: any,
-  userId: string,
+  userId: number,
 ): Promise<TemplateListResponseDto | string> => {
   try {
     const aloneTemplateList: TemplateListResponseDto = await templateListResponse(
@@ -21,7 +21,7 @@ const getAloneTemplateList = async (
 
 const getTogetherTemplateList = async (
   client: any,
-  userId: string,
+  userId: number,
 ): Promise<TemplateListResponseDto | string> => {
   try {
     const togetherTemplateList: TemplateListResponseDto = await templateListResponse(
@@ -37,29 +37,26 @@ const getTogetherTemplateList = async (
   }
 };
 
-
-
 const getTemplate = async (
-    client: any,
-    templateId: string,
-  ): Promise<DetailedTemplateResponseDto | string> => {
-    try {
-        const { rows: template } = await client.query(
-            `
+  client: any,
+  templateId: string,
+): Promise<DetailedTemplateResponseDto | string> => {
+  try {
+    const { rows: template } = await client.query(
+      `
                 SELECT t.title
                 FROM "template" t
                 WHERE t.id = $1 AND t.is_deleted = false
             `,
-            [templateId]
-        );
-        if(template.length === 0) {
-            return 'no_template';
-        }
-        const templateTitle = template[0].title;
+      [templateId],
+    );
+    if (template.length === 0) {
+      return 'no_template';
+    }
+    const templateTitle = template[0].title;
 
-
-        const { rows: category } = await client.query(
-            `
+    const { rows: category } = await client.query(
+      `
                 SELECT c.id::text, c.name,	COALESCE(json_agg(json_build_object(
                     'id', p.id::text,
                     'name', p.name
@@ -71,23 +68,22 @@ const getTemplate = async (
                 GROUP BY c.id
                 ORDER BY c.id
             `,
-            [templateId],
-        );
-            
-        const templateResponse: DetailedTemplateResponseDto = {
-            id: templateId,
-            title: templateTitle,
-            category: category
-        }
-        return templateResponse;
+      [templateId],
+    );
 
-    }  catch (error) {
-      console.log(error);
-      throw error;
-    }
-  };
-  
-  export default {
+    const templateResponse: DetailedTemplateResponseDto = {
+      id: templateId,
+      title: templateTitle,
+      category: category,
+    };
+    return templateResponse;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export default {
   getAloneTemplateList,
   getTogetherTemplateList,
   getTemplate,
