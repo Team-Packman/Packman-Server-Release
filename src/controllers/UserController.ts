@@ -55,7 +55,6 @@ const deleteUser = async (req: Request, res: Response) => {
   let client;
 
   const userId = req.body.user.id;
-
   try {
     client = await db.connect(req);
 
