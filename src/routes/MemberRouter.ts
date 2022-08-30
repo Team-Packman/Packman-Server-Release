@@ -4,6 +4,6 @@ import auth from '../middlewares/auth';
 
 const router = Router();
 
-router.get('/:listId', auth, MemberController.getMember);
+router.get('/:groupId', auth, MemberController.getMember);
 
 export default router;
