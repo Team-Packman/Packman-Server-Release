@@ -92,7 +92,7 @@ const createTogetherList = async (
       [myListId],
     );
 
-    if (togetherListCreateDto.templateId === "''") {
+    if (togetherListCreateDto.templateId === '') {
       await client.query(
         `
           INSERT INTO "category" (list_id, name)

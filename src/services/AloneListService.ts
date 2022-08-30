@@ -35,7 +35,7 @@ const createAloneList = async (
       [aloneListCreateDto.folderId, aloneListId],
     );
 
-    if (aloneListCreateDto.templateId === "''") {
+    if (aloneListCreateDto.templateId === '') {
       await client.query(
         `
           INSERT INTO "category" (list_id, name)
