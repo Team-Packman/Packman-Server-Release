@@ -1,6 +1,6 @@
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { ListCreateDto } from '../interfaces/IList';
-import { AloneListResponseDto } from '../interfaces/IAloneList';
+import { AloneListInfoResponseDto, AloneListResponseDto } from '../interfaces/IAloneList';
 
 const createAloneList = async (
   client: any,
@@ -35,7 +35,7 @@ const createAloneList = async (
       [aloneListCreateDto.folderId, aloneListId],
     );
 
-    if (!aloneListCreateDto.templateId) {
+    if (aloneListCreateDto.templateId === "''") {
       await client.query(
         `
           INSERT INTO "category" (list_id, name)
@@ -148,7 +148,79 @@ const readAloneList = async (
   }
 };
 
+const deleteAloneList = async (
+  client: any,
+  folderId: string,
+  aloneListId: string,
+): Promise<AloneListInfoResponseDto | string> => {
+  try {
+    const aloneListIdArray: string[] = aloneListId.split(',');
+
+    const { rows: existFolder } = await client.query(
+      `
+        SELECT *
+        FROM "folder" as f
+        WHERE f.id=$1 AND f.is_aloned=true
+      `,
+      [folderId],
+    );
+    if (existFolder.length === 0) return 'no_folder';
+
+    const { rows: existList } = await client.query(
+      `
+        SELECT *
+        FROM "alone_packing_list" as l
+        JOIN "packing_list" p ON l.id=p.id
+        WHERE l.id IN (${aloneListIdArray}) AND l.is_aloned=true AND p.is_deleted=false
+      `,
+    );
+    if (existList.length !== aloneListIdArray.length) return 'no_list';
+
+    const { rows: existFolderList } = await client.query(
+      `
+        SELECT *
+        FROM "folder_packing_list" as f
+        WHERE f.folder_id=$1 AND f.list_id IN (${aloneListIdArray})
+      `,
+      [folderId],
+    );
+    if (existFolderList.length !== aloneListIdArray.length) return 'no_folder_list';
+
+    await client.query(
+      `
+        UPDATE "packing_list"
+        SET is_deleted=true
+        WHERE id IN (${aloneListIdArray})
+      `,
+    );
+
+    const { rows: alonePackingListInfoArray } = await client.query(
+      `
+        SELECT pl.id::text, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate",
+              count(p.id)::text as "packTotalNum", count(p.id) FILTER ( WHERE p.is_checked=false )::text as "packRemainNum"
+        FROM "folder_packing_list" fpl
+        JOIN "packing_list" pl ON fpl.list_id=pl.id
+        LEFT JOIN "category" c ON pl.id=c.list_id
+        LEFT JOIN "pack" p ON c.id=p.category_id
+        WHERE fpl.folder_id=$1 AND pl.is_deleted=false
+        GROUP BY pl.id
+        ORDER BY pl.id DESC
+      `,
+      [folderId],
+    );
+
+    const data: AloneListInfoResponseDto = {
+      alonePackingList: alonePackingListInfoArray,
+    };
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export default {
   createAloneList,
   readAloneList,
+  deleteAloneList,
 };

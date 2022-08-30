@@ -10,6 +10,7 @@ import AloneListController from './AloneListController';
 import AloneListCategoryController from './AloneListCategoryController';
 import AloneListPackController from './AloneListPackController';
 import TemplateController from './TemplateController';
+import MemberController from './MemberController';
 
 export {
   UserController,
@@ -24,4 +25,5 @@ export {
   AloneListCategoryController,
   AloneListPackController,
   TemplateController,
+  MemberController,
 };
