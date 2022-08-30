@@ -10,3 +10,13 @@ export interface MemberResponseDto {
     },
   ];
 }
+
+export interface MemberDeleteResponseDto {
+  member: [
+    {
+      id: string;
+      nickname: string;
+      profileImage: string;
+    },
+  ];
+}
