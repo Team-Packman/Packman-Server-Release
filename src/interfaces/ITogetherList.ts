@@ -37,6 +37,9 @@ export interface TogetherListCategoryResponseDto {
   category: TogetherCategoryResponseDto[];
 }
 
+export interface TogetherAloneResponseDto {
+  listId: string;
+}
 export interface TogetherListInfoResponseDto {
   togetherPackingList: ListInfoResponseDto[];
 }

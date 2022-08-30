@@ -2,7 +2,7 @@ import { TemplateListResponseDto } from '../interfaces/ITemplate';
 
 async function templateListResponse(
   client: any,
-  userId: string,
+  userId: number,
   isAloned: boolean,
 ): Promise<TemplateListResponseDto> {
   try {
