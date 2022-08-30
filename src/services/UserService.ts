@@ -1,5 +1,6 @@
 import { UserCreateDto, UserResponseDto, UserUpdateDto } from '../interfaces/IUser';
 import jwtHandler from '../modules/jwtHandler';
+import FolderService from './FolderService';
 
 const createUser = async (
   client: any,
@@ -62,7 +63,7 @@ const getUser = async (client: any, userId: string): Promise<UserResponseDto | s
   }
 };
 
-const deleteUser = async (client: any, userEmail: string) => {
+const dropUser = async (client: any, userEmail: string) => {
   await client.query(
     `
       DELETE 
@@ -125,10 +126,42 @@ const updateUser = async (
     throw error;
   }
 };
+const deleteUser = async (client: any, userId: string) => {
+  await client.query(
+    `
+    UPDATE "user" 
+    SET is_deleted = true
+    WHERE id = $1
+    `,
+    [userId],
+  );
+
+  const { rows: existFolder } = await client.query(
+    `
+    SELECT f.id
+    FROM "folder" f
+    WHERE f.user_id = $1
+    `,
+    [userId],
+  );
+
+  const folder = existFolder.map((list: { id: string }) => list.id);
+
+  for (let i = 0; i < folder.length; i++) {
+    await FolderService.deleteFolder(client, userId, folder[i]);
+  }
+
+  const data = {
+    id: userId.toString(),
+  };
+
+  return data;
+};
+
 export default {
   createUser,
   getUser,
-  deleteUser,
+  dropUser,
   checkUser,
   updateUser,
 };

@@ -35,7 +35,7 @@ const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthRespon
 
     if (userInfo.length) {
       if (userInfo[0].is_deleted) {
-        await UserService.deleteUser(client, userEmail);
+        await UserService.dropUser(client, userEmail);
       } else {
         const accessToken = jwtHandler.getAccessToken(userInfo[0].id);
         const refreshToken = jwtHandler.getRefreshToken();

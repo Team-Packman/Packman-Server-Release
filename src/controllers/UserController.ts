@@ -116,8 +116,34 @@ const getUser = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @route DELETE /user
+ *  @desc delete user
+ *  @access private
+ **/
+const deleteUser = async (req: Request, res: Response) => {
+  let client;
+
+  const userId = req.body.user.id;
+  try {
+    client = await db.connect(req);
+
+    const data = await UserService.deleteUser(client, userId);
+
+    res.status(statusCode.OK).send(util.success(statusCode.OK, message.SUCCESS_DELETE_USER, data));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    if (client !== undefined) client.release();
+  }
+};
+
 export default {
   createUser,
   updateUser,
   getUser,
+  deleteUser,
 };
