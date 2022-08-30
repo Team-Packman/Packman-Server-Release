@@ -7,6 +7,14 @@ export interface RecentCreatedListResponseDto {
   url: string;
 }
 
+export interface ListInfoResponseDto {
+  id: string;
+  title: string;
+  departureDate: string;
+  packTotalNum: string;
+  packRemainNum: string;
+}
+
 export interface ListInviteResponseDto {
   id: string;
   title: string;
