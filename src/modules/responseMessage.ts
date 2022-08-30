@@ -101,9 +101,10 @@ const message = {
   SUCCESS_ADD_MEMBER: '그룹원 추가 성공',
 
   // 멤버
-  SUCCESS_GET_MEMBERS: '멤버 조회 성공',
-  NO_MEMBER_USER: '멤버에 유저가 존재하지 않습니다',
+  SUCCESS_GET_MEMBER: '멤버 조회 성공',
+  NO_MEMBER_USER: '멤버에 존재하지 않는 유저입니다',
   ALREADY_EXIST_MEMBER: '이미 추가된 멤버입니다',
+  EMPTY_MEMBER: '멤버가 비어있습니다',
 
   // 랜딩
   DUPLICATED_PHONE: '이미 제출되었습니다!',
