@@ -5,5 +5,6 @@ import auth from '../middlewares/auth';
 const router = Router();
 
 router.get('/:listId', auth, MemberController.getMember);
+router.delete('/:groupId/:memberId', auth, MemberController.deleteMember);
 
 export default router;
