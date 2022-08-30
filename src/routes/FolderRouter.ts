@@ -18,6 +18,7 @@ router.patch(
   auth,
   FolderController.updateFolder,
 );
+router.delete('/:folderId', auth, FolderController.deleteFolder);
 router.get('/', auth, FolderController.getFolders);
 router.get('/together', auth, FolderController.getTogetherFolders);
 router.get('/alone', auth, FolderController.getAloneFolders);
