@@ -6,7 +6,12 @@ const router = Router();
 
 router.post(
   '/',
-  [body('departureDate').notEmpty(), body('folderId').notEmpty(), body('title').notEmpty()],
+  [
+    body('departureDate').notEmpty(),
+    body('folderId').notEmpty(),
+    body('title').notEmpty(),
+    body('templateId').notEmpty(),
+  ],
   auth,
   TogetherListController.createTogetherList,
 );

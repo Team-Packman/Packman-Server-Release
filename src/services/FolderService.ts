@@ -5,6 +5,7 @@ import {
   FolderResponseDto,
   TogetherListInFolderResponseDto,
   AloneListInFolderResponseDto,
+  FolderUpdateDto,
 } from '../interfaces/IFolder';
 import { folderResponse } from '../modules/folderResponse';
 import dayjs from 'dayjs';
@@ -108,6 +109,42 @@ const createFolder = async (
         VALUES ($1, $2, $3)
       `,
       [userId, folderCreateDto.name, folderCreateDto.isAloned],
+    );
+
+    const folder = await folderResponse(client, userId);
+
+    return folder;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+const updateFolder = async (
+  client: any,
+  userId: string,
+  folderUpdateDto: FolderUpdateDto,
+): Promise<AllFolderResponseDto | string> => {
+  try {
+    if (folderUpdateDto.name.length > 8) return 'exceed_len';
+    const { rows: existFolder } = await client.query(
+      `
+        SELECT * 
+        FROM "folder" f
+        WHERE f.user_id = $1 AND f.id= $2
+      `,
+      [userId, folderUpdateDto.id]
+    );
+    if (existFolder.length === 0) {
+      return 'no_folder';
+    }
+    await client.query(
+      `
+        UPDATE "folder"
+        SET name = $1
+        WHERE id = $2
+      `,
+      [folderUpdateDto.name, folderUpdateDto.id],
     );
 
     const folder = await folderResponse(client, userId);
@@ -398,6 +435,7 @@ const getAloneListInFolder = async (
 export default {
   getRecentCreatedList,
   createFolder,
+  updateFolder,
   deleteFolder,
   getFolders,
   getTogetherFolders,

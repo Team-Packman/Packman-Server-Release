@@ -1,4 +1,5 @@
 import { AloneCategoryResponseDto } from './ICategory';
+import { ListInfoResponseDto } from './IList';
 
 export interface AloneListCategoryResponseDto {
   id: string;
@@ -11,4 +12,8 @@ export interface AloneListResponseDto {
   departureDate: string;
   category: AloneCategoryResponseDto[];
   isSaved: boolean;
+}
+
+export interface AloneListInfoResponseDto {
+  alonePackingList: ListInfoResponseDto[];
 }

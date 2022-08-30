@@ -15,7 +15,7 @@ const getPackingByInviteCode = async (
         SELECT pl.id::text, pl.title
         FROM "together_packing_list" as t
         JOIN "packing_list" as pl ON pl.id = t.id
-        WHERE t.invite_code = $1
+        WHERE t.invite_code = $1 AND pl.is_deleted = false
       `,
       [inviteCode],
     );

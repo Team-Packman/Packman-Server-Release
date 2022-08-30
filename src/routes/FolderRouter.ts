@@ -12,6 +12,12 @@ router.post(
   auth,
   FolderController.createFolder,
 );
+router.patch(
+  '/',
+  [body('id').notEmpty(), body('name').notEmpty()],
+  auth,
+  FolderController.updateFolder,
+);
 router.delete('/:folderId', auth, FolderController.deleteFolder);
 router.get('/', auth, FolderController.getFolders);
 router.get('/together', auth, FolderController.getTogetherFolders);
