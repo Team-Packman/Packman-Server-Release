@@ -5,7 +5,7 @@ import { body } from 'express-validator';
 
 const router = Router();
 
-router.get('/invite/:inviteCode', auth, ListController.inviteList);
+router.get('/invite/:inviteCode', ListController.inviteList);
 router.patch(
   '/title',
   [body('id').notEmpty(), body('title').notEmpty(), body('isAloned').notEmpty()],

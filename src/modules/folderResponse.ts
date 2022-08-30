@@ -18,7 +18,6 @@ async function folderResponse(client: any, userId: string): Promise<AllFolderRes
         `,
       [userId],
     );
-    console.log(folders)
     const aloneFolder = await folders.filter((folder: FolderInfoDto) => folder.isAloned === true)
                                       .map((filteredFolder: FolderInfoDto) => (
                                         {

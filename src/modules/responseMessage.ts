@@ -44,6 +44,7 @@ const message = {
   NO_LIST: '존재하지 않는 패킹리스트입니다',
   NO_ALONE_LIST: '존재하지 않는 혼자 패킹리스트입니다',
   NO_USER_LIST: '유저가 생성한 리스트가 없습니다',
+  NO_FOLDER_LIST: '폴더에 존재하지 않는 패킹리스트입니다',
   DUPLICATION_LIST: '중복된 리스트 이름입니다',
   UPDATE_LIST_TITLE_SUCCESS: '패킹리스트 제목 수정 성공',
   UPDATE_LIST_DATE_SUCCESS: '패킹리스트 출발 날짜 수정 성공',
@@ -83,9 +84,10 @@ const message = {
   DUPLICATED_CATEGORY: '중복된 카테고리 명입니다',
 
   //템플릿
-  NO_TEMPLATE: '존재하지 않는 Template입니다',
+  NO_TEMPLATE: '존재하지 않는 템플릿입니다',
   GET_ALONE_TEMPLATE_SUCCESS: '혼자 패킹 템플릿 리스트 조회 성공',
   GET_TOGETHER_TEMPLATE_SUCCESS: '함께 패킹 템플릿 리스트 조회 성공',
+  NO_TEMPLATE_TYPE: '존재하지 않는 템플릿 형식입니다',
 
   // 초대 코드 관련
   SUCCESS_INVITE_TOGETHER_PACKING: '함께 패킹리스트 초대 성공',
