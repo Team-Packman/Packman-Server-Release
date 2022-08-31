@@ -102,9 +102,12 @@ const message = {
 
   // 멤버
   SUCCESS_GET_MEMBER: '멤버 조회 성공',
+  SUCCESS_DELETE_MEMBER: '멤버 삭제 성공',
   NO_MEMBER_USER: '멤버에 존재하지 않는 유저입니다',
   ALREADY_EXIST_MEMBER: '이미 추가된 멤버입니다',
   EMPTY_MEMBER: '멤버가 비어있습니다',
+  NO_MAKER: '삭제할 권한이 없는 유저입니다',
+  NO_DELETE_MAKER: '생성자는 삭제할 수 없습니다',
 
   // 랜딩
   DUPLICATED_PHONE: '이미 제출되었습니다!',
