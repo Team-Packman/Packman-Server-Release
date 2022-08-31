@@ -9,8 +9,8 @@ import {
 } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
-import { nanoid } from 'nanoid';
 import { ListCreateDto } from '../interfaces/IList';
+import { generateInviteCode } from '../modules/generateInviteCode';
 
 const createTogetherList = async (
   client: any,
@@ -18,7 +18,7 @@ const createTogetherList = async (
   togetherListCreateDto: ListCreateDto,
 ): Promise<TogetherListResponseDto | string> => {
   try {
-    const inviteCode = nanoid(5);
+    const inviteCode: string = await generateInviteCode(client, 'together_packing_list');
 
     if (togetherListCreateDto.title.length > 12) return 'exceed_len';
 
