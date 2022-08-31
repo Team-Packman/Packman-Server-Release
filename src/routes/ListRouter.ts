@@ -2,10 +2,11 @@ import { Router } from 'express';
 import { ListController } from '../controllers';
 import auth from '../middlewares/auth';
 import { body } from 'express-validator';
+import isLogin from '../middlewares/isLogin';
 
 const router = Router();
 
-router.get('/invite/:inviteCode', ListController.inviteList);
+router.get('/invite/:inviteCode', isLogin, ListController.inviteList);
 router.patch(
   '/title',
   [body('id').notEmpty(), body('title').notEmpty(), body('isAloned').notEmpty()],

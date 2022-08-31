@@ -18,6 +18,7 @@ export interface ListInfoResponseDto {
 export interface ListInviteResponseDto {
   id: string;
   title: string;
+  isMember: boolean;
 }
 
 export interface ListCreateDto {
