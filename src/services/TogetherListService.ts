@@ -163,7 +163,7 @@ const createTogetherList = async (
   }
 };
 
-const readTogetherList = async (
+const getTogetherList = async (
   client: any,
   listId: string,
   userId: number,
@@ -604,7 +604,7 @@ const deleteTogetherList = async (
 
 export default {
   createTogetherList,
-  readTogetherList,
+  getTogetherList,
   updatePacker,
   addMember,
   deleteTogetherList,
