@@ -106,7 +106,7 @@ const getAloneList = async (
   try {
     const { rows: existList } = await client.query(
       `
-        SELECT *
+        SELECT invite_code AS "inviteCode"
         FROM "alone_packing_list" as l
         JOIN "packing_list" p ON l.id=p.id
         WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
@@ -132,7 +132,7 @@ const getAloneList = async (
       title: etcData.title,
       departureDate: etcData.departureDate,
       category: category,
-      inviteCode: existList[0].invite_code,
+      inviteCode: existList[0].inviteCode,
       isSaved: etcData.isSaved,
     };
 
