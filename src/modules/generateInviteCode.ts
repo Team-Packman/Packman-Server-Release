@@ -12,7 +12,7 @@ const generateInviteCode = async (client: any, listType: string): Promise<string
           SELECT EXISTS (SELECT *
                          FROM "${listType}" pl
                          WHERE pl.invite_code=$1)
-       `,
+        `,
         [inviteCode],
       );
       existInviteCode = duplicateInviteCode[0].exists;
