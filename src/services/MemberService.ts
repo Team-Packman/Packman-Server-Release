@@ -1,5 +1,6 @@
 import { MemberResponseDto, MemberDeleteResponseDto } from '../interfaces/IMember';
 import dayjs from 'dayjs';
+import TogetherListService from './TogetherListService';
 
 const getMember = async (
   client: any,
@@ -122,6 +123,25 @@ const deleteMember = async (
         WHERE group_id = $1 AND user_id = $2
         `,
         [groupId, memberId],
+      );
+
+      const { rows: togetherMyList } = await client.query(
+        `
+        SELECT f.id::TEXT as "folderId", tapl.id::TEXT as id
+        FROM "folder" f
+        JOIN folder_packing_list fpl on f.id = fpl.folder_id
+        JOIN together_alone_packing_list tapl on fpl.list_id = tapl.my_packing_list_id
+        JOIN together_packing_list tpl on tapl.together_packing_list_id = tpl.id
+        WHERE f.user_id = $1 AND tpl.group_id = $2
+        `,
+        [memberId, groupId],
+      );
+
+      await TogetherListService.deleteTogetherList(
+        client,
+        Number(memberId),
+        togetherMyList[0].folderId,
+        togetherMyList[0].id,
       );
 
       const { rows: member } = await client.query(
