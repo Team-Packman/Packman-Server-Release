@@ -51,7 +51,7 @@ const createUser = async (req: Request, res: Response) => {
  *  @desc update user
  *  @access private
  **/
- const updateUser = async (req: Request, res: Response) => {
+const updateUser = async (req: Request, res: Response) => {
   let client;
   const error = validationResult(req);
   if (!error.isEmpty()) {
@@ -73,8 +73,8 @@ const createUser = async (req: Request, res: Response) => {
         .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
     } else if (data === 'no_user') {
       res
-      .status(statusCode.BAD_REQUEST)
-      .send(util.success(statusCode.BAD_REQUEST, message.NO_USER));
+        .status(statusCode.BAD_REQUEST)
+        .send(util.success(statusCode.BAD_REQUEST, message.NO_USER));
     } else {
       res
         .status(statusCode.OK)
@@ -116,8 +116,34 @@ const getUser = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @route DELETE /user
+ *  @desc delete user
+ *  @access private
+ **/
+const deleteUser = async (req: Request, res: Response) => {
+  let client;
+
+  const userId = req.body.user.id;
+  try {
+    client = await db.connect(req);
+
+    const data = await UserService.deleteUser(client, userId);
+
+    res.status(statusCode.OK).send(util.success(statusCode.OK, message.SUCCESS_DELETE_USER, data));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    if (client !== undefined) client.release();
+  }
+};
+
 export default {
   createUser,
   updateUser,
   getUser,
+  deleteUser,
 };

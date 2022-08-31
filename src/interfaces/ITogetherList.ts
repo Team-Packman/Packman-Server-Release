@@ -1,5 +1,6 @@
 import { AloneListCategoryResponseDto } from './IAloneList';
 import { TogetherCategoryResponseDto } from './ICategory';
+import { ListInfoResponseDto } from './IList';
 
 export interface TogetherListResponseDto {
   id: string;
@@ -38,4 +39,17 @@ export interface TogetherListCategoryResponseDto {
 
 export interface TogetherAloneResponseDto {
   listId: string;
+}
+export interface TogetherListInfoResponseDto {
+  togetherPackingList: ListInfoResponseDto[];
+}
+
+export interface UseForMapInDeleteDto {
+  id: number;
+  groupId?: number;
+}
+
+export interface UseForReduceInDeleteDto {
+  myListId: number;
+  togetherListId: number;
 }

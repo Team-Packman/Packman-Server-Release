@@ -9,6 +9,7 @@ import {
 } from '../interfaces/IFolder';
 import { folderResponse } from '../modules/folderResponse';
 import dayjs from 'dayjs';
+import TogetherListService from './TogetherListService';
 
 const getRecentCreatedList = async (
   client: any,
@@ -132,7 +133,7 @@ const updateFolder = async (
         FROM "folder" f
         WHERE f.user_id = $1 AND f.id= $2
       `,
-      [userId, folderUpdateDto.id]
+      [userId, folderUpdateDto.id],
     );
     if (existFolder.length === 0) {
       return 'no_folder';
@@ -144,6 +145,74 @@ const updateFolder = async (
         WHERE id = $2
       `,
       [folderUpdateDto.name, folderUpdateDto.id],
+    );
+
+    const folder = await folderResponse(client, userId);
+
+    return folder;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+const deleteFolder = async (
+  client: any,
+  userId: string,
+  folderId: string,
+): Promise<AllFolderResponseDto | string> => {
+  try {
+    const { rows: existFolder } = await client.query(
+      `
+        SELECT *
+        FROM "folder" f
+        WHERE f.user_id = $1 AND f.id = $2
+      `,
+      [userId, folderId],
+    );
+    if (existFolder.length === 0) return 'no_folder';
+
+    if (existFolder[0].is_aloned) {
+      await client.query(
+        `
+          UPDATE "packing_list" pl
+          SET is_deleted = true
+          WHERE pl.id IN ( 
+                            SELECT fl.list_id
+                            FROM "folder_packing_list" fl
+                            WHERE fl.folder_id = $1
+                          )
+        `,
+        [folderId],
+      );
+    } else {
+      const { rows: togetherList } = await client.query(
+        `
+          SELECT tal.id AS id
+          FROM "folder_packing_list" fl
+          JOIN "together_alone_packing_list" tal ON tal.my_packing_list_id = fl.list_id
+          WHERE fl.folder_id = $1
+        `,
+        [folderId],
+      );
+      if (togetherList.length > 0) {
+        const togetherIdArray = togetherList.map((list: { id: string }) => list.id);
+        const data = await TogetherListService.deleteTogetherList(
+          client,
+          Number(userId),
+          folderId,
+          togetherIdArray.join(','),
+        );
+        if (data === 'no_folder') return 'no_folder';
+      }
+    }
+
+    await client.query(
+      `
+        DELETE FROM "folder" f
+        WHERE f.id = $1 
+      `,
+      [folderId],
     );
 
     const folder = await folderResponse(client, userId);
@@ -257,17 +326,17 @@ const getTogetherListInFolder = async (
 
     const { rows: togetherList } = await client.query(
       `
-        SELECT tapl.together_packing_list_id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
-          Count(p.id) AS "packTotalNum",
-          Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum"
-        FROM folder_packing_list fpl
-        JOIN together_alone_packing_list tapl on fpl.list_id = tapl.my_packing_list_id
-        JOIN packing_list pl on tapl.together_packing_list_id = pl.id
-        LEFT JOIN category c ON pl.id = c.list_id
-        LEFT JOIN pack p ON c.id = p.category_id
-        WHERE fpl.folder_id = $1 and pl.is_deleted = false
-        GROUP BY tapl.together_packing_list_id, pl.title, pl.departure_date
-        ORDER BY tapl.together_packing_list_id DESC
+      SELECT tapl.id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
+        Count(p.id) AS "packTotalNum",
+        Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum"
+      FROM folder_packing_list fpl
+      JOIN together_alone_packing_list tapl on fpl.list_id = tapl.my_packing_list_id
+      JOIN packing_list pl on tapl.together_packing_list_id = pl.id
+      LEFT JOIN category c ON pl.id = c.list_id
+      LEFT JOIN pack p ON c.id = p.category_id
+      WHERE fpl.folder_id = $1 and pl.is_deleted = false
+      GROUP BY tapl.together_packing_list_id, pl.title, pl.departure_date, tapl.id
+      ORDER BY tapl.together_packing_list_id DESC
       `,
       [folderId],
     );
@@ -369,6 +438,7 @@ export default {
   getRecentCreatedList,
   createFolder,
   updateFolder,
+  deleteFolder,
   getFolders,
   getTogetherFolders,
   getAloneFolders,

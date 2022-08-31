@@ -18,5 +18,5 @@ router.patch(
   TogetherListController.updatePacker,
 );
 router.post('/add-member', auth, [body('listId').notEmpty()], TogetherListController.addMember);
-
+router.delete('/:folderId/:listId', auth, TogetherListController.deleteTogetherList);
 export default router;
