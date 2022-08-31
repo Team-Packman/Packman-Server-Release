@@ -11,7 +11,7 @@ router.post(
   auth,
   AloneListController.createAloneList,
 );
-router.get('/:listId', auth, AloneListController.readAloneList);
+router.get('/:listId', auth, AloneListController.getAloneList);
 router.delete('/:folderId/:listId', auth, AloneListController.deleteAloneList);
 
 export default router;

@@ -99,7 +99,7 @@ const createAloneList = async (
   }
 };
 
-const readAloneList = async (
+const getAloneList = async (
   client: any,
   aloneListId: string,
 ): Promise<AloneListResponseDto | string> => {
@@ -216,6 +216,6 @@ const deleteAloneList = async (
 
 export default {
   createAloneList,
-  readAloneList,
+  getAloneList,
   deleteAloneList,
 };

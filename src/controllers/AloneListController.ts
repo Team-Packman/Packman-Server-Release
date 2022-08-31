@@ -51,14 +51,14 @@ const createAloneList = async (req: Request, res: Response) => {
  *  @desc read alone list
  *  @access private
  **/
-const readAloneList = async (req: Request, res: Response) => {
+const getAloneList = async (req: Request, res: Response) => {
   let client;
   const { listId } = req.params;
 
   try {
     client = await db.connect(req);
 
-    const data = await AloneListService.readAloneList(client, listId);
+    const data = await AloneListService.getAloneList(client, listId);
 
     if (data === 'no_list')
       res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
@@ -115,6 +115,6 @@ const deleteAloneList = async (req: Request, res: Response) => {
 
 export default {
   createAloneList,
-  readAloneList,
+  getAloneList,
   deleteAloneList,
 };
