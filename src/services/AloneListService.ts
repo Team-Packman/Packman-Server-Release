@@ -11,20 +11,21 @@ const createAloneList = async (
     if (aloneListCreateDto.title.length > 12) return 'exceed_len';
     const inviteCode: string = await generateInviteCode(client, 'alone_packing_list');
 
-    const { rows: listId } = await client.query(
+    const { rows: insertListInfo } = await client.query(
       `
         INSERT INTO "packing_list" (title, departure_date)
-        VALUES ($1, $2)
-        RETURNING id
+        VALUES ($1, $1)
+        RETURNING id, title, TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate", is_saved AS "isSaved"
       `,
       [aloneListCreateDto.title, aloneListCreateDto.departureDate],
     );
-    const aloneListId = listId[0].id;
+    const aloneListId = insertListInfo[0].id;
 
-    await client.query(
+    const { rows: insertAloneListInfo } = await client.query(
       `
         INSERT INTO "alone_packing_list" (id, invite_code)
         VALUES ($1, $2)
+        RETURNING invite_code AS "inviteCode"
       `,
       [aloneListId, inviteCode],
     );
@@ -80,25 +81,15 @@ const createAloneList = async (
       }
     }
 
-    const { rows: etcDataArray } = await client.query(
-      `
-        SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate", p.is_saved AS "isSaved"
-        FROM "packing_list" p
-        WHERE p.id=$1
-      `,
-      [aloneListId],
-    );
-    const etcData = etcDataArray[0];
-
     const aloneListCategory = await aloneCategoryResponse(client, aloneListId);
 
     const data: AloneListResponseDto = {
       id: aloneListId.toString(),
-      title: etcData.title,
-      departureDate: etcData.departureDate,
+      title: insertListInfo[0].title,
+      departureDate: insertListInfo[0].departureDate,
       category: aloneListCategory,
-      inviteCode: inviteCode,
-      isSaved: etcData.isSaved,
+      inviteCode: insertAloneListInfo[0].inviteCode,
+      isSaved: insertListInfo[0].isSaved,
     };
 
     return data;
