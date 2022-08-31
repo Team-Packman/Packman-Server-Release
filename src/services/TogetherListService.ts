@@ -148,7 +148,7 @@ const createTogetherList = async (
         groupId: groupId.toString(),
         category: togetherCategory,
         inviteCode: insertTogetherList[0].inviteCode,
-        isSaved: insertListInfo[1].is_saved,
+        isSaved: insertListInfo[1].isSaved,
       },
       myPackingList: {
         id: myListId.toString(),
