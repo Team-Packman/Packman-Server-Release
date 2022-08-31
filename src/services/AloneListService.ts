@@ -1,6 +1,7 @@
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { ListCreateDto } from '../interfaces/IList';
 import { AloneListInfoResponseDto, AloneListResponseDto } from '../interfaces/IAloneList';
+import { generateInviteCode } from '../modules/generateInviteCode';
 
 const createAloneList = async (
   client: any,
@@ -8,6 +9,7 @@ const createAloneList = async (
 ): Promise<AloneListResponseDto | string> => {
   try {
     if (aloneListCreateDto.title.length > 12) return 'exceed_len';
+    const inviteCode: string = await generateInviteCode(client, 'alone_packing_list');
 
     const { rows: listId } = await client.query(
       `
@@ -21,10 +23,10 @@ const createAloneList = async (
 
     await client.query(
       `
-        INSERT INTO "alone_packing_list" (id)
-        VALUES ($1)
+        INSERT INTO "alone_packing_list" (id, invite_code)
+        VALUES ($1, $2)
       `,
-      [aloneListId],
+      [aloneListId, inviteCode],
     );
 
     await client.query(
@@ -95,6 +97,7 @@ const createAloneList = async (
       title: etcData.title,
       departureDate: etcData.departureDate,
       category: aloneListCategory,
+      inviteCode: inviteCode,
       isSaved: etcData.isSaved,
     };
 
@@ -138,6 +141,7 @@ const readAloneList = async (
       title: etcData.title,
       departureDate: etcData.departureDate,
       category: category,
+      inviteCode: existList[0].invite_code,
       isSaved: etcData.isSaved,
     };
 
