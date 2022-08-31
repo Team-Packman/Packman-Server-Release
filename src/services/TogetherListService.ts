@@ -339,10 +339,11 @@ const addMember = async (
   try {
     const { rows: togetherList } = await client.query(
       `
-        SELECT *
-        FROM "packing_list" as pl
-        JOIN "together_packing_list" as t ON pl.id = t.id
-        WHERE pl.id = $1 AND pl.is_deleted = false
+        SELECT tpl.group_id as "groupId", pl.title as title, pl.departure_date as "departureDate", tpl.id as "togetherId"
+        FROM together_alone_packing_list tapl
+        JOIN together_packing_list tpl on tapl.together_packing_list_id = tpl.id
+        JOIN packing_list pl on tpl.id = pl.id
+        WHERE tapl.id = $1 AND pl.is_deleted = false
       `,
       [listId],
     );
@@ -355,7 +356,7 @@ const addMember = async (
         FROM "user_group" as ug
         WHERE ug.user_id = $1 AND ug.group_id = $2
       `,
-      [userId, togetherList[0].group_id],
+      [userId, togetherList[0].groupId],
     );
     if (existMember.length > 0) return 'already_exist_member';
 
@@ -364,7 +365,7 @@ const addMember = async (
         INSERT INTO "user_group" (user_id, group_id)
         VALUES ($1, $2)
       `,
-      [userId, togetherList[0].group_id],
+      [userId, togetherList[0].groupId],
     );
 
     // 기본 폴더 추가
@@ -399,7 +400,7 @@ const addMember = async (
         VALUES ($1, $2)
         RETURNING *
       `,
-      [togetherList[0].title, togetherList[0].departure_date],
+      [togetherList[0].title, togetherList[0].departureDate],
     );
 
     const { rows: aloneList } = await client.query(
@@ -417,7 +418,7 @@ const addMember = async (
         VALUES ($1, $2)
         RETURNING id::text
       `,
-      [aloneList[0].id, togetherList[0].id],
+      [aloneList[0].id, togetherList[0].togetherId],
     );
 
     await client.query(
