@@ -13,15 +13,16 @@ const getPackingByInviteCode = async (
   try {
     const { rows: packingList } = await client.query(
       `
-        SELECT pl.id::text, pl.title, t.group_id
-        FROM "together_packing_list" as t
-        JOIN "packing_list" as pl ON pl.id = t.id
-        WHERE t.invite_code = $1 AND pl.is_deleted = false
+      SELECT tapl.id::text, pl.title, t.group_id
+      FROM "together_packing_list" as t
+      JOIN "packing_list" as pl ON pl.id = t.id
+      JOIN together_alone_packing_list tapl on t.id = tapl.together_packing_list_id
+      WHERE t.invite_code = $1 AND pl.is_deleted = false
       `,
       [inviteCode],
     );
     if (packingList.length === 0) return 'no_list';
-    
+
     // 이미 추가된 멤버인지
     let isMember = false;
 
@@ -39,7 +40,7 @@ const getPackingByInviteCode = async (
     const data: ListInviteResponseDto = {
       id: packingList[0].id,
       title: packingList[0].title,
-      isMember: isMember
+      isMember: isMember,
     };
     return data;
   } catch (error) {
