@@ -14,7 +14,7 @@ const createAloneList = async (
     const { rows: insertListInfo } = await client.query(
       `
         INSERT INTO "packing_list" (title, departure_date)
-        VALUES ($1, $1)
+        VALUES ($1, $2)
         RETURNING id, title, TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate", is_saved AS "isSaved"
       `,
       [aloneListCreateDto.title, aloneListCreateDto.departureDate],
