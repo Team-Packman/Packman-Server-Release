@@ -12,7 +12,7 @@ router.post(
   AloneListController.createAloneList,
 );
 
-router.get('/:listId', auth, AloneListController.readAloneList);
+router.get('/:listId', auth, AloneListController.getAloneList);
 
 router.get('/:listId', auth, AloneListController.getAloneList);
 
