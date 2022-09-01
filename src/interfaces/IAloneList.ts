@@ -11,6 +11,7 @@ export interface AloneListResponseDto {
   title: string;
   departureDate: string;
   category: AloneCategoryResponseDto[];
+  inviteCode: string;
   isSaved: boolean;
 }
 
