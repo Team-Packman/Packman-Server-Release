@@ -18,10 +18,7 @@ const inviteList = async (req: Request, res: Response) => {
   const inviteCode = req.params.inviteCode;
   try {
     client = await db.connect(req);
-    let userId = 0;
-    if (req.body.user) {
-      userId = req.body.user.id;
-    }
+    const userId = req.body.user.id;
     const data = await ListService.getPackingByInviteCode(client, inviteCode, userId);
     if (data === 'no_list') {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));

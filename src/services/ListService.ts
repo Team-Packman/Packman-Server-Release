@@ -11,7 +11,6 @@ const getPackingByInviteCode = async (
   userId: number,
 ): Promise<ListInviteResponseDto | string> => {
   try {
-
     const { rows: packingList } = await client.query(
       `
       SELECT tapl.id::text, t.group_id, t.id AS "togetherId"
@@ -27,20 +26,19 @@ const getPackingByInviteCode = async (
     // 이미 추가된 멤버인지
     let isMember = false;
 
-    if (userId !== 0) {
-      const { rows: existMember } = await client.query(
-        `
+    const { rows: existMember } = await client.query(
+      `
           SELECT *
           FROM "user_group" as ug
           WHERE ug.user_id = $1 AND ug.group_id = $2
         `,
-        [userId, packingList[0].group_id],
-      );
-      if (existMember.length > 0) isMember = true;
+      [userId, packingList[0].group_id],
+    );
+    if (existMember.length > 0) isMember = true;
 
-      if (isMember === true) {
-        const { rows: newPackingList } = await client.query(
-          `
+    if (isMember === true) {
+      const { rows: newPackingList } = await client.query(
+        `
             SELECT tal.id::text
             FROM "together_alone_packing_list" tal 
             JOIN "folder_packing_list" fl ON tal.my_packing_list_id = fl.list_id
@@ -48,17 +46,15 @@ const getPackingByInviteCode = async (
             JOIN "packing_list" pl ON pl.id =  fl.list_id
             WHERE tal.together_packing_list_id = $1 AND f.user_id = $2 AND pl.is_deleted = false
           `,
-          [packingList[0].togetherId, userId]
-        );
-        if (newPackingList.length === 0) return 'no_list';
-        const data: ListInviteResponseDto = {
-          id: newPackingList[0].id,
-          isMember: isMember,
-        };
-        return data;
-      }
+        [packingList[0].togetherId, userId],
+      );
+      if (newPackingList.length === 0) return 'no_list';
+      const data: ListInviteResponseDto = {
+        id: newPackingList[0].id,
+        isMember: isMember,
+      };
+      return data;
     }
-
 
     const data: ListInviteResponseDto = {
       id: packingList[0].id,
