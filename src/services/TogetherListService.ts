@@ -22,6 +22,16 @@ const createTogetherList = async (
 
     if (togetherListCreateDto.title.length > 12) return 'exceed_len';
 
+    const { rows: existFolder } = await client.query(
+      `
+        SELECT *
+        FROM "folder"
+        WHERE id=$1 AND is_aloned=false
+      `,
+      [togetherListCreateDto.folderId],
+    );
+    if (existFolder.length === 0) return 'no_folder';
+
     const { rows: insertListInfo } = await client.query(
       `
         INSERT INTO "packing_list" (title, departure_date)

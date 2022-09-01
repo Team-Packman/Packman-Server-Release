@@ -38,6 +38,8 @@ const createTogetherList = async (req: Request, res: Response) => {
       res
         .status(statusCode.BAD_REQUEST)
         .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
+    else if (data === 'no_folder')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_FOLDER));
     else
       res
         .status(statusCode.OK)
