@@ -5,26 +5,38 @@ import { generateInviteCode } from '../modules/generateInviteCode';
 
 const createAloneList = async (
   client: any,
+  userId: number,
   aloneListCreateDto: ListCreateDto,
 ): Promise<AloneListResponseDto | string> => {
   try {
-    if (aloneListCreateDto.title.length > 12) return 'exceed_len';
     const inviteCode: string = await generateInviteCode(client, 'alone_packing_list');
+    if (aloneListCreateDto.title.length > 12) return 'exceed_len';
 
-    const { rows: listId } = await client.query(
+    const { rows: existFolder } = await client.query(
+      `
+        SELECT *
+        FROM "folder"
+        WHERE id=$1 AND is_aloned=true AND user_id=$2
+      `,
+      [aloneListCreateDto.folderId, userId],
+    );
+    if (existFolder.length === 0) return 'no_folder';
+
+    const { rows: insertListInfo } = await client.query(
       `
         INSERT INTO "packing_list" (title, departure_date)
         VALUES ($1, $2)
-        RETURNING id
+        RETURNING id, title, TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate", is_saved AS "isSaved"
       `,
       [aloneListCreateDto.title, aloneListCreateDto.departureDate],
     );
-    const aloneListId = listId[0].id;
+    const aloneListId = insertListInfo[0].id;
 
-    await client.query(
+    const { rows: insertAloneListInfo } = await client.query(
       `
         INSERT INTO "alone_packing_list" (id, invite_code)
         VALUES ($1, $2)
+        RETURNING invite_code AS "inviteCode"
       `,
       [aloneListId, inviteCode],
     );
@@ -80,25 +92,15 @@ const createAloneList = async (
       }
     }
 
-    const { rows: etcDataArray } = await client.query(
-      `
-        SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate", p.is_saved AS "isSaved"
-        FROM "packing_list" p
-        WHERE p.id=$1
-      `,
-      [aloneListId],
-    );
-    const etcData = etcDataArray[0];
-
     const aloneListCategory = await aloneCategoryResponse(client, aloneListId);
 
     const data: AloneListResponseDto = {
       id: aloneListId.toString(),
-      title: etcData.title,
-      departureDate: etcData.departureDate,
+      title: insertListInfo[0].title,
+      departureDate: insertListInfo[0].departureDate,
       category: aloneListCategory,
-      inviteCode: inviteCode,
-      isSaved: etcData.isSaved,
+      inviteCode: insertAloneListInfo[0].inviteCode,
+      isSaved: insertListInfo[0].isSaved,
     };
 
     return data;
@@ -108,14 +110,14 @@ const createAloneList = async (
   }
 };
 
-const readAloneList = async (
+const getAloneList = async (
   client: any,
   aloneListId: string,
 ): Promise<AloneListResponseDto | string> => {
   try {
     const { rows: existList } = await client.query(
       `
-        SELECT *
+        SELECT invite_code AS "inviteCode"
         FROM "alone_packing_list" as l
         JOIN "packing_list" p ON l.id=p.id
         WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
@@ -141,7 +143,7 @@ const readAloneList = async (
       title: etcData.title,
       departureDate: etcData.departureDate,
       category: category,
-      inviteCode: existList[0].invite_code,
+      inviteCode: existList[0].inviteCode,
       isSaved: etcData.isSaved,
     };
 
@@ -225,6 +227,6 @@ const deleteAloneList = async (
 
 export default {
   createAloneList,
-  readAloneList,
+  getAloneList,
   deleteAloneList,
 };

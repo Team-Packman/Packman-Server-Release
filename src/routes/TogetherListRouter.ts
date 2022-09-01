@@ -10,7 +10,7 @@ router.post(
   auth,
   TogetherListController.createTogetherList,
 );
-router.get('/:listId', auth, TogetherListController.readTogetherList);
+router.get('/:listId', auth, TogetherListController.getTogetherList);
 router.patch(
   '/packer',
   [body('listId').notEmpty(), body('packId').notEmpty(), body('packerId').notEmpty()],

@@ -22,16 +22,26 @@ const createTogetherList = async (
 
     if (togetherListCreateDto.title.length > 12) return 'exceed_len';
 
-    const { rows: listIdArray } = await client.query(
+    const { rows: existFolder } = await client.query(
+      `
+        SELECT *
+        FROM "folder"
+        WHERE id=$1 AND is_aloned=false AND folder.user_id=$2
+      `,
+      [togetherListCreateDto.folderId, userId],
+    );
+    if (existFolder.length === 0) return 'no_folder';
+
+    const { rows: insertListInfo } = await client.query(
       `
         INSERT INTO "packing_list" (title, departure_date)
         VALUES ($1, $2), ($1, $2)
-        RETURNING id, is_saved
+        RETURNING id, title, TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate", is_saved AS "isSaved"
       `,
       [togetherListCreateDto.title, togetherListCreateDto.departureDate],
     );
-    const togetherListId = listIdArray[0].id;
-    const myListId = listIdArray[1].id;
+    const togetherListId = insertListInfo[0].id;
+    const myListId = insertListInfo[1].id;
 
     const { rows: group } = await client.query(
       `
@@ -50,10 +60,11 @@ const createTogetherList = async (
       [userId, groupId],
     );
 
-    await client.query(
+    const { rows: insertTogetherList } = await client.query(
       `
         INSERT INTO "together_packing_list" (id, group_id, invite_code)
         VALUES ($1, $2, $3)
+        RETURNING invite_code AS "inviteCode"
       `,
       [togetherListId, groupId, inviteCode],
     );
@@ -135,31 +146,19 @@ const createTogetherList = async (
       }
     }
 
-    const { rows: etcDataArray } = await client.query(
-      `
-        SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate",
-          t.group_id AS "groupId", t.invite_code AS "inviteCode"
-        FROM "packing_list" p
-        JOIN "together_packing_list" t ON p.id=t.id 
-        WHERE t.id=$1
-      `,
-      [togetherListId],
-    );
-    const etcData = etcDataArray[0];
-
     const togetherCategory = await togetherCategoryResponse(client, togetherListId);
     const myListCategory = await aloneCategoryResponse(client, myListId);
 
     const data: TogetherListResponseDto = {
       id: togetherMyId.toString(),
-      title: etcData.title,
-      departureDate: etcData.departureDate,
+      title: insertListInfo[0].title,
+      departureDate: insertListInfo[0].departureDate,
       togetherPackingList: {
         id: togetherListId.toString(),
-        groupId: etcData.groupId.toString(),
+        groupId: groupId.toString(),
         category: togetherCategory,
-        inviteCode: etcData.inviteCode,
-        isSaved: listIdArray[1].is_saved,
+        inviteCode: insertTogetherList[0].inviteCode,
+        isSaved: insertListInfo[1].isSaved,
       },
       myPackingList: {
         id: myListId.toString(),
@@ -174,7 +173,7 @@ const createTogetherList = async (
   }
 };
 
-const readTogetherList = async (
+const getTogetherList = async (
   client: any,
   listId: string,
   userId: number,
@@ -616,7 +615,7 @@ const deleteTogetherList = async (
 
 export default {
   createTogetherList,
-  readTogetherList,
+  getTogetherList,
   updatePacker,
   addMember,
   deleteTogetherList,

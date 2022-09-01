@@ -38,6 +38,8 @@ const createTogetherList = async (req: Request, res: Response) => {
       res
         .status(statusCode.BAD_REQUEST)
         .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
+    else if (data === 'no_folder')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_FOLDER));
     else
       res
         .status(statusCode.OK)
@@ -57,7 +59,7 @@ const createTogetherList = async (req: Request, res: Response) => {
  *  @desc read together list
  *  @access private
  **/
-const readTogetherList = async (req: Request, res: Response) => {
+const getTogetherList = async (req: Request, res: Response) => {
   let client;
   const { listId } = req.params;
   const userId: number = req.body.user.id;
@@ -65,7 +67,7 @@ const readTogetherList = async (req: Request, res: Response) => {
   try {
     client = await db.connect(req);
 
-    const data = await TogetherListService.readTogetherList(client, listId, userId);
+    const data = await TogetherListService.getTogetherList(client, listId, userId);
 
     if (data === 'no_list')
       res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
@@ -205,7 +207,7 @@ const deleteTogetherList = async (req: Request, res: Response) => {
 
 export default {
   createTogetherList,
-  readTogetherList,
+  getTogetherList,
   updatePacker,
   addMember,
   deleteTogetherList,
