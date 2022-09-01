@@ -32,17 +32,20 @@ const getRecentCreatedList = async (
     if (aloneList.length === 0) return 'no_list';
 
     let recentListId = aloneList[0].id;
+    let togetherConnectId;
 
     if (aloneList[0].is_aloned === false) {
       const { rows: togetherListId } = await client.query(
         `
-          SELECT tapl.together_packing_list_id::text AS id
+          SELECT tapl.id::TEXT as id, tapl.together_packing_list_id::TEXT AS "togetherId"
           FROM "together_alone_packing_list" tapl
           WHERE tapl.my_packing_list_id = $1
         `,
         [recentListId],
       );
-      recentListId = togetherListId[0].id;
+
+      recentListId = togetherListId[0].togetherId;
+      togetherConnectId = togetherListId[0].id;
     }
 
     const { rows: recentList } = await client.query(
