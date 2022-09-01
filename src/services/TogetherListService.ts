@@ -26,9 +26,9 @@ const createTogetherList = async (
       `
         SELECT *
         FROM "folder"
-        WHERE id=$1 AND is_aloned=false
+        WHERE id=$1 AND is_aloned=false AND folder.user_id=$2
       `,
-      [togetherListCreateDto.folderId],
+      [togetherListCreateDto.folderId, userId],
     );
     if (existFolder.length === 0) return 'no_folder';
 

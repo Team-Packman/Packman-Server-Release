@@ -21,17 +21,20 @@ const createAloneList = async (req: Request, res: Response) => {
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
 
+  const userId: number = req.body.user.id;
   const aloneListCreateDto: ListCreateDto = req.body;
 
   try {
     client = await db.connect(req);
 
-    const data = await AloneListService.createAloneList(client, aloneListCreateDto);
+    const data = await AloneListService.createAloneList(client, userId, aloneListCreateDto);
 
     if (data === 'exceed_len')
       res
         .status(statusCode.BAD_REQUEST)
         .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
+    else if (data === 'no_folder')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_FOLDER));
     else
       res
         .status(statusCode.OK)

@@ -5,11 +5,22 @@ import { generateInviteCode } from '../modules/generateInviteCode';
 
 const createAloneList = async (
   client: any,
+  userId: number,
   aloneListCreateDto: ListCreateDto,
 ): Promise<AloneListResponseDto | string> => {
   try {
-    if (aloneListCreateDto.title.length > 12) return 'exceed_len';
     const inviteCode: string = await generateInviteCode(client, 'alone_packing_list');
+    if (aloneListCreateDto.title.length > 12) return 'exceed_len';
+
+    const { rows: existFolder } = await client.query(
+      `
+        SELECT *
+        FROM "folder"
+        WHERE id=$1 AND is_aloned=true AND user_id=$2
+      `,
+      [aloneListCreateDto.folderId, userId],
+    );
+    if (existFolder.length === 0) return 'no_folder';
 
     const { rows: insertListInfo } = await client.query(
       `
