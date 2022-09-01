@@ -1,6 +1,10 @@
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { ListCreateDto } from '../interfaces/IList';
-import { AloneListInfoResponseDto, AloneListResponseDto } from '../interfaces/IAloneList';
+import {
+  AloneListInfoResponseDto,
+  AloneListResponseDto,
+  InviteAloneListResponseDto,
+} from '../interfaces/IAloneList';
 import { generateInviteCode } from '../modules/generateInviteCode';
 
 const createAloneList = async (
@@ -223,8 +227,46 @@ const deleteAloneList = async (
   }
 };
 
+const getInviteAloneList = async (
+  client: any,
+  userId: number,
+  inviteCode: string,
+): Promise<InviteAloneListResponseDto | string> => {
+  try {
+    const { rows: aloneList } = await client.query(
+      `
+        SELECT apl.id::TEXT, f.user_id as "userId"
+        FROM alone_packing_list apl
+        JOIN packing_list pl on apl.id = pl.id
+        JOIN folder_packing_list fpl on apl.id = fpl.list_id
+        JOIN folder f on fpl.folder_id = f.id
+        WHERE apl.invite_code = $1 AND pl.is_deleted = false
+      `,
+      [inviteCode],
+    );
+
+    if (aloneList.length === 0) return 'no_list';
+
+    const ownerId = aloneList[0].userId;
+
+    let isOwner = false;
+    if (userId === ownerId) isOwner = true;
+
+    const data: InviteAloneListResponseDto = {
+      id: aloneList[0].id,
+      isOwner: isOwner,
+    };
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export default {
   createAloneList,
   readAloneList,
   deleteAloneList,
+  getInviteAloneList,
 };
