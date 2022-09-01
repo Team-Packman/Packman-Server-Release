@@ -66,9 +66,10 @@ const getRecentCreatedList = async (
     let url = '';
 
     if (aloneList[0].is_aloned === true) {
-      url = `/alone/${recentListId}`;
+      url = `alone?id=${recentListId}`;
     } else {
-      url = `/together/${recentListId}`;
+      recentListId = togetherConnectId;
+      url = `together?id=${recentListId}`;
     }
 
     const data: RecentCreatedListResponseDto = {
