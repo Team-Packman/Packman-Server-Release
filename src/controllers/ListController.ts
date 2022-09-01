@@ -62,7 +62,7 @@ const updateTitle = async (req: Request, res: Response) => {
         .status(statusCode.BAD_REQUEST)
         .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
     else if (data === 'no_list')
-      res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.NO_LIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     else
       res
         .status(statusCode.OK)
@@ -100,7 +100,7 @@ const updateDate = async (req: Request, res: Response) => {
     const data = await ListService.updateDate(client, dateUpdateDto);
 
     if (data === 'no_list')
-      res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.NO_LIST));
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     else
       res
         .status(statusCode.OK)
