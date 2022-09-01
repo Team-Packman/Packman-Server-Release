@@ -11,9 +11,10 @@ const getPackingByInviteCode = async (
   userId: number,
 ): Promise<ListInviteResponseDto | string> => {
   try {
+
     const { rows: packingList } = await client.query(
       `
-      SELECT tapl.id::text, pl.title, t.group_id
+      SELECT tapl.id::text, t.group_id, t.id AS "togetherId"
       FROM "together_packing_list" as t
       JOIN "packing_list" as pl ON pl.id = t.id
       JOIN together_alone_packing_list tapl on t.id = tapl.together_packing_list_id
@@ -36,10 +37,31 @@ const getPackingByInviteCode = async (
         [userId, packingList[0].group_id],
       );
       if (existMember.length > 0) isMember = true;
+
+      if (isMember === true) {
+        const { rows: newPackingList } = await client.query(
+          `
+            SELECT tal.id::text
+            FROM "together_alone_packing_list" tal 
+            JOIN "folder_packing_list" fl ON tal.my_packing_list_id = fl.list_id
+            JOIN "folder" f ON f.id = fl.folder_id
+            JOIN "packing_list" pl ON pl.id =  fl.list_id
+            WHERE tal.together_packing_list_id = $1 AND f.user_id = $2 AND pl.is_deleted = false
+          `,
+          [packingList[0].togetherId, userId]
+        );
+        if (newPackingList.length === 0) return 'no_list';
+        const data: ListInviteResponseDto = {
+          id: newPackingList[0].id,
+          isMember: isMember,
+        };
+        return data;
+      }
     }
+
+
     const data: ListInviteResponseDto = {
       id: packingList[0].id,
-      title: packingList[0].title,
       isMember: isMember,
     };
     return data;
