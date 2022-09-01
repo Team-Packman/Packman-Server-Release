@@ -201,10 +201,10 @@ const updateMyTemplate = async (
     if (myTemplateUpdateDto.isAloned === true) {
       const { rows: existList } = await client.query(
         `
-        SELECT *
-        FROM "alone_packing_list" as l
-        JOIN "packing_list" p ON l.id=p.id
-        WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
+          SELECT *
+          FROM "alone_packing_list" as l
+          JOIN "packing_list" p ON l.id=p.id
+          WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
         `,
         [myTemplateUpdateDto.id],
       );
@@ -214,11 +214,11 @@ const updateMyTemplate = async (
     } else {
       const { rows: existList } = await client.query(
         `
-        SELECT *
-        FROM "together_alone_packing_list" as l
-        JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
-        WHERE l.id=$1 AND p.is_deleted=false
-        ORDER BY p.id
+          SELECT *
+          FROM "together_alone_packing_list" as l
+          JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
+          WHERE l.id=$1 AND p.is_deleted=false
+          ORDER BY p.id
         `,
         [myTemplateUpdateDto.id],
       );
@@ -233,18 +233,18 @@ const updateMyTemplate = async (
     if (myTemplateUpdateDto.isSaved === false) {
       await client.query(
         `
-        UPDATE "packing_list"
-        SET is_saved=true
-        WHERE id=$1
+          UPDATE "packing_list"
+          SET is_saved=true
+          WHERE id=$1
         `,
         [aloneListId],
       );
 
       const { rows: template } = await client.query(
         `
-        INSERT INTO "template" (is_aloned, title,packing_list_id, user_id)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id
+          INSERT INTO "template" (is_aloned, title,packing_list_id, user_id)
+          VALUES ($1, $2, $3, $4)
+          RETURNING id
         `,
         [myTemplateUpdateDto.isAloned, title, aloneListId, userId],
       );
@@ -252,9 +252,9 @@ const updateMyTemplate = async (
     } else {
       const { rows: existTemplate } = await client.query(
         `
-        SELECT *
-        FROM "template" t
-        WHERE t.packing_list_id=$1
+          SELECT *
+          FROM "template" t
+          WHERE t.packing_list_id=$1
         `,
         [aloneListId],
       );
@@ -263,9 +263,18 @@ const updateMyTemplate = async (
 
       await client.query(
         `
-        DELETE
-        FROM "template_category" tc
-        WHERE tc.template_id=$1
+          UPDATE "template"
+          SET title=$1
+          WHERE id=$2
+        `,
+        [title, templateId],
+      );
+
+      await client.query(
+        `
+          DELETE
+          FROM "template_category" tc
+          WHERE tc.template_id=$1
         `,
         [templateId],
       );
@@ -288,7 +297,7 @@ const updateMyTemplate = async (
           INSERT INTO "template_category" (template_id, name)
           VALUES($1, (SELECT name FROM "category" WHERE id=$2))
           RETURNING *
-          `,
+        `,
         [templateId, categoryId],
       );
       const templateCategoryId = templateCategoryIdArray[0].id;
@@ -299,16 +308,16 @@ const updateMyTemplate = async (
           SELECT t.id, p.name
           FROM "template_category" t, "pack" p
           WHERE t.id=$1 AND p.category_id=$2
-          `,
+        `,
         [templateCategoryId, categoryId],
       );
     }
 
     const { rows: returnData } = await client.query(
       `
-      SELECT is_saved as "isSaved"
-      FROM packing_list p
-      WHERE p.id=$1
+        SELECT is_saved as "isSaved"
+        FROM packing_list p
+        WHERE p.id=$1
       `,
       [aloneListId],
     );

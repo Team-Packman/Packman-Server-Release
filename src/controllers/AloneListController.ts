@@ -21,17 +21,20 @@ const createAloneList = async (req: Request, res: Response) => {
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
 
+  const userId: number = req.body.user.id;
   const aloneListCreateDto: ListCreateDto = req.body;
 
   try {
     client = await db.connect(req);
 
-    const data = await AloneListService.createAloneList(client, aloneListCreateDto);
+    const data = await AloneListService.createAloneList(client, userId, aloneListCreateDto);
 
     if (data === 'exceed_len')
       res
         .status(statusCode.BAD_REQUEST)
         .send(util.success(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
+    else if (data === 'no_folder')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_FOLDER));
     else
       res
         .status(statusCode.OK)
@@ -51,14 +54,14 @@ const createAloneList = async (req: Request, res: Response) => {
  *  @desc read alone list
  *  @access private
  **/
-const readAloneList = async (req: Request, res: Response) => {
+const getAloneList = async (req: Request, res: Response) => {
   let client;
   const { listId } = req.params;
 
   try {
     client = await db.connect(req);
 
-    const data = await AloneListService.readAloneList(client, listId);
+    const data = await AloneListService.getAloneList(client, listId);
 
     if (data === 'no_list')
       res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
@@ -147,7 +150,7 @@ const getInviteAloneList = async (req: Request, res: Response) => {
 
 export default {
   createAloneList,
-  readAloneList,
+  getAloneList,
   deleteAloneList,
   getInviteAloneList,
 };
