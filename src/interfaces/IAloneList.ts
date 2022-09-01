@@ -18,3 +18,8 @@ export interface AloneListResponseDto {
 export interface AloneListInfoResponseDto {
   alonePackingList: ListInfoResponseDto[];
 }
+
+export interface InviteAloneListResponseDto {
+  id: string;
+  isOwner: boolean;
+}

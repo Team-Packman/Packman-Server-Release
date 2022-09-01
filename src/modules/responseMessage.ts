@@ -58,6 +58,7 @@ const message = {
   CREATE_ALONE_CATEGORY_SUCCESS: '혼자 패킹리스트 카테고리 생성 성공',
   UPDATE_ALONE_CATEGORY_SUCCESS: '혼자 패킹리스트 카테고리 수정 성공',
   DELETE_ALONE_CATEGORY_SUCCESS: '혼자 패킹리스트 카테고리 삭제 성공',
+  GET_INVITE_ALONE_LIST_SUCCESS: '공유된 혼자 패킹리스트 조회 성공',
   CREATE_ALONE_PACK_SUCCESS: '혼자 패킹리스트 짐 생성 성공',
   UPDATE_ALONE_PACK_SUCCESS: '혼자 패킹리스트 짐 수정 성공',
   DELETE_ALONE_PACK_SUCCESS: '혼자 패킹리스트 짐 삭제 성공',
