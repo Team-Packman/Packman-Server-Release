@@ -16,44 +16,36 @@ const getRecentCreatedList = async (
   userId: string,
 ): Promise<RecentCreatedListResponseDto | string> => {
   try {
-    const { rows: list } = await client.query(
-      `
-      SELECT *
-      FROM "folder" f
-      JOIN folder_packing_list fpl ON f.id = fpl.folder_id
-      JOIN packing_list pl on fpl.list_id = pl.id
-      WHERE f.user_id = $1 AND pl.is_deleted = false
-      `,
-      [userId],
-    );
-
-    if (list.length === 0) return 'no_list';
-
     const { rows: aloneList } = await client.query(
       `
         SELECT pl.id::text, apl.is_aloned
         FROM "folder" f
         JOIN folder_packing_list fpl ON f.id = fpl.folder_id
-        LEFT JOIN packing_list pl ON fpl.list_id = pl.id
-        LEFT JOIN alone_packing_list apl ON pl.id = apl.id
-        WHERE f.user_id = $1
+        JOIN packing_list pl ON fpl.list_id = pl.id
+        JOIN alone_packing_list apl ON pl.id = apl.id
+        WHERE f.user_id = $1 AND pl.is_deleted = false
         ORDER BY pl.created_at DESC 
       `,
       [userId],
     );
 
+    if (aloneList.length === 0) return 'no_list';
+
     let recentListId = aloneList[0].id;
+    let togetherConnectId;
 
     if (aloneList[0].is_aloned === false) {
       const { rows: togetherListId } = await client.query(
         `
-          SELECT tapl.together_packing_list_id::text AS id
+          SELECT tapl.id::TEXT as id, tapl.together_packing_list_id::TEXT AS "togetherId"
           FROM "together_alone_packing_list" tapl
           WHERE tapl.my_packing_list_id = $1
         `,
         [recentListId],
       );
-      recentListId = togetherListId[0].id;
+
+      recentListId = togetherListId[0].togetherId;
+      togetherConnectId = togetherListId[0].id;
     }
 
     const { rows: recentList } = await client.query(
@@ -74,9 +66,10 @@ const getRecentCreatedList = async (
     let url = '';
 
     if (aloneList[0].is_aloned === true) {
-      url = `/alone/${recentListId}`;
+      url = `alone?id=${recentListId}`;
     } else {
-      url = `/together/${recentListId}`;
+      recentListId = togetherConnectId;
+      url = `together?id=${recentListId}`;
     }
 
     const data: RecentCreatedListResponseDto = {
