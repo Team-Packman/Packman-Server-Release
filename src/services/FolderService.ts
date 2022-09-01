@@ -16,19 +16,6 @@ const getRecentCreatedList = async (
   userId: string,
 ): Promise<RecentCreatedListResponseDto | string> => {
   try {
-    const { rows: list } = await client.query(
-      `
-      SELECT *
-      FROM "folder" f
-      JOIN folder_packing_list fpl ON f.id = fpl.folder_id
-      JOIN packing_list pl on fpl.list_id = pl.id
-      WHERE f.user_id = $1 AND pl.is_deleted = false
-      `,
-      [userId],
-    );
-
-    if (list.length === 0) return 'no_list';
-
     const { rows: aloneList } = await client.query(
       `
         SELECT pl.id::text, apl.is_aloned
@@ -41,6 +28,8 @@ const getRecentCreatedList = async (
       `,
       [userId],
     );
+
+    if (aloneList.length === 0) return 'no_list';
 
     let recentListId = aloneList[0].id;
 
