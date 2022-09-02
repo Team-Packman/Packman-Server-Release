@@ -614,39 +614,10 @@ const deleteTogetherList = async (
   }
 };
 
-const getInviteTogetherList = async (
-  client: any,
-  inviteCode: string,
-): Promise<InviteTogetherListResponseDto | string> => {
-  try {
-    const { rows: togetherList } = await client.query(
-      `
-        SELECT pl.title
-        FROM together_packing_list tpl
-        JOIN packing_list pl on tpl.id = pl.id
-        WHERE tpl.invite_code= $1 AND pl.is_deleted = false
-      `,
-      [inviteCode],
-    );
-
-    if (togetherList.length === 0) return 'no_list';
-
-    const data = {
-      title: togetherList[0].title,
-    };
-
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
-
 export default {
   createTogetherList,
   getTogetherList,
   updatePacker,
   addMember,
   deleteTogetherList,
-  getInviteTogetherList,
 };

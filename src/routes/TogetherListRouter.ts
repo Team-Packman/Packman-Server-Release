@@ -19,6 +19,5 @@ router.patch(
 );
 router.post('/add-member', auth, [body('listId').notEmpty()], TogetherListController.addMember);
 router.delete('/:folderId/:listId', auth, TogetherListController.deleteTogetherList);
-router.get('/invite/:inviteCode', TogetherListController.getInviteTogetherList);
 
 export default router;
