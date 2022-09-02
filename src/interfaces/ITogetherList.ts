@@ -53,3 +53,7 @@ export interface UseForReduceInDeleteDto {
   myListId: number;
   togetherListId: number;
 }
+
+export interface InviteTogetherListResponseDto {
+  title: string;
+}
