@@ -52,6 +52,7 @@ const message = {
   UPDATE_LIST_TITLE_SUCCESS: '패킹리스트 제목 수정 성공',
   UPDATE_LIST_DATE_SUCCESS: '패킹리스트 출발 날짜 수정 성공',
   UPDATE_LIST_MY_TEMPLATE_SUCCESS: '패킹리스트 나의 템플릿 여부 수정 성공',
+  INVALID_LIST_TYPE: '유효하지 않은 리스트 타입입니다',
 
   //혼자 패킹리스트
   CREATE_ALONE_LIST_SUCCESS: '혼자 패킹리스트 생성 성공',
