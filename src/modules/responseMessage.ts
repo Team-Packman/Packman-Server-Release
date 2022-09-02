@@ -69,6 +69,7 @@ const message = {
   CREATE_TOGETHER_CATEGORY_SUCCESS: '함께 패킹리스트 카테고리 생성 성공',
   UPDATE_TOGETHER_CATEGORY_SUCCESS: '함께 패킹리스트 카테고리 수정 성공',
   DELETE_TOGETHER_CATEGORY_SUCCESS: '함께 패킹리스트 카테고리 삭제 성공',
+  GET_INVITE_TOGETHER_LIST_SUCCESS: '공유된 함께 패킹리스트 조회 성공',
   CREATE_TOGETHER_PACK_SUCCESS: '함께 패킹리스트 짐 생성 성공',
   UPDATE_TOGETHER_PACK_SUCCESS: '함께 패킹리스트 짐 수정 성공',
   DELETE_TOGETHER_PACK_SUCCESS: '함께 패킹리스트 짐 삭제 성공',
