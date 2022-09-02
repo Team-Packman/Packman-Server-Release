@@ -7,6 +7,9 @@ import isLogin from '../middlewares/isLogin';
 const router = Router();
 
 router.get('/invite/:inviteCode', isLogin, ListController.inviteList);
+
+router.get('/share/:listType/:inviteCode', ListController.getSharedList);
+
 router.patch(
   '/title',
   [body('id').notEmpty(), body('title').notEmpty(), body('isAloned').notEmpty()],
