@@ -411,6 +411,14 @@ const addMember = async (
       [packingList[0].id],
     );
 
+    await client.query(
+      `
+        INSERT INTO "category" (list_id, name)
+        VALUES ($1, '기본')
+      `,
+      [packingList[0].id],
+    );
+
     const { rows: aloneTogether } = await client.query(
       `
         INSERT INTO "together_alone_packing_list" (my_packing_list_id, together_packing_list_id)
