@@ -1,9 +1,13 @@
+import { SharedAloneListResponseDto } from '../interfaces/IAloneList';
 import {
   ListInviteResponseDto,
   TitleUpdateDto,
   DateUpdateDto,
   MyTemplateUpdateDto,
 } from '../interfaces/IList';
+import { SharedTogetherListResponseDto } from '../interfaces/ITogetherList';
+import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
+import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
 
 const getPackingByInviteCode = async (
   client: any,
@@ -352,9 +356,74 @@ const updateMyTemplate = async (
   }
 };
 
+const getSharedList = async (
+  client: any,
+  listType: string,
+  inviteCode: string,
+): Promise<SharedAloneListResponseDto | SharedTogetherListResponseDto | string> => {
+  try {
+    let table;
+
+    if (listType === 'alone') table = 'alone_packing_list';
+    else if (listType === 'together') table = 'together_packing_list';
+    else return 'invalid_list_type';
+
+    const { rows: list } = await client.query(
+      `
+      SELECT pl.id::TEXT
+      FROM "${table}" pl
+      JOIN packing_list p on pl.id = p.id
+      WHERE pl.invite_code= $1 AND p.is_deleted = false
+      `,
+      [inviteCode],
+    );
+
+    if (list.length === 0) return 'no_list';
+
+    const listId = list[0].id;
+
+    const { rows: listInfo } = await client.query(
+      `
+        SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate"
+        FROM "packing_list" p
+        WHERE p.id= $1
+      `,
+      [listId],
+    );
+
+    if (listType === 'alone') {
+      const category = await aloneCategoryResponse(client, listId);
+
+      const data: SharedAloneListResponseDto = {
+        id: listId,
+        title: listInfo[0].title,
+        departureDate: listInfo[0].departureDate,
+        category: category,
+      };
+
+      return data;
+    } else {
+      const category = await togetherCategoryResponse(client, listId);
+
+      const data: SharedTogetherListResponseDto = {
+        id: listId,
+        title: listInfo[0].title,
+        departureDate: listInfo[0].departureDate,
+        category: category,
+      };
+
+      return data;
+    }
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export default {
   getPackingByInviteCode,
   updateTitle,
   updateDate,
   updateMyTemplate,
+  getSharedList,
 };

@@ -52,6 +52,7 @@ const message = {
   UPDATE_LIST_TITLE_SUCCESS: '패킹리스트 제목 수정 성공',
   UPDATE_LIST_DATE_SUCCESS: '패킹리스트 출발 날짜 수정 성공',
   UPDATE_LIST_MY_TEMPLATE_SUCCESS: '패킹리스트 나의 템플릿 여부 수정 성공',
+  INVALID_LIST_TYPE: '유효하지 않은 리스트 타입입니다',
 
   //혼자 패킹리스트
   CREATE_ALONE_LIST_SUCCESS: '혼자 패킹리스트 생성 성공',
@@ -69,6 +70,7 @@ const message = {
   CREATE_TOGETHER_CATEGORY_SUCCESS: '함께 패킹리스트 카테고리 생성 성공',
   UPDATE_TOGETHER_CATEGORY_SUCCESS: '함께 패킹리스트 카테고리 수정 성공',
   DELETE_TOGETHER_CATEGORY_SUCCESS: '함께 패킹리스트 카테고리 삭제 성공',
+  GET_INVITE_LIST_SUCCESS: '공유된 패킹리스트 조회 성공',
   CREATE_TOGETHER_PACK_SUCCESS: '함께 패킹리스트 짐 생성 성공',
   UPDATE_TOGETHER_PACK_SUCCESS: '함께 패킹리스트 짐 수정 성공',
   DELETE_TOGETHER_PACK_SUCCESS: '함께 패킹리스트 짐 삭제 성공',

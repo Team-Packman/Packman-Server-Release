@@ -15,6 +15,13 @@ export interface AloneListResponseDto {
   isSaved: boolean;
 }
 
+export interface SharedAloneListResponseDto {
+  id: string;
+  title: string;
+  departureDate: string;
+  category: AloneCategoryResponseDto[];
+}
+
 export interface AloneListInfoResponseDto {
   alonePackingList: ListInfoResponseDto[];
 }
