@@ -6,7 +6,6 @@ import {
   TogetherListInfoResponseDto,
   UseForMapInDeleteDto,
   UseForReduceInDeleteDto,
-  InviteTogetherListResponseDto,
 } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
