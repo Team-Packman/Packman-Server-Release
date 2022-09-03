@@ -1,10 +1,5 @@
 import { SharedAloneListResponseDto } from '../interfaces/IAloneList';
-import {
-  ListInviteResponseDto,
-  TitleUpdateDto,
-  DateUpdateDto,
-  MyTemplateUpdateDto,
-} from '../interfaces/IList';
+import { TitleUpdateDto, DateUpdateDto, MyTemplateUpdateDto } from '../interfaces/IList';
 import { SharedTogetherListResponseDto } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
