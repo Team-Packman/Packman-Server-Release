@@ -158,7 +158,7 @@ const updateMyTemplate = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route GET /list/share/:type/:inviteCode
+ *  @route GET /list/:listType/share/:inviteCode
  *  @desc get shared list
  *  @access public
  **/

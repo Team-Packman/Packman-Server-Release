@@ -5,7 +5,7 @@ import { body } from 'express-validator';
 
 const router = Router();
 
-router.get('/share/:listType/:inviteCode', ListController.getSharedList);
+router.get('/:listType/share/:inviteCode', ListController.getSharedList);
 
 router.get('/invite/:inviteCode', auth, ListController.inviteList);
 
