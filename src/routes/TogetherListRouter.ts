@@ -10,14 +10,20 @@ router.post(
   auth,
   TogetherListController.createTogetherList,
 );
+
 router.get('/:listId', auth, TogetherListController.getTogetherList);
+
 router.patch(
   '/packer',
   [body('listId').notEmpty(), body('packId').notEmpty(), body('packerId').notEmpty()],
   auth,
   TogetherListController.updatePacker,
 );
+
 router.post('/add-member', auth, [body('listId').notEmpty()], TogetherListController.addMember);
+
 router.delete('/:folderId/:listId', auth, TogetherListController.deleteTogetherList);
+
+router.get('/invite/:inviteCode', auth, TogetherListController.getInviteTogetherList);
 
 export default router;
