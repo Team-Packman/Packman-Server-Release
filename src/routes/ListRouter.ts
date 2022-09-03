@@ -2,13 +2,12 @@ import { Router } from 'express';
 import { ListController } from '../controllers';
 import auth from '../middlewares/auth';
 import { body } from 'express-validator';
-import isLogin from '../middlewares/isLogin';
 
 const router = Router();
 
-router.get('/invite/:inviteCode', isLogin, ListController.inviteList);
-
 router.get('/share/:listType/:inviteCode', ListController.getSharedList);
+
+router.get('/invite/:inviteCode', auth, ListController.inviteList);
 
 router.patch(
   '/title',

@@ -1,3 +1,4 @@
+import { AuthResponseDto } from '../interfaces/IAuth';
 import { UserCreateDto, UserResponseDto, UserUpdateDto } from '../interfaces/IUser';
 import jwtHandler from '../modules/jwtHandler';
 import FolderService from './FolderService';
@@ -5,7 +6,7 @@ import FolderService from './FolderService';
 const createUser = async (
   client: any,
   userCreateDto: UserCreateDto,
-): Promise<UserResponseDto | string> => {
+): Promise<AuthResponseDto | string> => {
   try {
     if (userCreateDto.nickname.length > 4) return 'exceed_len';
 
@@ -16,7 +17,7 @@ const createUser = async (
       `
         INSERT INTO "user" (email, name, nickname, profile_image, refresh_token)
         VALUES ($1, $2, $3, $4, $5)
-        RETURNING id, nickname, email, profile_image, refresh_token
+        RETURNING id, name, nickname, email, profile_image, refresh_token
       `,
       [
         userCreateDto.email,
@@ -29,8 +30,10 @@ const createUser = async (
 
     const accessToken = jwtHandler.getAccessToken(user[0].id);
 
-    const data: UserResponseDto = {
+    const data: AuthResponseDto = {
+      isAlreadyUser: true,
       id: user[0].id.toString(),
+      name: user[0].name,
       nickname: user[0].nickname,
       email: user[0].email,
       profileImage: user[0].profile_image,
