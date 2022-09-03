@@ -18,7 +18,7 @@ const createTogetherList = async (
   togetherListCreateDto: ListCreateDto,
 ): Promise<TogetherListResponseDto | string> => {
   try {
-    const inviteCode: string = await generateInviteCode(client, 'together_packing_list');
+    const inviteCode: string = await generateInviteCode(client);
 
     if (togetherListCreateDto.title.length > 12) return 'exceed_len';
 

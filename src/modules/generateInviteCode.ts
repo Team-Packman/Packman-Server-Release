@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 
-const generateInviteCode = async (client: any, listType: string): Promise<string> => {
+const generateInviteCode = async (client: any): Promise<string> => {
   try {
     let existInviteCode;
     let inviteCode: string;
@@ -10,8 +10,8 @@ const generateInviteCode = async (client: any, listType: string): Promise<string
       const { rows: duplicateInviteCode } = await client.query(
         `
           SELECT EXISTS (SELECT *
-                         FROM "${listType}" pl
-                         WHERE pl.invite_code=$1)
+                         FROM "together_packing_list" tl, "alone_packing_list" al
+                         WHERE tl.invite_code = $1 OR al.invite_code = $1)
         `,
         [inviteCode],
       );
