@@ -1,71 +1,8 @@
-import {
-  ListInviteResponseDto,
-  TitleUpdateDto,
-  DateUpdateDto,
-  MyTemplateUpdateDto,
-} from '../interfaces/IList';
-
-const getPackingByInviteCode = async (
-  client: any,
-  inviteCode: string,
-  userId: number,
-): Promise<ListInviteResponseDto | string> => {
-  try {
-    const { rows: packingList } = await client.query(
-      `
-      SELECT tapl.id::text, t.group_id, t.id AS "togetherId"
-      FROM "together_packing_list" as t
-      JOIN "packing_list" as pl ON pl.id = t.id
-      JOIN together_alone_packing_list tapl on t.id = tapl.together_packing_list_id
-      WHERE t.invite_code = $1 AND pl.is_deleted = false
-      `,
-      [inviteCode],
-    );
-    if (packingList.length === 0) return 'no_list';
-
-    // 이미 추가된 멤버인지
-    let isMember = false;
-
-    const { rows: existMember } = await client.query(
-      `
-          SELECT *
-          FROM "user_group" as ug
-          WHERE ug.user_id = $1 AND ug.group_id = $2
-        `,
-      [userId, packingList[0].group_id],
-    );
-    if (existMember.length > 0) isMember = true;
-
-    if (isMember === true) {
-      const { rows: newPackingList } = await client.query(
-        `
-            SELECT tal.id::text
-            FROM "together_alone_packing_list" tal 
-            JOIN "folder_packing_list" fl ON tal.my_packing_list_id = fl.list_id
-            JOIN "folder" f ON f.id = fl.folder_id
-            JOIN "packing_list" pl ON pl.id =  fl.list_id
-            WHERE tal.together_packing_list_id = $1 AND f.user_id = $2 AND pl.is_deleted = false
-          `,
-        [packingList[0].togetherId, userId],
-      );
-      if (newPackingList.length === 0) return 'no_list';
-      const data: ListInviteResponseDto = {
-        id: newPackingList[0].id,
-        isMember: isMember,
-      };
-      return data;
-    }
-
-    const data: ListInviteResponseDto = {
-      id: packingList[0].id,
-      isMember: isMember,
-    };
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
+import { SharedAloneListResponseDto } from '../interfaces/IAloneList';
+import { TitleUpdateDto, DateUpdateDto, MyTemplateUpdateDto } from '../interfaces/IList';
+import { SharedTogetherListResponseDto } from '../interfaces/ITogetherList';
+import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
+import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
 
 const updateTitle = async (
   client: any,
@@ -352,9 +289,73 @@ const updateMyTemplate = async (
   }
 };
 
+const getSharedList = async (
+  client: any,
+  listType: string,
+  inviteCode: string,
+): Promise<SharedAloneListResponseDto | SharedTogetherListResponseDto | string> => {
+  try {
+    let table;
+
+    if (listType === 'alone') table = 'alone_packing_list';
+    else if (listType === 'together') table = 'together_packing_list';
+    else return 'invalid_list_type';
+
+    const { rows: list } = await client.query(
+      `
+      SELECT pl.id::TEXT
+      FROM "${table}" pl
+      JOIN packing_list p on pl.id = p.id
+      WHERE pl.invite_code= $1 AND p.is_deleted = false
+      `,
+      [inviteCode],
+    );
+
+    if (list.length === 0) return 'no_list';
+
+    const listId = list[0].id;
+
+    const { rows: listInfo } = await client.query(
+      `
+        SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate"
+        FROM "packing_list" p
+        WHERE p.id= $1
+      `,
+      [listId],
+    );
+
+    if (listType === 'alone') {
+      const category = await aloneCategoryResponse(client, listId);
+
+      const data: SharedAloneListResponseDto = {
+        id: listId,
+        title: listInfo[0].title,
+        departureDate: listInfo[0].departureDate,
+        category: category,
+      };
+
+      return data;
+    } else {
+      const category = await togetherCategoryResponse(client, listId);
+
+      const data: SharedTogetherListResponseDto = {
+        id: listId,
+        title: listInfo[0].title,
+        departureDate: listInfo[0].departureDate,
+        category: category,
+      };
+
+      return data;
+    }
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export default {
-  getPackingByInviteCode,
   updateTitle,
   updateDate,
   updateMyTemplate,
+  getSharedList,
 };

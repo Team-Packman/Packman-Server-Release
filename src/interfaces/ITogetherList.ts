@@ -26,6 +26,14 @@ export interface TogetherListResponseDto {
   };
   isMember?: boolean;
 }
+
+export interface SharedTogetherListResponseDto {
+  id: string;
+  title: string;
+  departureDate: string;
+  category: TogetherCategoryResponseDto[];
+}
+
 export interface PackerUpdateDto {
   listId: string;
   packId: string;
@@ -52,4 +60,8 @@ export interface UseForMapInDeleteDto {
 export interface UseForReduceInDeleteDto {
   myListId: number;
   togetherListId: number;
+}
+
+export interface InviteTogetherListResponseDto {
+  title: string;
 }

@@ -205,10 +205,40 @@ const deleteTogetherList = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @route GET /invite/:inviteCode
+ *  @desc invite list
+ *  @access private
+ **/
+const getInviteTogetherList = async (req: Request, res: Response) => {
+  let client;
+
+  const inviteCode = req.params.inviteCode;
+  try {
+    client = await db.connect(req);
+    const userId = req.body.user.id;
+    const data = await TogetherListService.getInviteTogetherList(client, inviteCode, userId);
+    if (data === 'no_list') {
+      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
+    } else {
+      res
+        .status(statusCode.OK)
+        .send(util.success(statusCode.OK, message.SUCCESS_INVITE_TOGETHER_PACKING, data));
+    }
+  } catch (error) {
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    if (client !== undefined) client.release();
+  }
+};
+
 export default {
   createTogetherList,
   getTogetherList,
   updatePacker,
   addMember,
   deleteTogetherList,
+  getInviteTogetherList,
 };

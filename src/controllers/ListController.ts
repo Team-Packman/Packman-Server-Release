@@ -8,35 +8,6 @@ import { ListService } from '../services';
 import db from '../loaders/db';
 
 /**
- *  @route GET /invite/:inviteCode
- *  @desc invite list
- *  @access private
- **/
-const inviteList = async (req: Request, res: Response) => {
-  let client;
-
-  const inviteCode = req.params.inviteCode;
-  try {
-    client = await db.connect(req);
-    const userId = req.body.user.id;
-    const data = await ListService.getPackingByInviteCode(client, inviteCode, userId);
-    if (data === 'no_list') {
-      res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
-    } else {
-      res
-        .status(statusCode.OK)
-        .send(util.success(statusCode.OK, message.SUCCESS_INVITE_TOGETHER_PACKING, data));
-    }
-  } catch (error) {
-    res
-      .status(statusCode.INTERNAL_SERVER_ERROR)
-      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
-  } finally {
-    if (client !== undefined) client.release();
-  }
-};
-
-/**
  *  @route PATCH /list/title
  *  @desc update list title
  *  @access private
@@ -157,9 +128,44 @@ const updateMyTemplate = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ *  @route GET /list/:listType/share/:inviteCode
+ *  @desc get shared list
+ *  @access public
+ **/
+const getSharedList = async (req: Request, res: Response) => {
+  let client;
+
+  const { listType, inviteCode } = req.params;
+
+  try {
+    client = await db.connect(req);
+
+    const data = await ListService.getSharedList(client, listType, inviteCode);
+
+    if (data === 'no_list')
+      res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
+    else if (data === 'invalid_list_type')
+      res
+        .status(statusCode.BAD_REQUEST)
+        .send(util.success(statusCode.BAD_REQUEST, message.INVALID_LIST_TYPE));
+    else
+      res
+        .status(statusCode.OK)
+        .send(util.success(statusCode.OK, message.GET_INVITE_LIST_SUCCESS, data));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    if (client !== undefined) client.release();
+  }
+};
+
 export default {
-  inviteList,
   updateDate,
   updateTitle,
   updateMyTemplate,
+  getSharedList,
 };
