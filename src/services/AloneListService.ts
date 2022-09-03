@@ -13,7 +13,7 @@ const createAloneList = async (
   aloneListCreateDto: ListCreateDto,
 ): Promise<AloneListResponseDto | string> => {
   try {
-    const inviteCode: string = await generateInviteCode(client, 'alone_packing_list');
+    const inviteCode: string = await generateInviteCode(client);
     if (aloneListCreateDto.title.length > 12) return 'exceed_len';
 
     const { rows: existFolder } = await client.query(
