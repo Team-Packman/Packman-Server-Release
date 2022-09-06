@@ -24,7 +24,8 @@ const createCategory = async (req: Request, res: Response) => {
 
   try {
     client = await db.connect(req);
-    const data = await TogetherListCategoryService.createCategory(client, categoryCreateDto);
+    const userId = req.body.user.id;
+    const data = await TogetherListCategoryService.createCategory(client, userId, categoryCreateDto);
 
     if (data === 'exceed_len') {
       res

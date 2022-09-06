@@ -4,6 +4,7 @@ import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
 
 const createCategory = async (
   client: any,
+  userId: number,
   categoryCreateDto: CategoryCreateDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
@@ -12,13 +13,15 @@ const createCategory = async (
     }
     const { rows: existList } = await client.query(
       `
-      SELECT *
-      FROM "packing_list" as pl
-      JOIN "together_packing_list" tpl on pl.id = tpl.id
-      WHERE tpl.id = $1 and pl.is_deleted = false
-        `,
-      [categoryCreateDto.listId],
+        SELECT *
+        FROM "packing_list" as pl
+        JOIN "together_packing_list" tpl on pl.id = tpl.id
+        JOIN "user_group" ug ON tpl.group_id = ug.group_id
+        WHERE tpl.id = $1 AND ug.user_id = $2 AND pl.is_deleted = false
+      `,
+      [categoryCreateDto.listId, userId],
     );
+
     if (existList.length === 0) {
       return 'no_list';
     }
