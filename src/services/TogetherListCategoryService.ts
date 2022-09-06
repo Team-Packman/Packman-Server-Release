@@ -62,6 +62,7 @@ const createCategory = async (
 
 const updateCategory = async (
   client: any,
+  userId: number,
   categoryUpdateDto: CategoryUpdateDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
@@ -73,9 +74,10 @@ const updateCategory = async (
         SELECT *
         FROM "packing_list" as pl
         JOIN "together_packing_list" tpl on pl.id = tpl.id
-        WHERE tpl.id = $1 and pl.is_deleted = false
+        JOIN "user_group" ug ON tpl.group_id = ug.group_id
+        WHERE tpl.id = $1 AND ug.user_id = $2 AND pl.is_deleted = false
       `,
-      [categoryUpdateDto.listId],
+      [categoryUpdateDto.listId, userId],
     );
     if (existList.length === 0) {
       return 'no_list';
@@ -138,6 +140,7 @@ const updateCategory = async (
 
 const deleteCategory = async (
   client: any,
+  userId: number,
   categoryDeleteDto: CategoryDeleteDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
@@ -146,9 +149,10 @@ const deleteCategory = async (
         SELECT *
         FROM "packing_list" as pl
         JOIN "together_packing_list" tpl on pl.id = tpl.id
-        WHERE tpl.id = $1 and pl.is_deleted = false
+        JOIN "user_group" ug ON tpl.group_id = ug.group_id
+        WHERE tpl.id = $1 AND ug.user_id = $2 AND pl.is_deleted = false
       `,
-      [categoryDeleteDto.listId],
+      [categoryDeleteDto.listId, userId],
     );
     if (existList.length === 0) {
       return 'no_list';
