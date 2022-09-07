@@ -11,7 +11,7 @@ import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
 import { ListCreateDto, ListInviteResponseDto } from '../interfaces/IList';
 import { generateInviteCode } from '../modules/generateInviteCode';
-import { folderCheckResponse } from '../modules/folderCheckResponse,';
+import { folderCheckResponse } from '../modules/folderCheckResponse';
 
 const createTogetherList = async (
   client: any,
