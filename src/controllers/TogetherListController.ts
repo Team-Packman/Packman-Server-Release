@@ -99,12 +99,13 @@ const updatePacker = async (req: Request, res: Response) => {
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
 
+  const userId: number = req.body.user.id;
   const packerUpdateDto: PackerUpdateDto = req.body;
 
   try {
     client = await db.connect(req);
 
-    const data = await TogetherListService.updatePacker(client, packerUpdateDto);
+    const data = await TogetherListService.updatePacker(client, userId, packerUpdateDto);
 
     if (data === 'no_list')
       res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));

@@ -249,16 +249,19 @@ const getTogetherList = async (
 
 const updatePacker = async (
   client: any,
+  userId: number,
   packerUpdateDto: PackerUpdateDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
     const { rows: existList } = await client.query(
       `
         SELECT *
-        FROM "packing_list" pl
-        WHERE pl.id =$1  AND pl.is_deleted=false
+        FROM "together_packing_list" tpl
+        JOIN "packing_list" pl ON tpl.id=pl.id
+        JOIN "user_group" ug ON tpl.group_id=ug.group_id
+        WHERE tpl.id=$1  AND pl.is_deleted=false AND ug.user_id=$2
       `,
-      [packerUpdateDto.listId],
+      [packerUpdateDto.listId, userId],
     );
     if (existList.length === 0) return 'no_list';
 
