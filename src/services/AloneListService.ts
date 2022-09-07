@@ -6,6 +6,7 @@ import {
   InviteAloneListResponseDto,
 } from '../interfaces/IAloneList';
 import { generateInviteCode } from '../modules/generateInviteCode';
+import { folderCheckResponse } from '../modules/folderCheckResponse';
 
 const createAloneList = async (
   client: any,
@@ -16,15 +17,8 @@ const createAloneList = async (
     const inviteCode: string = await generateInviteCode(client);
     if (aloneListCreateDto.title.length > 12) return 'exceed_len';
 
-    const { rows: existFolder } = await client.query(
-      `
-        SELECT *
-        FROM "folder"
-        WHERE id=$1 AND is_aloned=true AND user_id=$2
-      `,
-      [aloneListCreateDto.folderId, userId],
-    );
-    if (existFolder.length === 0) return 'no_folder';
+    const check = await folderCheckResponse(client, userId, aloneListCreateDto.folderId, true);
+    if (check === 'no_folder') return 'no_folder';
 
     const { rows: insertListInfo } = await client.query(
       `
@@ -160,21 +154,14 @@ const getAloneList = async (
 
 const deleteAloneList = async (
   client: any,
+  userId: number,
   folderId: string,
   aloneListId: string,
 ): Promise<AloneListInfoResponseDto | string> => {
   try {
     const aloneListIdArray: string[] = aloneListId.split(',');
-
-    const { rows: existFolder } = await client.query(
-      `
-        SELECT *
-        FROM "folder" as f
-        WHERE f.id=$1 AND f.is_aloned=true
-      `,
-      [folderId],
-    );
-    if (existFolder.length === 0) return 'no_folder';
+    const check = await folderCheckResponse(client, userId, folderId, true);
+    if (check === 'no_folder') return 'no_folder';
 
     const { rows: existList } = await client.query(
       `

@@ -86,13 +86,14 @@ const getAloneList = async (req: Request, res: Response) => {
  **/
 const deleteAloneList = async (req: Request, res: Response) => {
   let client;
+  const userId: number = req.body.user.id;
   const { folderId } = req.params;
   const { listId } = req.params;
 
   try {
     client = await db.connect(req);
 
-    const data = await AloneListService.deleteAloneList(client, folderId, listId);
+    const data = await AloneListService.deleteAloneList(client, userId, folderId, listId);
 
     if (data === 'no_folder')
       res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_FOLDER));
