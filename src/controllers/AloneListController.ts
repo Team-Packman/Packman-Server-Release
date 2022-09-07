@@ -56,13 +56,12 @@ const createAloneList = async (req: Request, res: Response) => {
  **/
 const getAloneList = async (req: Request, res: Response) => {
   let client;
-  const userId: number = req.body.user.id;
   const { listId } = req.params;
 
   try {
     client = await db.connect(req);
 
-    const data = await AloneListService.getAloneList(client, userId, listId);
+    const data = await AloneListService.getAloneList(client, listId);
 
     if (data === 'no_list')
       res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_LIST));
