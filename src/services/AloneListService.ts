@@ -7,7 +7,6 @@ import {
 } from '../interfaces/IAloneList';
 import { generateInviteCode } from '../modules/generateInviteCode';
 import { folderCheckResponse } from '../modules/folderCheckResponse';
-import { aloneListCheckResponse } from '../modules/aloneListCheckResponse';
 
 const createAloneList = async (
   client: any,

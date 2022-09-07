@@ -15,7 +15,7 @@ async function aloneListCheckResponse(
         	JOIN "packing_list" pl ON fpl.list_id=pl.id
         	JOIN "alone_packing_list" apl ON pl.id=apl.id
         	WHERE pl.is_deleted=false AND apl.id=$2 AND apl.is_aloned=true
-      	`,
+      `,
       [userId, listId],
     );
 
