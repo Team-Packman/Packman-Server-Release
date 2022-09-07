@@ -1,11 +1,14 @@
-import { SharedAloneListResponseDto } from '../interfaces/IAloneList';
+import { AloneListCheckResponseDto, SharedAloneListResponseDto } from '../interfaces/IAloneList';
 import { TitleUpdateDto, DateUpdateDto, MyTemplateUpdateDto } from '../interfaces/IList';
 import { SharedTogetherListResponseDto } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
+import { aloneListCheckResponse } from '../modules/aloneListCheckResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
+import { togetherListCheckResponse } from '../modules/togetherListCheckResponse';
 
 const updateTitle = async (
   client: any,
+  userId: number,
   titleUpdateDto: TitleUpdateDto,
 ): Promise<TitleUpdateDto | string> => {
   try {
@@ -13,15 +16,16 @@ const updateTitle = async (
     if (titleUpdateDto.title.length > 12) return 'exceed_len';
 
     if (titleUpdateDto.isAloned === true) {
-      const { rows: existList } = await client.query(
-        `
-          SELECT *
-          FROM "alone_packing_list" as l
-          JOIN "packing_list" p ON l.id=p.id
-          WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
-        `,
-        [titleUpdateDto.id],
-      );
+      // const { rows: existList } = await client.query(
+      //   `
+      //     SELECT *
+      //     FROM "alone_packing_list" as l
+      //     JOIN "packing_list" p ON l.id=p.id
+      //     WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
+      //   `,
+      //   [titleUpdateDto.id],
+      // );
+      const existList = await aloneListCheckResponse(client, userId, titleUpdateDto.id);
       if (existList.length === 0) return 'no_list';
 
       const { rows: updatedData } = await client.query(
@@ -35,19 +39,20 @@ const updateTitle = async (
       );
       updatedTitle = updatedData[0].title;
     } else {
-      const { rows: existList } = await client.query(
-        `
-          SELECT together_packing_list_id, my_packing_list_id
-          FROM "together_alone_packing_list" as l
-          JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
-          WHERE l.id=$1 AND p.is_deleted=false
-        `,
-        [titleUpdateDto.id],
-      );
+      // const { rows: existList } = await client.query(
+      //   `
+      //     SELECT together_packing_list_id, my_packing_list_id
+      //     FROM "together_alone_packing_list" as l
+      //     JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
+      //     WHERE l.id=$1 AND p.is_deleted=false
+      //   `,
+      //   [titleUpdateDto.id],
+      // );
+      const existList = await togetherListCheckResponse(client, userId, titleUpdateDto.id);
       if (existList.length < 2) return 'no_list';
 
-      const togetherListId = existList[0].together_packing_list_id;
-      const aloneListId = existList[0].my_packing_list_id;
+      const togetherListId = existList[0].togetherListId;
+      const aloneListId = existList[0].myListId;
 
       const { rows: updatedData } = await client.query(
         `
@@ -75,6 +80,7 @@ const updateTitle = async (
 
 const updateDate = async (
   client: any,
+  userId: number,
   dateUpdateDto: DateUpdateDto,
 ): Promise<DateUpdateDto | string> => {
   try {

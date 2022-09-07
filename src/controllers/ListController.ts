@@ -22,12 +22,13 @@ const updateTitle = async (req: Request, res: Response) => {
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
 
+  const userId: number = req.body.user.id;
   const titleUpdateDto: TitleUpdateDto = req.body;
 
   try {
     client = await db.connect(req);
 
-    const data = await ListService.updateTitle(client, titleUpdateDto);
+    const data = await ListService.updateTitle(client, userId, titleUpdateDto);
 
     if (data === 'exceed_len')
       res
@@ -63,13 +64,13 @@ const updateDate = async (req: Request, res: Response) => {
       .status(statusCode.BAD_REQUEST)
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
-
+  const userId: number = req.body.user.id;
   const dateUpdateDto: DateUpdateDto = req.body;
 
   try {
     client = await db.connect(req);
 
-    const data = await ListService.updateDate(client, dateUpdateDto);
+    const data = await ListService.updateDate(client, userId, dateUpdateDto);
 
     if (data === 'no_list')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
@@ -102,12 +103,12 @@ const updateMyTemplate = async (req: Request, res: Response) => {
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
 
+  const userId: number = req.body.user.id;
   const myTemplateUpdateDto: MyTemplateUpdateDto = req.body;
 
   try {
     client = await db.connect(req);
 
-    const userId: number = req.body.user.id;
     const data = await ListService.updateMyTemplate(client, userId, myTemplateUpdateDto);
 
     if (data === 'no_list')
