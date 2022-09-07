@@ -1,6 +1,6 @@
 import { PackCreateDto, PackUpdateDto, PackDeleteDto } from '../interfaces/IPack';
 import { TogetherListCategoryResponseDto } from '../interfaces/ITogetherList';
-import { listCategoryCheckResponse } from '../modules/listCategoryCheckResponse';
+import { togetherListCategoryCheckResponse } from '../modules/togetherListCategoryCheckResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
 
 const createPack = async (
@@ -11,7 +11,7 @@ const createPack = async (
   try {
     if (packCreateDto.name.length > 12) return 'exceed_len';
 
-    const check = await listCategoryCheckResponse(
+    const check = await togetherListCategoryCheckResponse(
       client,
       userId,
       packCreateDto.listId,
@@ -51,7 +51,7 @@ const updatePack = async (
   try {
     if (packUpdateDto.name.length > 12) return 'exceed_len';
 
-    const check = await listCategoryCheckResponse(
+    const check = await togetherListCategoryCheckResponse(
       client,
       userId,
       packUpdateDto.listId,
@@ -103,7 +103,7 @@ const deletePack = async (
   packDeleteDto: PackDeleteDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
-    const check = await listCategoryCheckResponse(
+    const check = await togetherListCategoryCheckResponse(
       client,
       userId,
       packDeleteDto.listId,

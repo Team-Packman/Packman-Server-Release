@@ -1,4 +1,4 @@
-async function listCategoryCheckResponse(
+async function togetherListCategoryCheckResponse(
   client: any,
   userId: number,
   listId: string,
@@ -7,12 +7,11 @@ async function listCategoryCheckResponse(
   try {
     const { rows: existList } = await client.query(
       `
-        SELECT *
-        FROM "folder" f
-        JOIN folder_packing_list fpl on f.id = fpl.folder_id
-        JOIN together_alone_packing_list tapl on fpl.list_id = tapl.my_packing_list_id
-        JOIN packing_list pl on tapl.together_packing_list_id = pl.id
-        WHERE f.user_id = $1 AND tapl.together_packing_list_id = $2
+      SELECT *
+      FROM "together_packing_list" tpl
+      JOIN packing_list pl on tpl.id = pl.id
+      JOIN user_group ug on tpl.group_id = ug.group_id
+      WHERE ug.user_id = $1 AND tpl.id = $2 AND pl.is_deleted = false
       `,
       [userId, listId],
     );
@@ -39,4 +38,4 @@ async function listCategoryCheckResponse(
   }
 }
 
-export { listCategoryCheckResponse };
+export { togetherListCategoryCheckResponse };
