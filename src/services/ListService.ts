@@ -126,34 +126,17 @@ const updateMyTemplate = async (
     let listId: string = myTemplateUpdateDto.id;
 
     if (myTemplateUpdateDto.isAloned === true) {
-      const { rows: existList } = await client.query(
-        `
-          SELECT *
-          FROM "alone_packing_list" as l
-          JOIN "packing_list" p ON l.id=p.id
-          WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
-        `,
-        [myTemplateUpdateDto.id],
-      );
+      const existList = await aloneListCheckResponse(client, userId, myTemplateUpdateDto.id);
       if (existList.length === 0) return 'no_list';
       title = existList[0].title;
-      isSaved = existList[0].is_saved;
+      isSaved = existList[0].isSaved;
     } else {
-      const { rows: existList } = await client.query(
-        `
-          SELECT *
-          FROM "together_alone_packing_list" as l
-          JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
-          WHERE l.id=$1 AND p.is_deleted=false
-          ORDER BY p.id
-        `,
-        [myTemplateUpdateDto.id],
-      );
+      const existList = await togetherListCheckResponse(client, userId, myTemplateUpdateDto.id);
       if (existList.length < 2) return 'no_list';
-      listId = existList[0].together_packing_list_id.toString();
-      aloneListId = existList[0].my_packing_list_id.toString();
+      listId = existList[0].togetherListId;
+      aloneListId = existList[0].myListId;
       title = existList[0].title;
-      isSaved = existList[1].is_saved;
+      isSaved = existList[1].isSaved;
     }
     if (isSaved !== myTemplateUpdateDto.isSaved) return 'no_template';
 
