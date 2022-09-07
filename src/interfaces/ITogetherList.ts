@@ -65,3 +65,10 @@ export interface UseForReduceInDeleteDto {
 export interface InviteTogetherListResponseDto {
   title: string;
 }
+
+export interface TogetherListCheckResponseDto {
+  title: string;
+  isSaved: boolean;
+  myListId: number;
+  togetherListId: number;
+}

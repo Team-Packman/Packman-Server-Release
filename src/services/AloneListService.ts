@@ -1,12 +1,14 @@
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { ListCreateDto } from '../interfaces/IList';
 import {
+  AloneListCheckResponseDto,
   AloneListInfoResponseDto,
   AloneListResponseDto,
   InviteAloneListResponseDto,
 } from '../interfaces/IAloneList';
 import { generateInviteCode } from '../modules/generateInviteCode';
 import { folderCheckResponse } from '../modules/folderCheckResponse';
+import { aloneListCheckResponse } from '../modules/aloneListCheckResponse';
 
 const createAloneList = async (
   client: any,
@@ -110,10 +112,17 @@ const createAloneList = async (
 
 const getAloneList = async (
   client: any,
+  userId: number,
   aloneListId: string,
 ): Promise<AloneListResponseDto | string> => {
   try {
-    const { rows: existList } = await client.query(
+    const existList: AloneListCheckResponseDto[] = await aloneListCheckResponse(
+      client,
+      userId,
+      aloneListId,
+    );
+    console.log(existList);
+    const { rows: existList1 } = await client.query(
       `
         SELECT invite_code AS "inviteCode"
         FROM "alone_packing_list" as l
@@ -139,10 +148,10 @@ const getAloneList = async (
     const data: AloneListResponseDto = {
       id: aloneListId.toString(),
       title: etcData.title,
-      departureDate: etcData.departureDate,
+      departureDate: existList[0].departureDate,
       category: category,
       inviteCode: existList[0].inviteCode,
-      isSaved: etcData.isSaved,
+      isSaved: existList[0].isSaved,
     };
 
     return data;

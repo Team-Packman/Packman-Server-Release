@@ -30,3 +30,10 @@ export interface InviteAloneListResponseDto {
   id: string;
   isOwner: boolean;
 }
+
+export interface AloneListCheckResponseDto {
+  title: string;
+  departureDate: string;
+  isSaved: boolean;
+  inviteCode: string;
+}
