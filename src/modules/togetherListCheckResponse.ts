@@ -6,18 +6,6 @@ async function togetherListCheckResponse(
   listId: string,
 ): Promise<TogetherListCheckResponseDto[]> {
   try {
-    await client.query(
-      `
-        SELECT *
-        FROM "together_alone_packing_list" as l
-        JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
-        WHERE l.id=$1 AND p.is_deleted=false
-        ORDER BY p.id
-      `,
-      [listId],
-    );
-
-    console.log(userId, listId);
     const { rows: existList } = await client.query(
       `
         SELECT pl.title,TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate", pl.is_saved AS "isSaved",
@@ -31,7 +19,6 @@ async function togetherListCheckResponse(
       `,
       [userId, listId],
     );
-    console.log(existList);
 
     return existList;
   } catch (error) {

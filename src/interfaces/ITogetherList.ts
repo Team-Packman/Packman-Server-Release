@@ -70,6 +70,6 @@ export interface TogetherListCheckResponseDto {
   title: string;
   departureDate: string;
   isSaved: boolean;
-  myListId: number;
-  togetherListId: number;
+  myListId: string;
+  togetherListId: string;
 }

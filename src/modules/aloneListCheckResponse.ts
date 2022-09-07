@@ -6,17 +6,6 @@ async function aloneListCheckResponse(
   listId: string,
 ): Promise<AloneListCheckResponseDto[]> {
   try {
-    // await client.query(
-    //   `
-    //     SELECT invite_code AS "inviteCode"
-    //     FROM "alone_packing_list" as l
-    //     JOIN "packing_list" p ON l.id=p.id
-    //     WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
-    //   `,
-    //   [listId],
-    // );
-
-    console.log(userId, listId);
     const { rows: existList } = await client.query(
       `
         	SELECT pl.title,TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate",
@@ -29,7 +18,7 @@ async function aloneListCheckResponse(
       	`,
       [userId, listId],
     );
-    console.log(existList);
+
     return existList;
   } catch (error) {
     console.log(error);
