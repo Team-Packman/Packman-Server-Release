@@ -121,33 +121,13 @@ const getAloneList = async (
       userId,
       aloneListId,
     );
-    console.log(existList);
-    const { rows: existList1 } = await client.query(
-      `
-        SELECT invite_code AS "inviteCode"
-        FROM "alone_packing_list" as l
-        JOIN "packing_list" p ON l.id=p.id
-        WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
-      `,
-      [aloneListId],
-    );
     if (existList.length === 0) return 'no_list';
-
-    const { rows: etcDataArray } = await client.query(
-      `
-        SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate", p.is_saved AS "isSaved"
-        FROM "packing_list" p
-        WHERE p.id=$1
-      `,
-      [aloneListId],
-    );
-    const etcData = etcDataArray[0];
 
     const category = await aloneCategoryResponse(client, aloneListId);
 
     const data: AloneListResponseDto = {
       id: aloneListId.toString(),
-      title: etcData.title,
+      title: existList[0].title,
       departureDate: existList[0].departureDate,
       category: category,
       inviteCode: existList[0].inviteCode,
