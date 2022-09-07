@@ -69,15 +69,7 @@ const updateDate = async (
     let updatedDate;
 
     if (dateUpdateDto.isAloned === true) {
-      const { rows: existList } = await client.query(
-        `
-          SELECT *
-          FROM "alone_packing_list" as l
-          JOIN "packing_list" p ON l.id=p.id
-          WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
-        `,
-        [dateUpdateDto.id],
-      );
+      const existList = await aloneListCheckResponse(client, userId, dateUpdateDto.id);
       if (existList.length === 0) return 'no_list';
 
       const { rows: updatedData } = await client.query(
@@ -91,19 +83,11 @@ const updateDate = async (
       );
       updatedDate = updatedData[0].departureDate;
     } else {
-      const { rows: existList } = await client.query(
-        `
-          SELECT together_packing_list_id, my_packing_list_id
-          FROM "together_alone_packing_list" as l
-          JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
-          WHERE l.id=$1 AND p.is_deleted=false
-        `,
-        [dateUpdateDto.id],
-      );
+      const existList = await togetherListCheckResponse(client, userId, dateUpdateDto.id);
       if (existList.length < 2) return 'no_list';
 
-      const togetherListId = existList[0].together_packing_list_id;
-      const aloneListId = existList[0].my_packing_list_id;
+      const togetherListId = existList[0].togetherListId;
+      const aloneListId = existList[0].myListId;
 
       const { rows: updatedData } = await client.query(
         `
