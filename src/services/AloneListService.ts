@@ -1,7 +1,6 @@
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { ListCreateDto } from '../interfaces/IList';
 import {
-  AloneListCheckResponseDto,
   AloneListInfoResponseDto,
   AloneListResponseDto,
   InviteAloneListResponseDto,
@@ -116,11 +115,7 @@ const getAloneList = async (
   aloneListId: string,
 ): Promise<AloneListResponseDto | string> => {
   try {
-    const existList: AloneListCheckResponseDto[] = await aloneListCheckResponse(
-      client,
-      userId,
-      aloneListId,
-    );
+    const existList = await aloneListCheckResponse(client, userId, aloneListId);
     if (existList.length === 0) return 'no_list';
 
     const category = await aloneCategoryResponse(client, aloneListId);

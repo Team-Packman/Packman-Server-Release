@@ -6,7 +6,6 @@ import {
   TogetherListInfoResponseDto,
   UseForMapInDeleteDto,
   UseForReduceInDeleteDto,
-  TogetherListCheckResponseDto,
 } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
@@ -175,11 +174,7 @@ const getTogetherList = async (
   userId: number,
 ): Promise<TogetherListResponseDto | string> => {
   try {
-    const existList: TogetherListCheckResponseDto[] = await togetherListCheckResponse(
-      client,
-      userId,
-      listId,
-    );
+    const existList = await togetherListCheckResponse(client, userId, listId);
     if (existList.length < 2) return 'no_list';
 
     const { rows: etcData } = await client.query(
