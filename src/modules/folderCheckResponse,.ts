@@ -9,9 +9,9 @@ async function folderCheckResponse(
       `
         SELECT *
         FROM "folder"
-        WHERE id=$1 AND is_aloned=${isAloned} AND folder.user_id=$2
+        WHERE id=$1 AND is_aloned=$2 AND folder.user_id=$3
       `,
-      [folderId, userId],
+      [folderId, isAloned, userId],
     );
     if (existFolder.length === 0) return 'no_folder';
 

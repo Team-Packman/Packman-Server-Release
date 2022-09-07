@@ -11,6 +11,7 @@ import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
 import { ListCreateDto, ListInviteResponseDto } from '../interfaces/IList';
 import { generateInviteCode } from '../modules/generateInviteCode';
+import { folderCheckResponse } from '../modules/folderCheckResponse,';
 
 const createTogetherList = async (
   client: any,
@@ -22,15 +23,8 @@ const createTogetherList = async (
 
     if (togetherListCreateDto.title.length > 12) return 'exceed_len';
 
-    const { rows: existFolder } = await client.query(
-      `
-        SELECT *
-        FROM "folder"
-        WHERE id=$1 AND is_aloned=false AND folder.user_id=$2
-      `,
-      [togetherListCreateDto.folderId, userId],
-    );
-    if (existFolder.length === 0) return 'no_folder';
+    const check = await folderCheckResponse(client, userId, togetherListCreateDto.folderId, false);
+    if (check === 'no_folder') return 'no_folder';
 
     const { rows: insertListInfo } = await client.query(
       `
@@ -457,15 +451,8 @@ const deleteTogetherList = async (
     // listMappingIdArray는 혼자-함께 패킹리스트 연결 id를 의미(together_alone_packing_list table의 id)
     const listMappingIdArray: string[] = listMappingId.split(',');
 
-    const { rows: existFolder } = await client.query(
-      `
-        SELECT *
-        FROM "folder" as f
-        WHERE f.id=$1 AND f.is_aloned=false AND f.user_id=$2
-      `,
-      [folderId, userId],
-    );
-    if (existFolder.length === 0) return 'no_folder';
+    const check = await folderCheckResponse(client, userId, folderId, false);
+    if (check === 'no_folder') return 'no_folder';
 
     const { rows: existList } = await client.query(
       `
