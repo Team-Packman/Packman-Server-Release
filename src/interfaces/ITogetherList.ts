@@ -68,6 +68,7 @@ export interface InviteTogetherListResponseDto {
 
 export interface TogetherListCheckResponseDto {
   title: string;
+  departureDate: string;
   isSaved: boolean;
   myListId: number;
   togetherListId: number;
