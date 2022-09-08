@@ -12,7 +12,7 @@ async function folderResponse(client: any, userId: string): Promise<AllFolderRes
                 ) AS f
         LEFT JOIN "folder_packing_list" as fl ON f.id = fl.folder_id
         LEFT JOIN "packing_list" as pl ON pl.id = fl.list_id AND pl.is_deleted = false
-        LEFT JOIN "alone_packing_list" as al ON al.id = fl.list_id
+        LEFT JOIN "alone_packing_list" as al ON al.id = pl.id
         GROUP BY f.id, f.name, f.is_aloned
         ORDER BY f.id DESC
         `,
