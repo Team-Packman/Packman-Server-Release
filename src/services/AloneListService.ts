@@ -200,6 +200,14 @@ const deleteAloneList = async (
 
     await client.query(
       `
+        DELETE
+        FROM "folder_packing_list" fpl
+        WHERE fpl.list_id IN (${aloneListIdArray})
+      `,
+    );
+
+    await client.query(
+      `
         UPDATE "packing_list"
         SET is_deleted=true
         WHERE id IN (${aloneListIdArray})
