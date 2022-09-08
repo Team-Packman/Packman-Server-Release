@@ -15,6 +15,8 @@ app.use(
       'https://www.packman.kr',
       config.baseUrl,
       'https://api.packman.kr',
+      'https://packman-beryl.vercel.app'
+
     ],
   }),
 );
