@@ -10,14 +10,7 @@ dotenv.config();
 app.use(
   cors({
     credentials: true,
-    origin: [
-      'http://localhost:3000',
-      'https://www.packman.kr',
-      config.baseUrl,
-      'https://api.packman.kr',
-      'https://packman-beryl.vercel.app'
-
-    ],
+    origin: ['*'],
   }),
 );
 
