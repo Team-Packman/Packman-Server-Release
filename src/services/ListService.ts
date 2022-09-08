@@ -240,6 +240,7 @@ const updateMyTemplate = async (
         SELECT c.id
         FROM "category" c
         WHERE c.list_id=$1
+        ORDER BY c.id
       `,
       [listId],
     );
@@ -263,6 +264,7 @@ const updateMyTemplate = async (
           SELECT t.id, p.name
           FROM "template_category" t, "pack" p
           WHERE t.id=$1 AND p.category_id=$2
+          ORDER BY p.id
         `,
         [templateCategoryId, categoryId],
       );

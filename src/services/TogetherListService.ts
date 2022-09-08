@@ -117,6 +117,7 @@ const createTogetherList = async (
           SELECT c.id
           FROM "template_category" c
           WHERE c.template_id=$1 
+          ORDER BY c.id
         `,
         [togetherListCreateDto.templateId],
       );
@@ -140,6 +141,7 @@ const createTogetherList = async (
             SELECT c.id, p.name
             FROM "category" c, "template_pack" p
             WHERE c.id=$1 AND p.category_id=$2
+            ORDER BY p.id
           `,
           [categoryId, templateCategoryId],
         );
