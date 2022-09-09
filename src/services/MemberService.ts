@@ -37,7 +37,7 @@ const getMember = async (
 
     const { rows: list } = await client.query(
       `
-      SELECT pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate"
+      SELECT pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate", tpl.invite_code AS "inviteCode"
       FROM "group" g
       JOIN together_packing_list tpl on g.id = tpl.group_id
       JOIN packing_list pl on tpl.id = pl.id
@@ -55,6 +55,7 @@ const getMember = async (
       departureDate: list[0].departureDate,
       remainDay: remainDay.toString(),
       member: member,
+      inviteCode: list[0].inviteCode,
     };
 
     return data;

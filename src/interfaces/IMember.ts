@@ -9,6 +9,7 @@ export interface MemberResponseDto {
       profileImage: string;
     },
   ];
+  inviteCode: string;
 }
 
 export interface MemberDeleteResponseDto {
