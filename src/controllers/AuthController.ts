@@ -15,7 +15,7 @@ const getKakaoUser = async (req: Request, res: Response) => {
   const token = req.body.accessToken;
 
   if (!token) {
-    res
+    return res
       .status(statusCode.BAD_REQUEST)
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE_TOKEN));
   }
@@ -49,7 +49,7 @@ const getNewToken = async (req: Request, res: Response) => {
   const refreshToken = req.headers.refresh as string;
 
   if (!accessToken || !refreshToken) {
-    res
+    return res
       .status(statusCode.BAD_REQUEST)
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE_TOKEN));
   }
