@@ -17,6 +17,7 @@ app.use(
       'https://api.packman.kr',
       'https://packman-beryl.vercel.app',
     ],
+    optionsSuccessStatus: 200
   }),
 );
 
