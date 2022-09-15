@@ -21,12 +21,14 @@ const createPack = async (req: Request, res: Response) => {
   }
 
   let client;
+
   const packCreateDto: PackCreateDto = req.body;
+  const userId = req.body.user.id;
 
   try {
     client = await db.connect(req);
 
-    const data = await AloneListPackService.createPack(client, packCreateDto);
+    const data = await AloneListPackService.createPack(client, userId, packCreateDto);
 
     if (data === 'exceed_len')
       res
@@ -69,11 +71,14 @@ const updatePack = async (req: Request, res: Response) => {
   }
 
   let client;
+
   const packUpdateDto: PackUpdateDto = req.body;
+  const userId = req.body.user.id;
+
   try {
     client = await db.connect(req);
 
-    const data = await AloneListPackService.updatePack(client, packUpdateDto);
+    const data = await AloneListPackService.updatePack(client, userId, packUpdateDto);
 
     if (data === 'exceed_len')
       res
@@ -123,10 +128,11 @@ const deletePack = async (req: Request, res: Response) => {
     categoryId: categoryId,
     packId: packId,
   };
+  const userId = req.body.user.id;
 
   try {
     client = await db.connect(req);
-    const data = await AloneListPackService.deletePack(client, packDeleteDto);
+    const data = await AloneListPackService.deletePack(client, userId, packDeleteDto);
 
     if (data === 'no_list')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_ALONE_LIST));
