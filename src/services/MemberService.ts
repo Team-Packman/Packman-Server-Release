@@ -72,16 +72,17 @@ const deleteMember = async (
   memberId: string,
 ): Promise<MemberDeleteResponseDto | string> => {
   try {
+    const memberArray: string[] = memberId.split(',');
+
     const { rows: existUser } = await client.query(
       `
         SELECT *
         FROM "user" u
-        WHERE u.id = $1 and u.is_deleted = false
+        WHERE u.id IN (${memberArray}) and u.is_deleted = false
       `,
-      [memberId],
     );
 
-    if (existUser.length === 0) return 'no_user';
+    if (existUser.length !== memberArray.length) return 'no_user';
 
     const { rows: existGroup } = await client.query(
       `
@@ -96,7 +97,7 @@ const deleteMember = async (
 
     const { rows: existUserGroup } = await client.query(
       `
-      SELECT ug.user_id as id
+      SELECT ug.user_id::text as id
       FROM "user_group" ug
       JOIN "user" u on ug.user_id = u.id
       WHERE ug.group_id = $1 AND u.is_deleted = false
@@ -109,41 +110,48 @@ const deleteMember = async (
     if (existUserGroup.length === 0) return 'empty_member';
 
     // 삭제 권한이 없는 유저일 때
-    if (existUserGroup[0].id !== userId) {
+    if (existUserGroup[0].id !== userId.toString()) {
       return 'no_maker';
     } else {
       // 삭제 권한이 있는 유저가 본인을 삭제하려고 할 때
-      if (memberId === userId.toString()) return 'no_delete_maker';
+      if (memberArray.indexOf(userId.toString()) > -1) return 'no_delete_maker';
 
-      const memberArr = existUserGroup.map((list: { id: number }) => list.id);
-      if (!memberArr.includes(Number(memberId))) return 'no_member_user';
+      // 멤버에 속해있는 userId가 아닌 경우
+      const existMemberArray = existUserGroup.map((list: { id: string }) => list.id);
+      if (
+        existMemberArray.filter((mem: string) => memberArray.includes(mem)).length !==
+        memberArray.length
+      )
+        return 'no_member_user';
 
       await client.query(
         `
-        DELETE FROM "user_group"
-        WHERE group_id = $1 AND user_id = $2
-        `,
-        [groupId, memberId],
+          DELETE FROM "user_group"
+          WHERE group_id = $1 AND user_id IN (${memberArray})
+          `,
+        [groupId],
       );
 
       const { rows: togetherMyList } = await client.query(
         `
-        SELECT f.id::TEXT as "folderId", tapl.id::TEXT as id
-        FROM "folder" f
-        JOIN folder_packing_list fpl on f.id = fpl.folder_id
-        JOIN together_alone_packing_list tapl on fpl.list_id = tapl.my_packing_list_id
-        JOIN together_packing_list tpl on tapl.together_packing_list_id = tpl.id
-        WHERE f.user_id = $1 AND tpl.group_id = $2
-        `,
-        [memberId, groupId],
+          SELECT f.id::TEXT as "folderId", f.user_id as "userId", tapl.id::TEXT as id
+          FROM "folder" f
+          JOIN folder_packing_list fpl on f.id = fpl.folder_id
+          JOIN together_alone_packing_list tapl on fpl.list_id = tapl.my_packing_list_id
+          JOIN together_packing_list tpl on tapl.together_packing_list_id = tpl.id
+          WHERE f.user_id IN (${memberArray}) AND tpl.group_id = $1
+          `,
+        [groupId],
       );
 
-      await TogetherListService.deleteTogetherList(
-        client,
-        Number(memberId),
-        togetherMyList[0].folderId,
-        togetherMyList[0].id,
-      );
+      for (let i = 0; i < togetherMyList.length; i++) {
+        await TogetherListService.deleteTogetherList(
+          client,
+          togetherMyList[i].userId,
+          togetherMyList[i].folderId,
+          togetherMyList[i].id,
+        );
+      }
 
       const { rows: member } = await client.query(
         `
