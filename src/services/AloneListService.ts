@@ -6,6 +6,7 @@ import {
   InviteAloneListResponseDto,
 } from '../interfaces/IAloneList';
 import { generateInviteCode } from '../modules/generateInviteCode';
+import { folderCheckResponse } from '../modules/folderCheckResponse';
 
 const createAloneList = async (
   client: any,
@@ -16,15 +17,8 @@ const createAloneList = async (
     const inviteCode: string = await generateInviteCode(client);
     if (aloneListCreateDto.title.length > 12) return 'exceed_len';
 
-    const { rows: existFolder } = await client.query(
-      `
-        SELECT *
-        FROM "folder"
-        WHERE id=$1 AND is_aloned=true AND user_id=$2
-      `,
-      [aloneListCreateDto.folderId, userId],
-    );
-    if (existFolder.length === 0) return 'no_folder';
+    const check = await folderCheckResponse(client, userId, aloneListCreateDto.folderId, true);
+    if (check === 'no_folder') return 'no_folder';
 
     const { rows: insertListInfo } = await client.query(
       `
@@ -123,34 +117,25 @@ const getAloneList = async (
   try {
     const { rows: existList } = await client.query(
       `
-        SELECT invite_code AS "inviteCode"
-        FROM "alone_packing_list" as l
-        JOIN "packing_list" p ON l.id=p.id
-        WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
+        SELECT pl.title,TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate",
+        	      pl.is_saved AS "isSaved", apl.invite_code AS "inviteCode"
+        FROM "alone_packing_list" apl
+        JOIN "packing_list" pl ON apl.id=pl.id
+        WHERE apl.id=$1 AND apl.is_aloned=true AND pl.is_deleted=false
       `,
       [aloneListId],
     );
     if (existList.length === 0) return 'no_list';
 
-    const { rows: etcDataArray } = await client.query(
-      `
-        SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate", p.is_saved AS "isSaved"
-        FROM "packing_list" p
-        WHERE p.id=$1
-      `,
-      [aloneListId],
-    );
-    const etcData = etcDataArray[0];
-
     const category = await aloneCategoryResponse(client, aloneListId);
 
     const data: AloneListResponseDto = {
       id: aloneListId.toString(),
-      title: etcData.title,
-      departureDate: etcData.departureDate,
+      title: existList[0].title,
+      departureDate: existList[0].departureDate,
       category: category,
       inviteCode: existList[0].inviteCode,
-      isSaved: etcData.isSaved,
+      isSaved: existList[0].isSaved,
     };
 
     return data;
@@ -162,21 +147,14 @@ const getAloneList = async (
 
 const deleteAloneList = async (
   client: any,
+  userId: number,
   folderId: string,
   aloneListId: string,
 ): Promise<AloneListInfoResponseDto | string> => {
   try {
     const aloneListIdArray: string[] = aloneListId.split(',');
-
-    const { rows: existFolder } = await client.query(
-      `
-        SELECT *
-        FROM "folder" as f
-        WHERE f.id=$1 AND f.is_aloned=true
-      `,
-      [folderId],
-    );
-    if (existFolder.length === 0) return 'no_folder';
+    const check = await folderCheckResponse(client, userId, folderId, true);
+    if (check === 'no_folder') return 'no_folder';
 
     const { rows: existList } = await client.query(
       `

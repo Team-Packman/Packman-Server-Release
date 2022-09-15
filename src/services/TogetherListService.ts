@@ -11,6 +11,8 @@ import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
 import { ListCreateDto, ListInviteResponseDto } from '../interfaces/IList';
 import { generateInviteCode } from '../modules/generateInviteCode';
+import { folderCheckResponse } from '../modules/folderCheckResponse';
+import { togetherListCheckResponse } from '../modules/togetherListCheckResponse';
 
 const createTogetherList = async (
   client: any,
@@ -22,15 +24,8 @@ const createTogetherList = async (
 
     if (togetherListCreateDto.title.length > 12) return 'exceed_len';
 
-    const { rows: existFolder } = await client.query(
-      `
-        SELECT *
-        FROM "folder"
-        WHERE id=$1 AND is_aloned=false AND folder.user_id=$2
-      `,
-      [togetherListCreateDto.folderId, userId],
-    );
-    if (existFolder.length === 0) return 'no_folder';
+    const check = await folderCheckResponse(client, userId, togetherListCreateDto.folderId, false);
+    if (check === 'no_folder') return 'no_folder';
 
     const { rows: insertListInfo } = await client.query(
       `
@@ -181,33 +176,20 @@ const getTogetherList = async (
   userId: number,
 ): Promise<TogetherListResponseDto | string> => {
   try {
-    const { rows: existList } = await client.query(
-      `
-        SELECT *
-        FROM "together_alone_packing_list" as l
-        JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
-        WHERE l.id=$1 AND p.is_deleted=false
-        ORDER BY p.id
-      `,
-      [listId],
-    );
+    const existList = await togetherListCheckResponse(client, userId, listId);
     if (existList.length < 2) return 'no_list';
 
-    const { rows: etcDataArray } = await client.query(
+    const { rows: etcData } = await client.query(
       `
-        SELECT ta.together_packing_list_id::text AS "togetherListId", ta.my_packing_list_id::text AS "myListId",
-          t.group_id::text AS "groupId", t.invite_code AS "inviteCode",
-          p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate"
-        FROM (SELECT * FROM "together_alone_packing_list" WHERE id=$1) ta
-        JOIN "together_packing_list" t ON ta.together_packing_list_id=t.id
-        JOIN "packing_list" p ON t.id=p.id
+        SELECT tpl.group_id::text AS "groupId", tpl.invite_code AS "inviteCode"
+        FROM "together_packing_list" tpl
+        WHERE tpl.id=$1
       `,
-      [listId],
+      [existList[0].togetherListId],
     );
-    const etcData = etcDataArray[0];
 
-    const togetherCategory = await togetherCategoryResponse(client, etcData.togetherListId);
-    const myCategory = await aloneCategoryResponse(client, etcData.myListId);
+    const togetherCategory = await togetherCategoryResponse(client, existList[0].togetherListId);
+    const myCategory = await aloneCategoryResponse(client, existList[0].myListId);
 
     const { rows: groupInfo } = await client.query(
       `
@@ -223,7 +205,7 @@ const getTogetherList = async (
         WHERE g.id=$1
         GROUP BY g.id
       `,
-      [etcData.groupId],
+      [etcData[0].groupId],
     );
 
     const { rows: isMember } = await client.query(
@@ -233,22 +215,22 @@ const getTogetherList = async (
         FROM "user_group" ug
         WHERE ug.group_id=$1 AND ug.user_id=$2)
       `,
-      [etcData.groupId, userId],
+      [etcData[0].groupId, userId],
     );
 
     const data: TogetherListResponseDto = {
       id: listId,
-      title: etcData.title,
-      departureDate: etcData.departureDate,
+      title: existList[0].title,
+      departureDate: existList[0].departureDate,
       togetherPackingList: {
-        id: etcData.togetherListId,
-        groupId: etcData.groupId,
+        id: existList[0].togetherListId,
+        groupId: etcData[0].groupId,
         category: togetherCategory,
-        inviteCode: etcData.inviteCode,
-        isSaved: existList[1].is_saved,
+        inviteCode: etcData[0].inviteCode,
+        isSaved: existList[1].isSaved,
       },
       myPackingList: {
-        id: etcData.myListId,
+        id: existList[0].myListId,
         category: myCategory,
       },
       group: groupInfo[0],
@@ -264,16 +246,19 @@ const getTogetherList = async (
 
 const updatePacker = async (
   client: any,
+  userId: number,
   packerUpdateDto: PackerUpdateDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
     const { rows: existList } = await client.query(
       `
         SELECT *
-        FROM "packing_list" pl
-        WHERE pl.id =$1  AND pl.is_deleted=false
+        FROM "together_packing_list" tpl
+        JOIN "packing_list" pl ON tpl.id=pl.id
+        JOIN "user_group" ug ON tpl.group_id=ug.group_id
+        WHERE tpl.id=$1  AND pl.is_deleted=false AND ug.user_id=$2
       `,
-      [packerUpdateDto.listId],
+      [packerUpdateDto.listId, userId],
     );
     if (existList.length === 0) return 'no_list';
 
@@ -459,15 +444,8 @@ const deleteTogetherList = async (
     // listMappingIdArray는 혼자-함께 패킹리스트 연결 id를 의미(together_alone_packing_list table의 id)
     const listMappingIdArray: string[] = listMappingId.split(',');
 
-    const { rows: existFolder } = await client.query(
-      `
-        SELECT *
-        FROM "folder" as f
-        WHERE f.id=$1 AND f.is_aloned=false AND f.user_id=$2
-      `,
-      [folderId, userId],
-    );
-    if (existFolder.length === 0) return 'no_folder';
+    const check = await folderCheckResponse(client, userId, folderId, false);
+    if (check === 'no_folder') return 'no_folder';
 
     const { rows: existList } = await client.query(
       `
