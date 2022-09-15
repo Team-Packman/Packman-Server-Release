@@ -12,7 +12,7 @@ async function aloneListCategoryCheckResponse(
       JOIN folder_packing_list fpl on f.id = fpl.folder_id
       JOIN packing_list pl on fpl.list_id = pl.id
       JOIN alone_packing_list apl on pl.id = apl.id
-      WHERE f.user_id =$1 AND apl.id = $2 AND pl.is_deleted = false      
+      WHERE f.user_id =$1 AND apl.id = $2 AND pl.is_deleted = false AND f.is_aloned = true
       `,
       [userId, listId],
     );
