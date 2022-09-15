@@ -39,6 +39,7 @@ const getTogetherTemplateList = async (
 
 const getTemplate = async (
   client: any,
+  userId: number,
   templateId: string,
 ): Promise<DetailedTemplateResponseDto | string> => {
   try {
@@ -46,9 +47,12 @@ const getTemplate = async (
       `
         SELECT t.title
         FROM "template" t
-        WHERE t.id = $1 AND t.is_deleted = false
+        WHERE t.id = $1 AND t.is_deleted = false AND (
+          CASE WHEN t.user_id IS NOT NULL THEN t.user_id=$2
+          ELSE true
+          END)
       `,
-      [templateId],
+      [templateId, userId],
     );
     if (template.length === 0) {
       return 'no_template';

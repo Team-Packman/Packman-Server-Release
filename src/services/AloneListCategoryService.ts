@@ -1,9 +1,11 @@
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { CategoryCreateDto, CategoryUpdateDto, CategoryDeleteDto } from '../interfaces/ICategory';
 import { AloneListCategoryResponseDto } from '../interfaces/IAloneList';
+import { aloneListCategoryCheckResponse } from '../modules/aloneListCategoryCheckResponse';
 
 const createCategory = async (
   client: any,
+  userId: number,
   categoryCreateDto: CategoryCreateDto,
 ): Promise<AloneListCategoryResponseDto | string> => {
   try {
@@ -13,11 +15,13 @@ const createCategory = async (
     const { rows: existList } = await client.query(
       `
         SELECT *
-        FROM "packing_list" as pl
+        FROM "folder" f
+        JOIN folder_packing_list fpl on f.id = fpl.folder_id
+        JOIN packing_list pl on fpl.list_id = pl.id
         JOIN alone_packing_list apl on pl.id = apl.id
-        WHERE apl.id = $1 and pl.is_deleted = false
+        WHERE f.user_id =$1 AND apl.id = $2 AND pl.is_deleted = false      
       `,
-      [categoryCreateDto.listId],
+      [userId, categoryCreateDto.listId],
     );
     if (existList.length === 0) {
       return 'no_list';
@@ -58,39 +62,23 @@ const createCategory = async (
 
 const updateCategory = async (
   client: any,
+  userId: number,
   categoryUpdateDto: CategoryUpdateDto,
 ): Promise<AloneListCategoryResponseDto | string> => {
   try {
     if (categoryUpdateDto.name.length > 12) {
       return 'exceed_len';
     }
-    const { rows: existList } = await client.query(
-      `
-        SELECT *
-        FROM "packing_list" as pl
-        JOIN alone_packing_list apl on pl.id = apl.id
-        WHERE apl.id = $1 and pl.is_deleted = false
-      `,
-      [categoryUpdateDto.listId],
-    );
-    if (existList.length === 0) {
-      return 'no_list';
-    }
-    const { rows: existCategory } = await client.query(
-      `
-        SELECT *
-        FROM "category" as c
-        WHERE c.id = $1
-      `,
-      [categoryUpdateDto.id],
+    const check = await aloneListCategoryCheckResponse(
+      client,
+      userId,
+      categoryUpdateDto.listId,
+      categoryUpdateDto.id,
     );
 
-    if (existCategory.length === 0) {
-      return 'no_category';
-    }
-    if (existCategory[0].list_id != categoryUpdateDto.listId) {
-      return 'no_list_category';
-    }
+    if (check === 'no_list') return 'no_list';
+    else if (check === 'no_category') return 'no_category';
+    else if (check === 'no_list_category') return 'no_list_category';
 
     const { rows: duplicatedCategory } = await client.query(
       `
@@ -134,36 +122,20 @@ const updateCategory = async (
 
 const deleteCategory = async (
   client: any,
+  userId: number,
   categoryDeleteDto: CategoryDeleteDto,
 ): Promise<AloneListCategoryResponseDto | string> => {
   try {
-    const { rows: existList } = await client.query(
-      `
-        SELECT *
-        FROM "packing_list" as pl
-        JOIN alone_packing_list apl on pl.id = apl.id
-        WHERE apl.id = $1 and pl.is_deleted = false
-      `,
-      [categoryDeleteDto.listId],
-    );
-    if (existList.length === 0) {
-      return 'no_list';
-    }
-    const { rows: existCategory } = await client.query(
-      `
-        SELECT *
-        FROM "category" as c
-        WHERE c.id = $1
-      `,
-      [categoryDeleteDto.categoryId],
+    const check = await aloneListCategoryCheckResponse(
+      client,
+      userId,
+      categoryDeleteDto.listId,
+      categoryDeleteDto.categoryId
     );
 
-    if (existCategory.length === 0) {
-      return 'no_category';
-    }
-    if (existCategory[0].list_id != categoryDeleteDto.listId) {
-      return 'no_list_category';
-    }
+    if (check === 'no_list') return 'no_list';
+    else if (check === 'no_category') return 'no_category';
+    else if (check === 'no_list_category') return 'no_list_category';
 
     await client.query(
       `

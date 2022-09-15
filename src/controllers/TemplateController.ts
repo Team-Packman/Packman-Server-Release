@@ -66,9 +66,10 @@ const getTogetherTemplateList = async (req: Request, res: Response) => {
 const getTemplate = async (req: Request, res: Response) => {
   let client;
   const { templateId } = req.params;
+  const userId = req.body.user.id;
   try {
     client = await db.connect(req);
-    const data = await TemplateService.getTemplate(client, templateId);
+    const data = await TemplateService.getTemplate(client, userId, templateId);
 
     if (data == 'no_template') {
       res

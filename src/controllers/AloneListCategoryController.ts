@@ -21,10 +21,10 @@ const createCategory = async (req: Request, res: Response) => {
   }
   let client;
   const categoryCreateDto: CategoryCreateDto = req.body;
-
+  const userId = req.body.user.id;
   try {
     client = await db.connect(req);
-    const data = await AloneListCategoryService.createCategory(client, categoryCreateDto);
+    const data = await AloneListCategoryService.createCategory(client, userId, categoryCreateDto);
 
     if (data === 'exceed_len') {
       res
@@ -65,10 +65,10 @@ const updateCategory = async (req: Request, res: Response) => {
   }
   let client;
   const categoryUpdateDto: CategoryUpdateDto = req.body;
-
+  const userId = req.body.user.id;
   try {
     client = await db.connect(req);
-    const data = await AloneListCategoryService.updateCategory(client, categoryUpdateDto);
+    const data = await AloneListCategoryService.updateCategory(client, userId, categoryUpdateDto);
 
     if (data === 'no_list') {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
@@ -114,9 +114,10 @@ const deleteCategory = async (req: Request, res: Response) => {
     listId: listId,
     categoryId: categoryId,
   };
+  const userId = req.body.user.id;
   try {
     client = await db.connect(req);
-    const data = await AloneListCategoryService.deleteCategory(client, categoryDeleteDto);
+    const data = await AloneListCategoryService.deleteCategory(client, userId, categoryDeleteDto);
     if (data === 'no_list') {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     } else if (data === 'no_category') {

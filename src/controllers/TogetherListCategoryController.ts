@@ -24,7 +24,8 @@ const createCategory = async (req: Request, res: Response) => {
 
   try {
     client = await db.connect(req);
-    const data = await TogetherListCategoryService.createCategory(client, categoryCreateDto);
+    const userId = req.body.user.id;
+    const data = await TogetherListCategoryService.createCategory(client, userId, categoryCreateDto);
 
     if (data === 'exceed_len') {
       res
@@ -68,7 +69,8 @@ const updateCategory = async (req: Request, res: Response) => {
 
   try {
     client = await db.connect(req);
-    const data = await TogetherListCategoryService.updateCategory(client, categoryUpdateDto);
+    const userId = req.body.user.id;
+    const data = await TogetherListCategoryService.updateCategory(client, userId, categoryUpdateDto);
 
     if (data === 'no_list') {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
@@ -116,7 +118,8 @@ const deleteCategory = async (req: Request, res: Response) => {
   };
   try {
     client = await db.connect(req);
-    const data = await TogetherListCategoryService.deleteCategory(client, categoryDeleteDto);
+    const userId = req.body.user.id;
+    const data = await TogetherListCategoryService.deleteCategory(client, userId, categoryDeleteDto);
     if (data === 'no_list') {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     } else if (data === 'no_category') {
