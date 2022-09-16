@@ -94,6 +94,8 @@ const createFolder = async (
   folderCreateDto: FolderCreateDto,
 ): Promise<AllFolderResponseDto | string> => {
   try {
+    await client.query('BEGIN');
+
     if (folderCreateDto.name.length > 8) return 'exceed_len';
 
     await client.query(
@@ -106,8 +108,12 @@ const createFolder = async (
 
     const folder = await folderResponse(client, userId);
 
+    await client.query('COMMIT');
+
     return folder;
   } catch (error) {
+    await client.query('ROLLBACK');
+
     console.log(error);
     throw error;
   }
@@ -119,6 +125,8 @@ const updateFolder = async (
   folderUpdateDto: FolderUpdateDto,
 ): Promise<AllFolderResponseDto | string> => {
   try {
+    await client.query('BEGIN');
+
     if (folderUpdateDto.name.length > 8) return 'exceed_len';
     const { rows: existFolder } = await client.query(
       `
@@ -141,9 +149,13 @@ const updateFolder = async (
     );
 
     const folder = await folderResponse(client, userId);
-
+    
+    await client.query('COMMIT');
+    
     return folder;
   } catch (error) {
+    await client.query('ROLLBACK');
+
     console.log(error);
     throw error;
   }
@@ -155,6 +167,8 @@ const deleteFolder = async (
   folderId: string,
 ): Promise<AllFolderResponseDto | string> => {
   try {
+    await client.query('BEGIN');
+
     const { rows: existFolder } = await client.query(
       `
         SELECT *
@@ -209,9 +223,13 @@ const deleteFolder = async (
     );
 
     const folder = await folderResponse(client, userId);
+    
+    await client.query('COMMIT');
 
     return folder;
   } catch (error) {
+    await client.query('ROLLBACK');
+    
     console.log(error);
     throw error;
   }
