@@ -9,6 +9,8 @@ const createCategory = async (
   categoryCreateDto: CategoryCreateDto,
 ): Promise<AloneListCategoryResponseDto | string> => {
   try {
+    await client.query('BEGIN');
+
     if (categoryCreateDto.name.length > 12) {
       return 'exceed_len';
     }
@@ -52,9 +54,12 @@ const createCategory = async (
       id: categoryCreateDto.listId,
       category: category,
     };
+    await client.query('COMMIT');
 
     return aloneListCategoryResponseDto;
   } catch (error) {
+    await client.query('ROLLBACK');
+
     console.log(error);
     throw error;
   }
@@ -66,6 +71,8 @@ const updateCategory = async (
   categoryUpdateDto: CategoryUpdateDto,
 ): Promise<AloneListCategoryResponseDto | string> => {
   try {
+    await client.query('BEGIN');
+
     if (categoryUpdateDto.name.length > 12) {
       return 'exceed_len';
     }
@@ -113,8 +120,11 @@ const updateCategory = async (
       category: category,
     };
 
+    await client.query('COMMIT');
+
     return aloneListResponseDto;
   } catch (error) {
+    await client.query('ROLLBACK');
     console.log(error);
     throw error;
   }
@@ -126,11 +136,13 @@ const deleteCategory = async (
   categoryDeleteDto: CategoryDeleteDto,
 ): Promise<AloneListCategoryResponseDto | string> => {
   try {
+    await client.query('BEGIN');
+
     const check = await aloneListCategoryCheckResponse(
       client,
       userId,
       categoryDeleteDto.listId,
-      categoryDeleteDto.categoryId
+      categoryDeleteDto.categoryId,
     );
 
     if (check === 'no_list') return 'no_list';
@@ -151,9 +163,11 @@ const deleteCategory = async (
       id: categoryDeleteDto.listId,
       category: category,
     };
+    await client.query('COMMIT');
 
     return aloneListCategoryResponseDto;
   } catch (error) {
+    await client.query('ROLLBACK');
     console.log(error);
     throw error;
   }
