@@ -9,6 +9,8 @@ const createCategory = async (
   categoryCreateDto: CategoryCreateDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
+    await client.query('BEGIN');
+
     if (categoryCreateDto.name.length > 12) {
       return 'exceed_len';
     }
@@ -54,8 +56,11 @@ const createCategory = async (
       category: category,
     };
 
+    await client.query('COMMIT');
+
     return togetherListCategoryResponseDto;
   } catch (error) {
+    await client.query('ROLLBACK');
     console.log(error);
     throw error;
   }
@@ -67,6 +72,8 @@ const updateCategory = async (
   categoryUpdateDto: CategoryUpdateDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
+    await client.query('BEGIN');
+
     if (categoryUpdateDto.name.length > 12) {
       return 'exceed_len';
     }
@@ -113,9 +120,11 @@ const updateCategory = async (
       id: categoryUpdateDto.listId,
       category: category,
     };
-
+    await client.query('COMMIT');
+    
     return togetherListResponseDto;
   } catch (error) {
+    await client.query('ROLLBACK');
     console.log(error);
     throw error;
   }
@@ -127,6 +136,8 @@ const deleteCategory = async (
   categoryDeleteDto: CategoryDeleteDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
+    await client.query('BEGIN');
+
     const check = await togetherListCategoryCheckResponse(
       client,
       userId,
@@ -152,9 +163,11 @@ const deleteCategory = async (
       id: categoryDeleteDto.listId,
       category: category,
     };
+    await client.query('COMMIT');
 
     return togetherListCategoryResponseDto;
   } catch (error) {
+    await client.query('ROLLBACK');
     console.log(error);
     throw error;
   }
