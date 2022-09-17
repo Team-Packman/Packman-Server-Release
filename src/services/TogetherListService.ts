@@ -220,6 +220,7 @@ const getTogetherList = async (
 
     const data: TogetherListResponseDto = {
       id: listId,
+      folderId: existList[0].folderId,
       title: existList[0].title,
       departureDate: existList[0].departureDate,
       togetherPackingList: {
