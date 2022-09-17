@@ -173,6 +173,7 @@ const deleteAloneList = async (
     );
     if (existFolderList.length !== aloneListIdArray.length) return 'no_folder_list';
 
+    await client.query('BEGIN');
     await client.query(
       `
         DELETE
@@ -203,13 +204,14 @@ const deleteAloneList = async (
       `,
       [folderId],
     );
+    await client.query('COMMIT');
 
     const data: AloneListInfoResponseDto = {
       alonePackingList: alonePackingListInfoArray,
     };
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
