@@ -20,6 +20,7 @@ const createAloneList = async (
     const check = await folderCheckResponse(client, userId, aloneListCreateDto.folderId, true);
     if (check === 'no_folder') return 'no_folder';
 
+    await client.query('BEGIN');
     const { rows: insertListInfo } = await client.query(
       `
         INSERT INTO "packing_list" (title, departure_date)
@@ -93,6 +94,7 @@ const createAloneList = async (
     }
 
     const aloneListCategory = await aloneCategoryResponse(client, aloneListId);
+    await client.query('COMMIT');
 
     const data: AloneListResponseDto = {
       id: aloneListId.toString(),
@@ -105,7 +107,7 @@ const createAloneList = async (
 
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };

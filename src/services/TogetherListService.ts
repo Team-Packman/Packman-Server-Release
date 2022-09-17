@@ -144,9 +144,9 @@ const createTogetherList = async (
       }
     }
 
-    await client.query('COMMIT');
     const togetherCategory = await togetherCategoryResponse(client, togetherListId);
     const myListCategory = await aloneCategoryResponse(client, myListId);
+    await client.query('COMMIT');
 
     const data: TogetherListResponseDto = {
       id: togetherMyId.toString(),
