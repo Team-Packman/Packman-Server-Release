@@ -487,6 +487,7 @@ const deleteTogetherList = async (
      **/
 
     // 공통 - together list의 pack에 현재 user가 packer로 등록되어 있을 경우packer_id를 null로 변경
+    await client.query('BEGIN');
     await client.query(
       `
         UPDATE "pack" p
@@ -589,13 +590,14 @@ const deleteTogetherList = async (
       `,
       [folderId],
     );
+    await client.query('COMMIT');
 
     const data: TogetherListInfoResponseDto = {
       togetherPackingList: togetherPackingListInfoArray,
     };
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
