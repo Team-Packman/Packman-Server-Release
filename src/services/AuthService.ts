@@ -5,67 +5,62 @@ import UserService from './UserService';
 import jwt from 'jsonwebtoken';
 
 const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthResponseDto | null> => {
-  try {
-    const response = await axios({
-      method: 'get',
-      url: 'https://kapi.kakao.com/v2/user/me',
-      headers: {
-        Authorization: `Bearer ${kakaoToken}`,
-      },
-    });
-    if (!response) return null;
+  const response = await axios({
+    method: 'get',
+    url: 'https://kapi.kakao.com/v2/user/me',
+    headers: {
+      Authorization: `Bearer ${kakaoToken}`,
+    },
+  });
+  if (!response) return null;
 
-    const userEmail = response.data.kakao_account.email;
-    const userName = response.data.kakao_account.profile.nickname;
+  const userEmail = response.data.kakao_account.email;
+  const userName = response.data.kakao_account.profile.nickname;
 
-    const { rows: userInfo } = await client.query(
-      `
-        SELECT *
-        FROM "user"
-        WHERE email=$1
-      `,
-      [userEmail],
-    );
+  const { rows: userInfo } = await client.query(
+    `
+      SELECT *
+      FROM "user"
+      WHERE email=$1
+    `,
+    [userEmail],
+  );
 
-    let data: AuthResponseDto = {
-      isAlreadyUser: false,
-      name: userName,
-      email: userEmail,
-    };
+  let data: AuthResponseDto = {
+    isAlreadyUser: false,
+    name: userName,
+    email: userEmail,
+  };
 
-    if (userInfo.length) {
-      if (userInfo[0].is_deleted) {
-        await UserService.dropUser(client, userEmail);
-      } else {
-        const accessToken = jwtHandler.getAccessToken(userInfo[0].id);
-        const refreshToken = jwtHandler.getRefreshToken();
+  if (userInfo.length) {
+    if (userInfo[0].is_deleted) {
+      await UserService.dropUser(client, userEmail);
+    } else {
+      const accessToken = jwtHandler.getAccessToken(userInfo[0].id);
+      const refreshToken = jwtHandler.getRefreshToken();
 
-        await client.query(
-          `
-            UPDATE "user"
-            SET refresh_token = $1
-            WHERE id = $2
-          `,
-          [refreshToken, userInfo[0].id],
-        );
+      await client.query(
+        `
+          UPDATE "user"
+          SET refresh_token = $1
+          WHERE id = $2
+        `,
+        [refreshToken, userInfo[0].id],
+      );
 
-        data = {
-          isAlreadyUser: true,
-          id: userInfo[0].id.toString(),
-          name: userInfo[0].name,
-          nickname: userInfo[0].nickname,
-          email: userInfo[0].email,
-          profileImage: userInfo[0].profile_image,
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-        };
-      }
+      data = {
+        isAlreadyUser: true,
+        id: userInfo[0].id.toString(),
+        name: userInfo[0].name,
+        nickname: userInfo[0].nickname,
+        email: userInfo[0].email,
+        profileImage: userInfo[0].profile_image,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      };
     }
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
   }
+  return data;
 };
 
 const getNewToken = async (
