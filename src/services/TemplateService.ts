@@ -5,18 +5,8 @@ const getAloneTemplateList = async (
   client: any,
   userId: number,
 ): Promise<TemplateListResponseDto | string> => {
-  try {
-    const aloneTemplateList: TemplateListResponseDto = await templateListResponse(
-      client,
-      userId,
-      true,
-    );
-
-    return aloneTemplateList;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  const aloneTemplateList = await templateListResponse(client, userId, true);
+  return aloneTemplateList;
 };
 
 const getTogetherTemplateList = async (
