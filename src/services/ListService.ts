@@ -130,6 +130,7 @@ const updateMyTemplate = async (
     }
     if (isSaved !== myTemplateUpdateDto.isSaved) return 'no_template';
 
+    await client.query('BEGIN');
     if (myTemplateUpdateDto.isSaved === false) {
       await client.query(
         `
@@ -223,6 +224,7 @@ const updateMyTemplate = async (
       `,
       [aloneListId],
     );
+    await client.query('COMMIT');
 
     const data: MyTemplateUpdateDto = {
       id: myTemplateUpdateDto.id,
@@ -231,7 +233,7 @@ const updateMyTemplate = async (
 
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
