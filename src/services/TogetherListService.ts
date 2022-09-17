@@ -291,6 +291,7 @@ const updatePacker = async (
     );
     if (existUser.length === 0) return 'no_user';
 
+    await client.query('BEGIN');
     await client.query(
       `
         UPDATE "pack"
@@ -301,6 +302,7 @@ const updatePacker = async (
     );
 
     const togetherCategory = await togetherCategoryResponse(client, packerUpdateDto.listId);
+    await client.query('COMMIT');
 
     const data: TogetherListCategoryResponseDto = {
       id: packerUpdateDto.listId,
@@ -309,7 +311,7 @@ const updatePacker = async (
 
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
