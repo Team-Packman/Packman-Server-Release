@@ -60,52 +60,47 @@ const updateDate = async (
   userId: number,
   dateUpdateDto: DateUpdateDto,
 ): Promise<DateUpdateDto | string> => {
-  try {
-    let updatedDate;
+  let updatedDate;
 
-    if (dateUpdateDto.isAloned === true) {
-      const existList = await aloneListCheckResponse(client, userId, dateUpdateDto.id);
-      if (existList.length === 0) return 'no_list';
+  if (dateUpdateDto.isAloned === true) {
+    const existList = await aloneListCheckResponse(client, userId, dateUpdateDto.id);
+    if (existList.length === 0) return 'no_list';
 
-      const { rows: updatedData } = await client.query(
-        `
-          UPDATE "packing_list"
-          SET departure_date=$1
-          WHERE id=$2
-          RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
-        `,
-        [dateUpdateDto.departureDate, dateUpdateDto.id],
-      );
-      updatedDate = updatedData[0].departureDate;
-    } else {
-      const existList = await togetherListCheckResponse(client, userId, dateUpdateDto.id);
-      if (existList.length < 2) return 'no_list';
+    const { rows: updatedData } = await client.query(
+      `
+        UPDATE "packing_list"
+        SET departure_date=$1
+        WHERE id=$2
+        RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
+      `,
+      [dateUpdateDto.departureDate, dateUpdateDto.id],
+    );
+    updatedDate = updatedData[0].departureDate;
+  } else {
+    const existList = await togetherListCheckResponse(client, userId, dateUpdateDto.id);
+    if (existList.length < 2) return 'no_list';
 
-      const togetherListId = existList[0].togetherListId;
-      const aloneListId = existList[0].myListId;
+    const togetherListId = existList[0].togetherListId;
+    const aloneListId = existList[0].myListId;
 
-      const { rows: updatedData } = await client.query(
-        `
-          UPDATE "packing_list"
-          SET departure_date=$1
-          WHERE id=$2 OR id=$3
-          RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
-        `,
-        [dateUpdateDto.departureDate, togetherListId, aloneListId],
-      );
-      updatedDate = updatedData[0].departureDate;
-    }
-
-    const data = {
-      id: dateUpdateDto.id,
-      departureDate: updatedDate,
-    };
-
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
+    const { rows: updatedData } = await client.query(
+      `
+        UPDATE "packing_list"
+        SET departure_date=$1
+        WHERE id=$2 OR id=$3
+        RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
+      `,
+      [dateUpdateDto.departureDate, togetherListId, aloneListId],
+    );
+    updatedDate = updatedData[0].departureDate;
   }
+
+  const data = {
+    id: dateUpdateDto.id,
+    departureDate: updatedDate,
+  };
+
+  return data;
 };
 
 const updateMyTemplate = async (
