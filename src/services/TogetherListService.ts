@@ -27,6 +27,7 @@ const createTogetherList = async (
     const check = await folderCheckResponse(client, userId, togetherListCreateDto.folderId, false);
     if (check === 'no_folder') return 'no_folder';
 
+    await client.query('BEGIN');
     const { rows: insertListInfo } = await client.query(
       `
         INSERT INTO "packing_list" (title, departure_date)
@@ -143,6 +144,7 @@ const createTogetherList = async (
       }
     }
 
+    await client.query('COMMIT');
     const togetherCategory = await togetherCategoryResponse(client, togetherListId);
     const myListCategory = await aloneCategoryResponse(client, myListId);
 
@@ -165,7 +167,7 @@ const createTogetherList = async (
 
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
