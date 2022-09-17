@@ -177,73 +177,68 @@ const getTogetherList = async (
   listId: string,
   userId: number,
 ): Promise<TogetherListResponseDto | string> => {
-  try {
-    const existList = await togetherListCheckResponse(client, userId, listId);
-    if (existList.length < 2) return 'no_list';
+  const existList = await togetherListCheckResponse(client, userId, listId);
+  if (existList.length < 2) return 'no_list';
 
-    const { rows: etcData } = await client.query(
-      `
-        SELECT tpl.group_id::text AS "groupId", tpl.invite_code AS "inviteCode"
-        FROM "together_packing_list" tpl
-        WHERE tpl.id=$1
-      `,
-      [existList[0].togetherListId],
-    );
+  const { rows: etcData } = await client.query(
+    `
+      SELECT tpl.group_id::text AS "groupId", tpl.invite_code AS "inviteCode"
+      FROM "together_packing_list" tpl
+      WHERE tpl.id=$1
+    `,
+    [existList[0].togetherListId],
+  );
 
-    const togetherCategory = await togetherCategoryResponse(client, existList[0].togetherListId);
-    const myCategory = await aloneCategoryResponse(client, existList[0].myListId);
+  const togetherCategory = await togetherCategoryResponse(client, existList[0].togetherListId);
+  const myCategory = await aloneCategoryResponse(client, existList[0].myListId);
 
-    const { rows: groupInfo } = await client.query(
-      `
-        SELECT g.id::text AS "id",
-          COALESCE(json_agg(json_build_object(
-              'id', u.id::text,
-              'nickname', u.nickname,
-              'profileImage',u.profile_image
-              ) ORDER BY ug.id) FILTER(WHERE u.id IS NOT NULL AND u.is_deleted=false),'[]') AS "member"
-        FROM "user_group" ug
-        JOIN "user" u ON ug.user_id=u.id
-        RIGHT JOIN "group" g ON ug.group_id=g.id
-        WHERE g.id=$1
-        GROUP BY g.id
-      `,
-      [etcData[0].groupId],
-    );
+  const { rows: groupInfo } = await client.query(
+    `
+      SELECT g.id::text AS "id",
+        COALESCE(json_agg(json_build_object(
+            'id', u.id::text,
+            'nickname', u.nickname,
+            'profileImage',u.profile_image
+            ) ORDER BY ug.id) FILTER(WHERE u.id IS NOT NULL AND u.is_deleted=false),'[]') AS "member"
+      FROM "user_group" ug
+      JOIN "user" u ON ug.user_id=u.id
+      RIGHT JOIN "group" g ON ug.group_id=g.id
+      WHERE g.id=$1
+      GROUP BY g.id
+    `,
+    [etcData[0].groupId],
+  );
 
-    const { rows: isMember } = await client.query(
-      `
-        SELECT EXISTS(
-        SELECT *
-        FROM "user_group" ug
-        WHERE ug.group_id=$1 AND ug.user_id=$2)
-      `,
-      [etcData[0].groupId, userId],
-    );
+  const { rows: isMember } = await client.query(
+    `
+      SELECT EXISTS(
+      SELECT *
+      FROM "user_group" ug
+      WHERE ug.group_id=$1 AND ug.user_id=$2)
+    `,
+    [etcData[0].groupId, userId],
+  );
 
-    const data: TogetherListResponseDto = {
-      id: listId,
-      title: existList[0].title,
-      departureDate: existList[0].departureDate,
-      togetherPackingList: {
-        id: existList[0].togetherListId,
-        groupId: etcData[0].groupId,
-        category: togetherCategory,
-        inviteCode: etcData[0].inviteCode,
-        isSaved: existList[1].isSaved,
-      },
-      myPackingList: {
-        id: existList[0].myListId,
-        category: myCategory,
-      },
-      group: groupInfo[0],
-      isMember: isMember[0].exists,
-    };
+  const data: TogetherListResponseDto = {
+    id: listId,
+    title: existList[0].title,
+    departureDate: existList[0].departureDate,
+    togetherPackingList: {
+      id: existList[0].togetherListId,
+      groupId: etcData[0].groupId,
+      category: togetherCategory,
+      inviteCode: etcData[0].inviteCode,
+      isSaved: existList[1].isSaved,
+    },
+    myPackingList: {
+      id: existList[0].myListId,
+      category: myCategory,
+    },
+    group: groupInfo[0],
+    isMember: isMember[0].exists,
+  };
 
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  return data;
 };
 
 const updatePacker = async (
