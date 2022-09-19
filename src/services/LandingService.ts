@@ -16,6 +16,8 @@ const createLandingUser = async (
 
     if (existPhone.length) return 'duplicate_phone';
 
+    await client.query('BEGIN');
+
     const { rows: landingUser } = await client.query(
       `
         INSERT INTO "landing_user" (phone)
@@ -37,9 +39,11 @@ const createLandingUser = async (
       num: num[0].num,
     };
 
+    await client.query('COMMIT');
+
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
