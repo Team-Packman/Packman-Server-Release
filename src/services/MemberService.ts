@@ -74,6 +74,8 @@ const deleteMember = async (
   try {
     const memberArray: string[] = memberId.split(',');
 
+    await client.query('BEGIN');
+
     const { rows: existUser } = await client.query(
       `
         SELECT *
@@ -168,9 +170,12 @@ const deleteMember = async (
         member: member,
       };
 
+      await client.query('COMMIT');
+
       return data;
     }
   } catch (error) {
+    await client.query('ROLLBACK');
     console.log(error);
     throw error;
   }

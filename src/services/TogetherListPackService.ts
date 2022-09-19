@@ -22,6 +22,8 @@ const createPack = async (
     else if (check === 'no_category') return 'no_category';
     else if (check === 'no_list_category') return 'no_list_category';
 
+    await client.query('BEGIN');
+
     await client.query(
       `
         INSERT INTO "pack" (category_id, name)
@@ -36,8 +38,12 @@ const createPack = async (
       id: packCreateDto.listId,
       category: category,
     };
+
+    await client.query('COMMIT');
+
     return togetherListCategoryResponseDto;
   } catch (error) {
+    await client.query('ROLLBACK');
     console.log(error);
     throw error;
   }
@@ -61,6 +67,8 @@ const updatePack = async (
     if (check === 'no_list') return 'no_list';
     else if (check === 'no_category') return 'no_category';
     else if (check === 'no_list_category') return 'no_list_category';
+
+    await client.query('BEGIN');
 
     const { rows: existPack } = await client.query(
       `
@@ -90,8 +98,12 @@ const updatePack = async (
       id: packUpdateDto.listId,
       category: category,
     };
+
+    await client.query('COMMIT');
+
     return togetherListCategoryResponseDto;
   } catch (error) {
+    await client.query('ROLLBACK');
     console.log(error);
     throw error;
   }
@@ -113,6 +125,8 @@ const deletePack = async (
     if (check === 'no_list') return 'no_list';
     else if (check === 'no_category') return 'no_category';
     else if (check === 'no_list_category') return 'no_list_category';
+
+    await client.query('BEGIN');
 
     const { rows: existPack } = await client.query(
       `
@@ -141,8 +155,12 @@ const deletePack = async (
       id: packDeleteDto.listId,
       category: category,
     };
+
+    await client.query('COMMIT');
+
     return togetherListCategoryResponseDto;
   } catch (error) {
+    await client.query('ROLLBACK');
     console.log(error);
     throw error;
   }
