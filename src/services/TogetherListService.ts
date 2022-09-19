@@ -221,25 +221,25 @@ const getTogetherList = async (
     [etcData[0].groupId, userId],
   );
 
-    const data: TogetherListResponseDto = {
-      id: listId,
-      folderId: existList[0].folderId,
-      title: existList[0].title,
-      departureDate: existList[0].departureDate,
-      togetherPackingList: {
-        id: existList[0].togetherListId,
-        groupId: etcData[0].groupId,
-        category: togetherCategory,
-        inviteCode: etcData[0].inviteCode,
-        isSaved: existList[1].isSaved,
-      },
-      myPackingList: {
-        id: existList[0].myListId,
-        category: myCategory,
-      },
-      group: groupInfo[0],
-      isMember: isMember[0].exists,
-    };
+  const data: TogetherListResponseDto = {
+    id: listId,
+    folderId: existList[0].folderId,
+    title: existList[0].title,
+    departureDate: existList[0].departureDate,
+    togetherPackingList: {
+      id: existList[0].togetherListId,
+      groupId: etcData[0].groupId,
+      category: togetherCategory,
+      inviteCode: etcData[0].inviteCode,
+      isSaved: existList[1].isSaved,
+    },
+    myPackingList: {
+      id: existList[0].myListId,
+      category: myCategory,
+    },
+    group: groupInfo[0],
+    isMember: isMember[0].exists,
+  };
 
   return data;
 };
@@ -434,7 +434,7 @@ const addMember = async (
     const data = {
       listId: aloneTogether[0].id,
     };
-    
+
     await client.query('COMMIT');
 
     return data;
@@ -622,26 +622,23 @@ const getInviteTogetherList = async (
   inviteCode: string,
   userId: number,
 ): Promise<ListInviteResponseDto | string> => {
-  try {
-    await client.query('BEGIN');
-    
-    const { rows: packingList } = await client.query(
-      `
+  const { rows: packingList } = await client.query(
+    `
       SELECT tapl.id::text, t.group_id, t.id AS "togetherId"
       FROM "together_packing_list" as t
       JOIN "packing_list" as pl ON pl.id = t.id
       JOIN together_alone_packing_list tapl on t.id = tapl.together_packing_list_id
       WHERE t.invite_code = $1 AND pl.is_deleted = false
       `,
-      [inviteCode],
-    );
-    if (packingList.length === 0) return 'no_list';
+    [inviteCode],
+  );
+  if (packingList.length === 0) return 'no_list';
 
-    // 이미 추가된 멤버인지
-    let isMember = false;
+  // 이미 추가된 멤버인지
+  let isMember = false;
 
-    const { rows: existMember } = await client.query(
-      `
+  const { rows: existMember } = await client.query(
+    `
           SELECT *
           FROM "user_group" as ug
           WHERE ug.user_id = $1 AND ug.group_id = $2
@@ -652,8 +649,8 @@ const getInviteTogetherList = async (
   if (existMember.length > 0) isMember = true;
 
   if (isMember === true) {
-      const { rows: newPackingList } = await client.query(
-        `
+    const { rows: newPackingList } = await client.query(
+      `
             SELECT tal.id::text
             FROM "together_alone_packing_list" tal 
             JOIN "folder_packing_list" fl ON tal.my_packing_list_id = fl.list_id
@@ -669,21 +666,16 @@ const getInviteTogetherList = async (
     const data: ListInviteResponseDto = {
       id: newPackingList[0].id,
       isMember: isMember,
-      };
-      return data;
-    }
-
-    const data: ListInviteResponseDto = {
-      id: packingList[0].id,
-      isMember: isMember,
     };
-    await client.query('COMMIT');
     return data;
-  } catch (error) {
-    await client.query('ROLLBACK');
-    console.log(error);
-    throw error;
   }
+
+  const data: ListInviteResponseDto = {
+    id: packingList[0].id,
+    isMember: isMember,
+  };
+
+  return data;
 };
 
 export default {
