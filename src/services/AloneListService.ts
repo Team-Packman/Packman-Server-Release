@@ -116,28 +116,32 @@ const getAloneList = async (
   client: any,
   aloneListId: string,
 ): Promise<AloneListResponseDto | string> => {
-  const { rows: existList } = await client.query(
-    `
-      SELECT pl.title,TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate",
-        	    pl.is_saved AS "isSaved", apl.invite_code AS "inviteCode"
-      FROM "alone_packing_list" apl
-      JOIN "packing_list" pl ON apl.id=pl.id
-      WHERE apl.id=$1 AND apl.is_aloned=true AND pl.is_deleted=false
-    `,
-    [aloneListId],
-  );
-  if (existList.length === 0) return 'no_list';
+  try {
+    const { rows: existList } = await client.query(
+      `
+        SELECT pl.title,TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate",
+               pl.is_saved AS "isSaved", apl.invite_code AS "inviteCode",
+               fpl.folder_id::text AS "folderId"
+        FROM "alone_packing_list" apl
+        JOIN "packing_list" pl ON apl.id=pl.id
+        JOIN "folder_packing_list" fpl ON pl.id=fpl.list_id
+        WHERE apl.id=$1 AND apl.is_aloned=true AND pl.is_deleted=false
+      `,
+      [aloneListId],
+    );
+    if (existList.length === 0) return 'no_list';
 
   const category = await aloneCategoryResponse(client, aloneListId);
 
-  const data: AloneListResponseDto = {
-    id: aloneListId.toString(),
-    title: existList[0].title,
-    departureDate: existList[0].departureDate,
-    category: category,
-    inviteCode: existList[0].inviteCode,
-    isSaved: existList[0].isSaved,
-  };
+    const data: AloneListResponseDto = {
+      id: aloneListId.toString(),
+      folderId: existList[0].folderId,
+      title: existList[0].title,
+      departureDate: existList[0].departureDate,
+      category: category,
+      inviteCode: existList[0].inviteCode,
+      isSaved: existList[0].isSaved,
+    };
 
   return data;
 };

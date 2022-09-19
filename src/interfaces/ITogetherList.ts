@@ -4,6 +4,7 @@ import { ListInfoResponseDto } from './IList';
 
 export interface TogetherListResponseDto {
   id: string;
+  folderId?: string;
   title: string;
   departureDate: string;
   togetherPackingList: {
@@ -72,4 +73,5 @@ export interface TogetherListCheckResponseDto {
   isSaved: boolean;
   myListId: string;
   togetherListId: string;
+  folderId: string;
 }

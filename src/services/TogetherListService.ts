@@ -219,24 +219,25 @@ const getTogetherList = async (
     [etcData[0].groupId, userId],
   );
 
-  const data: TogetherListResponseDto = {
-    id: listId,
-    title: existList[0].title,
-    departureDate: existList[0].departureDate,
-    togetherPackingList: {
-      id: existList[0].togetherListId,
-      groupId: etcData[0].groupId,
-      category: togetherCategory,
-      inviteCode: etcData[0].inviteCode,
-      isSaved: existList[1].isSaved,
-    },
-    myPackingList: {
-      id: existList[0].myListId,
-      category: myCategory,
-    },
-    group: groupInfo[0],
-    isMember: isMember[0].exists,
-  };
+    const data: TogetherListResponseDto = {
+      id: listId,
+      folderId: existList[0].folderId,
+      title: existList[0].title,
+      departureDate: existList[0].departureDate,
+      togetherPackingList: {
+        id: existList[0].togetherListId,
+        groupId: etcData[0].groupId,
+        category: togetherCategory,
+        inviteCode: etcData[0].inviteCode,
+        isSaved: existList[1].isSaved,
+      },
+      myPackingList: {
+        id: existList[0].myListId,
+        category: myCategory,
+      },
+      group: groupInfo[0],
+      isMember: isMember[0].exists,
+    };
 
   return data;
 };

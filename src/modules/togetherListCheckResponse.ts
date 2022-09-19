@@ -9,7 +9,8 @@ async function togetherListCheckResponse(
     const { rows: existList } = await client.query(
       `
         SELECT pl.title,TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate", pl.is_saved AS "isSaved",
-               tapl.my_packing_list_id::text AS "myListId", tapl.together_packing_list_id::text AS "togetherListId"
+               tapl.my_packing_list_id::text AS "myListId", tapl.together_packing_list_id::text AS "togetherListId",
+               f.id::text AS "folderId"
         FROM "folder" f
         JOIN "folder_packing_list" fpl ON f.id=fpl.folder_id
         JOIN "together_alone_packing_list" tapl ON fpl.list_id=tapl.my_packing_list_id

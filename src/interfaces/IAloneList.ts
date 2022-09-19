@@ -8,6 +8,7 @@ export interface AloneListCategoryResponseDto {
 
 export interface AloneListResponseDto {
   id: string;
+  folderId?: string;
   title: string;
   departureDate: string;
   category: AloneCategoryResponseDto[];
