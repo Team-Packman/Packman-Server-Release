@@ -44,7 +44,6 @@ const createPack = async (
     return togetherListCategoryResponseDto;
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log(error);
     throw error;
   }
 };
@@ -68,8 +67,6 @@ const updatePack = async (
     else if (check === 'no_category') return 'no_category';
     else if (check === 'no_list_category') return 'no_list_category';
 
-    await client.query('BEGIN');
-
     const { rows: existPack } = await client.query(
       `
         SELECT *
@@ -82,6 +79,8 @@ const updatePack = async (
     if (existPack.length === 0) return 'no_pack';
 
     if (existPack[0].category_id != packUpdateDto.categoryId) return 'no_category_pack';
+
+    await client.query('BEGIN');
 
     await client.query(
       `
@@ -104,7 +103,6 @@ const updatePack = async (
     return togetherListCategoryResponseDto;
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log(error);
     throw error;
   }
 };
@@ -126,8 +124,6 @@ const deletePack = async (
     else if (check === 'no_category') return 'no_category';
     else if (check === 'no_list_category') return 'no_list_category';
 
-    await client.query('BEGIN');
-
     const { rows: existPack } = await client.query(
       `
         SELECT *
@@ -140,6 +136,8 @@ const deletePack = async (
     if (existPack.length === 0) return 'no_pack';
 
     if (existPack[0].category_id != packDeleteDto.categoryId) return 'no_category_pack';
+
+    await client.query('BEGIN');
 
     await client.query(
       `
@@ -161,7 +159,6 @@ const deletePack = async (
     return togetherListCategoryResponseDto;
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log(error);
     throw error;
   }
 };

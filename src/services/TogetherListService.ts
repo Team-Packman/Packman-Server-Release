@@ -28,6 +28,7 @@ const createTogetherList = async (
     if (check === 'no_folder') return 'no_folder';
 
     await client.query('BEGIN');
+
     const { rows: insertListInfo } = await client.query(
       `
         INSERT INTO "packing_list" (title, departure_date)
@@ -178,6 +179,7 @@ const getTogetherList = async (
   userId: number,
 ): Promise<TogetherListResponseDto | string> => {
   const existList = await togetherListCheckResponse(client, userId, listId);
+
   if (existList.length < 2) return 'no_list';
 
   const { rows: etcData } = await client.query(
@@ -219,25 +221,25 @@ const getTogetherList = async (
     [etcData[0].groupId, userId],
   );
 
-    const data: TogetherListResponseDto = {
-      id: listId,
-      folderId: existList[0].folderId,
-      title: existList[0].title,
-      departureDate: existList[0].departureDate,
-      togetherPackingList: {
-        id: existList[0].togetherListId,
-        groupId: etcData[0].groupId,
-        category: togetherCategory,
-        inviteCode: etcData[0].inviteCode,
-        isSaved: existList[1].isSaved,
-      },
-      myPackingList: {
-        id: existList[0].myListId,
-        category: myCategory,
-      },
-      group: groupInfo[0],
-      isMember: isMember[0].exists,
-    };
+  const data: TogetherListResponseDto = {
+    id: listId,
+    folderId: existList[0].folderId,
+    title: existList[0].title,
+    departureDate: existList[0].departureDate,
+    togetherPackingList: {
+      id: existList[0].togetherListId,
+      groupId: etcData[0].groupId,
+      category: togetherCategory,
+      inviteCode: etcData[0].inviteCode,
+      isSaved: existList[1].isSaved,
+    },
+    myPackingList: {
+      id: existList[0].myListId,
+      category: myCategory,
+    },
+    group: groupInfo[0],
+    isMember: isMember[0].exists,
+  };
 
   return data;
 };
@@ -294,6 +296,7 @@ const updatePacker = async (
     if (existUser.length === 0) return 'no_user';
 
     await client.query('BEGIN');
+
     await client.query(
       `
         UPDATE "pack"
@@ -309,6 +312,7 @@ const updatePacker = async (
       id: packerUpdateDto.listId,
       category: togetherCategory,
     };
+
     await client.query('COMMIT');
 
     return data;
@@ -324,8 +328,6 @@ const addMember = async (
   userId: string,
 ): Promise<string | TogetherAloneResponseDto> => {
   try {
-    await client.query('BEGIN');
-
     const { rows: togetherList } = await client.query(
       `
         SELECT tpl.group_id as "groupId", pl.title as title, pl.departure_date as "departureDate", tpl.id as "togetherId"
@@ -347,7 +349,10 @@ const addMember = async (
       `,
       [userId, togetherList[0].groupId],
     );
+
     if (existMember.length > 0) return 'already_exist_member';
+
+    await client.query('BEGIN');
 
     await client.query(
       `
@@ -429,14 +434,12 @@ const addMember = async (
     const data = {
       listId: aloneTogether[0].id,
     };
-    
+
     await client.query('COMMIT');
 
     return data;
   } catch (error) {
     await client.query('ROLLBACK');
-
-    console.log(error);
     throw error;
   }
 };
@@ -496,6 +499,7 @@ const deleteTogetherList = async (
 
     // 공통 - together list의 pack에 현재 user가 packer로 등록되어 있을 경우packer_id를 null로 변경
     await client.query('BEGIN');
+
     await client.query(
       `
         UPDATE "pack" p
@@ -550,6 +554,7 @@ const deleteTogetherList = async (
     );
 
     let deleteTogetherListIdArray: number[] = [];
+
     if (deleteItemArray.length !== 0) {
       // 삭제해야 할 together_packing_list의 id 배열
       deleteTogetherListIdArray = await deleteItemArray.map(
@@ -602,6 +607,7 @@ const deleteTogetherList = async (
     const data: TogetherListInfoResponseDto = {
       togetherPackingList: togetherPackingListInfoArray,
     };
+
     await client.query('COMMIT');
 
     return data;
@@ -616,37 +622,35 @@ const getInviteTogetherList = async (
   inviteCode: string,
   userId: number,
 ): Promise<ListInviteResponseDto | string> => {
-  try {
-    await client.query('BEGIN');
-    
-    const { rows: packingList } = await client.query(
-      `
+  const { rows: packingList } = await client.query(
+    `
       SELECT tapl.id::text, t.group_id, t.id AS "togetherId"
       FROM "together_packing_list" as t
       JOIN "packing_list" as pl ON pl.id = t.id
       JOIN together_alone_packing_list tapl on t.id = tapl.together_packing_list_id
       WHERE t.invite_code = $1 AND pl.is_deleted = false
       `,
-      [inviteCode],
-    );
-    if (packingList.length === 0) return 'no_list';
+    [inviteCode],
+  );
+  if (packingList.length === 0) return 'no_list';
 
-    // 이미 추가된 멤버인지
-    let isMember = false;
+  // 이미 추가된 멤버인지
+  let isMember = false;
 
-    const { rows: existMember } = await client.query(
-      `
+  const { rows: existMember } = await client.query(
+    `
           SELECT *
           FROM "user_group" as ug
           WHERE ug.user_id = $1 AND ug.group_id = $2
         `,
-      [userId, packingList[0].group_id],
-    );
-    if (existMember.length > 0) isMember = true;
+    [userId, packingList[0].group_id],
+  );
 
-    if (isMember === true) {
-      const { rows: newPackingList } = await client.query(
-        `
+  if (existMember.length > 0) isMember = true;
+
+  if (isMember === true) {
+    const { rows: newPackingList } = await client.query(
+      `
             SELECT tal.id::text
             FROM "together_alone_packing_list" tal 
             JOIN "folder_packing_list" fl ON tal.my_packing_list_id = fl.list_id
@@ -654,27 +658,24 @@ const getInviteTogetherList = async (
             JOIN "packing_list" pl ON pl.id =  fl.list_id
             WHERE tal.together_packing_list_id = $1 AND f.user_id = $2 AND pl.is_deleted = false
           `,
-        [packingList[0].togetherId, userId],
-      );
-      if (newPackingList.length === 0) return 'no_list';
-      const data: ListInviteResponseDto = {
-        id: newPackingList[0].id,
-        isMember: isMember,
-      };
-      return data;
-    }
+      [packingList[0].togetherId, userId],
+    );
+
+    if (newPackingList.length === 0) return 'no_list';
 
     const data: ListInviteResponseDto = {
-      id: packingList[0].id,
+      id: newPackingList[0].id,
       isMember: isMember,
     };
-    await client.query('COMMIT');
     return data;
-  } catch (error) {
-    await client.query('ROLLBACK');
-    console.log(error);
-    throw error;
   }
+
+  const data: ListInviteResponseDto = {
+    id: packingList[0].id,
+    isMember: isMember,
+  };
+
+  return data;
 };
 
 export default {

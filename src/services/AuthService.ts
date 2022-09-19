@@ -34,6 +34,7 @@ const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthRespon
     };
 
     await client.query('BEGIN');
+
     if (userInfo.length) {
       if (userInfo[0].is_deleted) {
         await UserService.dropUser(client, userEmail);
@@ -62,6 +63,7 @@ const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthRespon
         };
       }
     }
+
     await client.query('COMMIT');
 
     return data;
@@ -76,58 +78,54 @@ const getNewToken = async (
   accessToken: string,
   refreshToken: string,
 ): Promise<AuthTokenResponseDto | string | undefined> => {
-  try {
-    const decodedAc = jwtHandler.verifyToken(accessToken);
-    const decodedRf = jwtHandler.verifyToken(refreshToken);
-    const decoded = jwt.decode(accessToken);
+  const decodedAc = jwtHandler.verifyToken(accessToken);
+  const decodedRf = jwtHandler.verifyToken(refreshToken);
+  const decoded = jwt.decode(accessToken);
 
-    if (decodedAc === 'invalid_token' || decodedRf === 'invalid_token') return 'invalid_token';
+  if (decodedAc === 'invalid_token' || decodedRf === 'invalid_token') return 'invalid_token';
 
-    const userId = (decoded as any).user.id;
+  const userId = (decoded as any).user.id;
 
-    const { rows: existUser } = await client.query(
-      `
+  const { rows: existUser } = await client.query(
+    `
         SELECT *
         FROM "user" u
         WHERE u.id = $1 and is_deleted = false
       `,
-      [userId],
-    );
+    [userId],
+  );
 
-    if (existUser.length === 0) return 'no_user';
+  if (existUser.length === 0) return 'no_user';
 
-    const { rows: refresh } = await client.query(
-      `
+  const { rows: refresh } = await client.query(
+    `
         SELECT u.refresh_token
         FROM "user" u
         WHERE u.id = $1
     `,
-      [userId],
-    );
+    [userId],
+  );
 
-    if (refresh[0].refresh_token !== refreshToken) return 'no_user_refresh';
+  if (refresh[0].refresh_token !== refreshToken) return 'no_user_refresh';
 
-    if (decodedAc === 'expired_token') {
-      //accessToken이 만료되고 refreshToken도 만료된 경우
-      if (decodedRf === 'expired_token') {
-        return 'all_expired_token';
-      } else {
-        // accessToken이 만료되고 refreshToken은 만료되지 않은 경우
-        const newAcToken = jwtHandler.getAccessToken(userId);
+  if (decodedAc === 'expired_token') {
+    //accessToken이 만료되고 refreshToken도 만료된 경우
+    if (decodedRf === 'expired_token') {
+      return 'all_expired_token';
+    } else {
+      // accessToken이 만료되고 refreshToken은 만료되지 않은 경우
+      const newAcToken = jwtHandler.getAccessToken(userId);
 
-        const data: AuthTokenResponseDto = {
-          accessToken: newAcToken,
-          refreshToken,
-        };
-        return data;
-      }
+      const data: AuthTokenResponseDto = {
+        accessToken: newAcToken,
+        refreshToken,
+      };
+      return data;
     }
-
-    // accessToken이 만료되지 않은 경우
-    return 'valid_token';
-  } catch (error) {
-    console.log(error);
   }
+
+  // accessToken이 만료되지 않은 경우
+  return 'valid_token';
 };
 
 export default {

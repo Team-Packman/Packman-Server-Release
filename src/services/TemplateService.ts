@@ -22,9 +22,8 @@ const getTemplate = async (
   userId: number,
   templateId: string,
 ): Promise<DetailedTemplateResponseDto | string> => {
-  try {
-    const { rows: template } = await client.query(
-      `
+  const { rows: template } = await client.query(
+    `
         SELECT t.title
         FROM "template" t
         WHERE t.id = $1 AND t.is_deleted = false AND (
@@ -32,15 +31,15 @@ const getTemplate = async (
           ELSE true
           END)
       `,
-      [templateId, userId],
-    );
-    if (template.length === 0) {
-      return 'no_template';
-    }
-    const templateTitle = template[0].title;
+    [templateId, userId],
+  );
+  if (template.length === 0) {
+    return 'no_template';
+  }
+  const templateTitle = template[0].title;
 
-    const { rows: category } = await client.query(
-      `
+  const { rows: category } = await client.query(
+    `
         SELECT c.id::text, c.name,	COALESCE(json_agg(json_build_object(
             'id', p.id::text,
             'name', p.name
@@ -52,19 +51,15 @@ const getTemplate = async (
         GROUP BY c.id
         ORDER BY c.id
       `,
-      [templateId],
-    );
+    [templateId],
+  );
 
-    const templateResponse: DetailedTemplateResponseDto = {
-      id: templateId,
-      title: templateTitle,
-      category: category,
-    };
-    return templateResponse;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  const templateResponse: DetailedTemplateResponseDto = {
+    id: templateId,
+    title: templateTitle,
+    category: category,
+  };
+  return templateResponse;
 };
 
 export default {

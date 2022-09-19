@@ -14,6 +14,7 @@ const createUser = async (
     userCreateDto.refreshToken = refreshToken;
 
     await client.query('BEGIN');
+
     const { rows: user } = await client.query(
       `
       INSERT INTO "user" (email, name, nickname, profile_image, refresh_token)
@@ -51,21 +52,16 @@ const createUser = async (
 };
 
 const getUser = async (client: any, userId: string): Promise<UserResponseDto | string> => {
-  try {
-    const { rows: existUser } = await client.query(
-      `
+  const { rows: existUser } = await client.query(
+    `
         SELECT u.id::TEXT, u.nickname, u.email, u.profile_image AS "profileImage"
         FROM "user" u
         WHERE u.id = $1 and u.is_deleted = false
       `,
-      [userId],
-    );
+    [userId],
+  );
 
-    return existUser[0];
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  return existUser[0];
 };
 
 const dropUser = async (client: any, userEmail: string) => {
@@ -98,8 +94,6 @@ const updateUser = async (
   userId: string,
 ): Promise<UserResponseDto | string> => {
   try {
-    await client.query('BEGIN');
-
     if (userUpdateDto.nickname.length > 4) return 'exceed_len';
     const { rows: existUser } = await client.query(
       `
@@ -109,7 +103,11 @@ const updateUser = async (
       `,
       [userId],
     );
+
     if (existUser.length === 0) return 'no_user';
+
+    await client.query('BEGIN');
+
     const { rows: user } = await client.query(
       `
         UPDATE "user" 
@@ -132,8 +130,6 @@ const updateUser = async (
     return data;
   } catch (error) {
     await client.query('ROLLBACK');
-
-    console.log(error);
     throw error;
   }
 };
@@ -174,7 +170,6 @@ const deleteUser = async (client: any, userId: string) => {
     return data;
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log(error);
     throw error;
   }
 };
