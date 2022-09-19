@@ -98,6 +98,8 @@ const updateUser = async (
   userId: string,
 ): Promise<UserResponseDto | string> => {
   try {
+    await client.query('BEGIN');
+
     if (userUpdateDto.nickname.length > 4) return 'exceed_len';
     const { rows: existUser } = await client.query(
       `
@@ -125,8 +127,12 @@ const updateUser = async (
       profileImage: user[0].profile_image,
     };
 
+    await client.query('COMMIT');
+
     return data;
   } catch (error) {
+    await client.query('ROLLBACK');
+
     console.log(error);
     throw error;
   }

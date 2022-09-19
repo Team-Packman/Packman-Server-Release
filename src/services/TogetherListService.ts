@@ -324,6 +324,8 @@ const addMember = async (
   userId: string,
 ): Promise<string | TogetherAloneResponseDto> => {
   try {
+    await client.query('BEGIN');
+
     const { rows: togetherList } = await client.query(
       `
         SELECT tpl.group_id as "groupId", pl.title as title, pl.departure_date as "departureDate", tpl.id as "togetherId"
@@ -427,9 +429,13 @@ const addMember = async (
     const data = {
       listId: aloneTogether[0].id,
     };
+    
+    await client.query('COMMIT');
 
     return data;
   } catch (error) {
+    await client.query('ROLLBACK');
+
     console.log(error);
     throw error;
   }
@@ -611,6 +617,8 @@ const getInviteTogetherList = async (
   userId: number,
 ): Promise<ListInviteResponseDto | string> => {
   try {
+    await client.query('BEGIN');
+    
     const { rows: packingList } = await client.query(
       `
       SELECT tapl.id::text, t.group_id, t.id AS "togetherId"
@@ -660,8 +668,10 @@ const getInviteTogetherList = async (
       id: packingList[0].id,
       isMember: isMember,
     };
+    await client.query('COMMIT');
     return data;
   } catch (error) {
+    await client.query('ROLLBACK');
     console.log(error);
     throw error;
   }
