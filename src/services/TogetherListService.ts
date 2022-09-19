@@ -249,7 +249,7 @@ const updatePacker = async (
   try {
     const { rows: existList } = await client.query(
       `
-        SELECT *
+        SELECT tpl.group_id AS "groupId"
         FROM "together_packing_list" tpl
         JOIN "packing_list" pl ON tpl.id=pl.id
         JOIN "user_group" ug ON tpl.group_id=ug.group_id
@@ -285,9 +285,10 @@ const updatePacker = async (
       `
         SELECT *
         FROM "user" u
-        WHERE u.id=$1 AND u.is_deleted = false
+        JOIN "user_group" ug ON u.id=ug.user_id
+        WHERE u.id=$1 AND u.is_deleted = false AND ug.group_id=$2
      `,
-      [packerUpdateDto.packerId],
+      [packerUpdateDto.packerId, existList[0].groupId],
     );
     if (existUser.length === 0) return 'no_user';
 
