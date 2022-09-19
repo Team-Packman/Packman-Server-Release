@@ -322,7 +322,7 @@ const getTogetherListInFolder = async (
       LEFT JOIN pack p ON c.id = p.category_id
       WHERE fpl.folder_id = $1 and pl.is_deleted = false
       GROUP BY tapl.together_packing_list_id, pl.title, pl.departure_date, tapl.id
-      ORDER BY tapl.together_packing_list_id DESC
+      ORDER BY tapl.id DESC
       `,
     [folderId],
   );
