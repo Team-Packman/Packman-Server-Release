@@ -44,7 +44,6 @@ const createPack = async (
     return aloneListCategoryResponseDto;
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log(error);
     throw error;
   }
 };
@@ -104,7 +103,6 @@ const updatePack = async (
     return aloneListCategoryResponseDto;
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log(error);
     throw error;
   }
 };
@@ -161,7 +159,6 @@ const deletePack = async (
     return aloneListCategoryResponseDto;
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log(error);
     throw error;
   }
 };

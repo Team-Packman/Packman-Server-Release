@@ -52,17 +52,17 @@ const createCategory = async (
     );
 
     const category = await aloneCategoryResponse(client, categoryCreateDto.listId);
+
     const aloneListCategoryResponseDto: AloneListCategoryResponseDto = {
       id: categoryCreateDto.listId,
       category: category,
     };
+
     await client.query('COMMIT');
 
     return aloneListCategoryResponseDto;
   } catch (error) {
     await client.query('ROLLBACK');
-
-    console.log(error);
     throw error;
   }
 };
@@ -127,7 +127,6 @@ const updateCategory = async (
     return aloneListResponseDto;
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log(error);
     throw error;
   }
 };
@@ -165,12 +164,12 @@ const deleteCategory = async (
       id: categoryDeleteDto.listId,
       category: category,
     };
+
     await client.query('COMMIT');
 
     return aloneListCategoryResponseDto;
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log(error);
     throw error;
   }
 };

@@ -15,9 +15,8 @@ const getRecentCreatedList = async (
   client: any,
   userId: string,
 ): Promise<RecentCreatedListResponseDto | string> => {
-  try {
-    const { rows: aloneList } = await client.query(
-      `
+  const { rows: aloneList } = await client.query(
+    `
         SELECT pl.id::text, apl.is_aloned
         FROM "folder" f
         JOIN folder_packing_list fpl ON f.id = fpl.folder_id
@@ -26,30 +25,30 @@ const getRecentCreatedList = async (
         WHERE f.user_id = $1 AND pl.is_deleted = false
         ORDER BY pl.created_at DESC 
       `,
-      [userId],
-    );
+    [userId],
+  );
 
-    if (aloneList.length === 0) return 'no_list';
+  if (aloneList.length === 0) return 'no_list';
 
-    let recentListId = aloneList[0].id;
-    let togetherConnectId;
+  let recentListId = aloneList[0].id;
+  let togetherConnectId;
 
-    if (aloneList[0].is_aloned === false) {
-      const { rows: togetherListId } = await client.query(
-        `
+  if (aloneList[0].is_aloned === false) {
+    const { rows: togetherListId } = await client.query(
+      `
           SELECT tapl.id::TEXT as id, tapl.together_packing_list_id::TEXT AS "togetherId"
           FROM "together_alone_packing_list" tapl
           WHERE tapl.my_packing_list_id = $1
         `,
-        [recentListId],
-      );
+      [recentListId],
+    );
 
-      recentListId = togetherListId[0].togetherId;
-      togetherConnectId = togetherListId[0].id;
-    }
+    recentListId = togetherListId[0].togetherId;
+    togetherConnectId = togetherListId[0].id;
+  }
 
-    const { rows: recentList } = await client.query(
-      `
+  const { rows: recentList } = await client.query(
+    `
         SELECT  pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
           Count(CASE WHEN p.is_checked = false THEN p.id END) AS remain,
           Count(p.id) AS total
@@ -59,33 +58,29 @@ const getRecentCreatedList = async (
         WHERE pl.id = $1
         GROUP BY pl.departure_date, pl.title
       `,
-      [recentListId],
-    );
+    [recentListId],
+  );
 
-    const remainDay = dayjs(recentList[0].departureDate).diff(dayjs().format('YYYY-MM-DD'), 'day');
-    let url = '';
+  const remainDay = dayjs(recentList[0].departureDate).diff(dayjs().format('YYYY-MM-DD'), 'day');
+  let url = '';
 
-    if (aloneList[0].is_aloned === true) {
-      url = `alone?id=${recentListId}`;
-    } else {
-      recentListId = togetherConnectId;
-      url = `together?id=${recentListId}`;
-    }
-
-    const data: RecentCreatedListResponseDto = {
-      id: recentListId,
-      title: recentList[0].title,
-      remainDay: remainDay.toString(),
-      packTotalNum: recentList[0].total,
-      packRemainNum: recentList[0].remain,
-      url: url,
-    };
-
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
+  if (aloneList[0].is_aloned === true) {
+    url = `alone?id=${recentListId}`;
+  } else {
+    recentListId = togetherConnectId;
+    url = `together?id=${recentListId}`;
   }
+
+  const data: RecentCreatedListResponseDto = {
+    id: recentListId,
+    title: recentList[0].title,
+    remainDay: remainDay.toString(),
+    packTotalNum: recentList[0].total,
+    packRemainNum: recentList[0].remain,
+    url: url,
+  };
+
+  return data;
 };
 
 const createFolder = async (
@@ -113,8 +108,6 @@ const createFolder = async (
     return folder;
   } catch (error) {
     await client.query('ROLLBACK');
-
-    console.log(error);
     throw error;
   }
 };
@@ -151,14 +144,12 @@ const updateFolder = async (
     );
 
     const folder = await folderResponse(client, userId);
-    
+
     await client.query('COMMIT');
-    
+
     return folder;
   } catch (error) {
     await client.query('ROLLBACK');
-
-    console.log(error);
     throw error;
   }
 };
@@ -225,68 +216,51 @@ const deleteFolder = async (
     );
 
     const folder = await folderResponse(client, userId);
-    
+
     await client.query('COMMIT');
 
     return folder;
   } catch (error) {
     await client.query('ROLLBACK');
-    
-    console.log(error);
     throw error;
   }
 };
 
 const getFolders = async (client: any, userId: string): Promise<AllFolderResponseDto> => {
-  try {
-    const data = await folderResponse(client, userId);
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  const data = await folderResponse(client, userId);
+  return data;
 };
 
 const getTogetherFolders = async (client: any, userId: string): Promise<FolderResponseDto[]> => {
-  try {
-    const { rows: togetherFolders } = await client.query(
-      `
+  const { rows: togetherFolders } = await client.query(
+    `
         SELECT f.id::text, f.name
         FROM "folder" f
         WHERE f.user_id = $1 and f.is_aloned = false
         ORDER BY f.id DESC
       `,
-      [userId],
-    );
+    [userId],
+  );
 
-    const data: FolderResponseDto[] = togetherFolders;
+  const data: FolderResponseDto[] = togetherFolders;
 
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  return data;
 };
 
 const getAloneFolders = async (client: any, userId: string): Promise<FolderResponseDto[]> => {
-  try {
-    const { rows: aloneFolders } = await client.query(
-      `
+  const { rows: aloneFolders } = await client.query(
+    `
         SELECT f.id::text, f.name
         FROM "folder" f
         WHERE f.user_id = $1 and f.is_aloned = true
         ORDER BY f.id DESC
       `,
-      [userId],
-    );
+    [userId],
+  );
 
-    const data: FolderResponseDto[] = aloneFolders;
+  const data: FolderResponseDto[] = aloneFolders;
 
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  return data;
 };
 
 const getTogetherListInFolder = async (
@@ -294,51 +268,50 @@ const getTogetherListInFolder = async (
   userId: string,
   folderId: string,
 ): Promise<TogetherListInFolderResponseDto | string> => {
-  try {
-    const { rows: existFolder } = await client.query(
-      `
+  const { rows: existFolder } = await client.query(
+    `
         SELECT *
         FROM "folder" f
         WHERE f.id = $1 and f.is_aloned = false
       `,
-      [folderId],
-    );
+    [folderId],
+  );
 
-    if (existFolder.length === 0) return 'no_folder';
+  if (existFolder.length === 0) return 'no_folder';
 
-    const { rows: currentFolder } = await client.query(
-      `
+  const { rows: currentFolder } = await client.query(
+    `
         SELECT f.id::text, f.name
         FROM "folder" f
         WHERE f.user_id = $1 and f.id = $2  
       `,
-      [userId, folderId],
-    );
+    [userId, folderId],
+  );
 
-    if (currentFolder.length === 0) return 'no_user_folder';
+  if (currentFolder.length === 0) return 'no_user_folder';
 
-    const { rows: folder } = await client.query(
-      `
+  const { rows: folder } = await client.query(
+    `
         SELECT f.id::text, f.name
         FROM "folder" f
         WHERE f.user_id = $1 and f.is_aloned = false
         ORDER BY f.id DESC
       `,
-      [userId],
-    );
+    [userId],
+  );
 
-    const { rows: listNum } = await client.query(
-      `
+  const { rows: listNum } = await client.query(
+    `
         SELECT COUNT(*) as "listNum"
         FROM folder_packing_list fpl
         JOIN packing_list pl on pl.id = fpl.list_id
         WHERE fpl.folder_id = $1 and pl.is_deleted = false
       `,
-      [folderId],
-    );
+    [folderId],
+  );
 
-    const { rows: togetherList } = await client.query(
-      `
+  const { rows: togetherList } = await client.query(
+    `
       SELECT tapl.id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
         Count(p.id) AS "packTotalNum",
         Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum"
@@ -351,21 +324,17 @@ const getTogetherListInFolder = async (
       GROUP BY tapl.together_packing_list_id, pl.title, pl.departure_date, tapl.id
       ORDER BY tapl.together_packing_list_id DESC
       `,
-      [folderId],
-    );
+    [folderId],
+  );
 
-    const data: TogetherListInFolderResponseDto = {
-      currentFolder: currentFolder[0],
-      folder: folder,
-      listNum: listNum[0].listNum,
-      togetherPackingList: togetherList,
-    };
+  const data: TogetherListInFolderResponseDto = {
+    currentFolder: currentFolder[0],
+    folder: folder,
+    listNum: listNum[0].listNum,
+    togetherPackingList: togetherList,
+  };
 
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  return data;
 };
 
 const getAloneListInFolder = async (
@@ -373,51 +342,50 @@ const getAloneListInFolder = async (
   userId: string,
   folderId: string,
 ): Promise<AloneListInFolderResponseDto | string> => {
-  try {
-    const { rows: existFolder } = await client.query(
-      `
+  const { rows: existFolder } = await client.query(
+    `
         SELECT *
         FROM "folder" f
         WHERE f.id = $1 and f.is_aloned = true
       `,
-      [folderId],
-    );
+    [folderId],
+  );
 
-    if (existFolder.length === 0) return 'no_folder';
+  if (existFolder.length === 0) return 'no_folder';
 
-    const { rows: currentFolder } = await client.query(
-      `
+  const { rows: currentFolder } = await client.query(
+    `
         SELECT f.id::text, f.name
         FROM "folder" f
         WHERE f.user_id = $1 and f.id = $2  
       `,
-      [userId, folderId],
-    );
+    [userId, folderId],
+  );
 
-    if (currentFolder.length === 0) return 'no_user_folder';
+  if (currentFolder.length === 0) return 'no_user_folder';
 
-    const { rows: folder } = await client.query(
-      `
+  const { rows: folder } = await client.query(
+    `
         SELECT f.id::text, f.name
         FROM "folder" f
         WHERE f.user_id = $1 and f.is_aloned = true
         ORDER BY f.id DESC
       `,
-      [userId],
-    );
+    [userId],
+  );
 
-    const { rows: listNum } = await client.query(
-      `
+  const { rows: listNum } = await client.query(
+    `
         SELECT COUNT(*) as "listNum"
         FROM folder_packing_list fpl
         JOIN packing_list pl on pl.id = fpl.list_id
         WHERE fpl.folder_id = $1 and pl.is_deleted = false
       `,
-      [folderId],
-    );
+    [folderId],
+  );
 
-    const { rows: aloneList } = await client.query(
-      `
+  const { rows: aloneList } = await client.query(
+    `
         SELECT apl.id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
           Count(p.id) AS "packTotalNum",
           Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum"
@@ -430,21 +398,17 @@ const getAloneListInFolder = async (
         GROUP BY apl.id, pl.title, pl.departure_date
         ORDER BY apl.id DESC
       `,
-      [folderId],
-    );
+    [folderId],
+  );
 
-    const data: AloneListInFolderResponseDto = {
-      currentFolder: currentFolder[0],
-      folder: folder,
-      listNum: listNum[0].listNum,
-      alonePackingList: aloneList,
-    };
+  const data: AloneListInFolderResponseDto = {
+    currentFolder: currentFolder[0],
+    folder: folder,
+    listNum: listNum[0].listNum,
+    alonePackingList: aloneList,
+  };
 
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  return data;
 };
 
 export default {

@@ -62,7 +62,6 @@ const createCategory = async (
     return togetherListCategoryResponseDto;
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log(error);
     throw error;
   }
 };
@@ -121,12 +120,12 @@ const updateCategory = async (
       id: categoryUpdateDto.listId,
       category: category,
     };
+
     await client.query('COMMIT');
-    
+
     return togetherListResponseDto;
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log(error);
     throw error;
   }
 };
@@ -169,7 +168,6 @@ const deleteCategory = async (
     return togetherListCategoryResponseDto;
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log(error);
     throw error;
   }
 };
