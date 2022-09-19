@@ -13,12 +13,13 @@ const createUser = async (
     const refreshToken = jwtHandler.getRefreshToken();
     userCreateDto.refreshToken = refreshToken;
 
+    await client.query('BEGIN');
     const { rows: user } = await client.query(
       `
-        INSERT INTO "user" (email, name, nickname, profile_image, refresh_token)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING id, name, nickname, email, profile_image, refresh_token
-      `,
+      INSERT INTO "user" (email, name, nickname, profile_image, refresh_token)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, name, nickname, email, profile_image, refresh_token
+    `,
       [
         userCreateDto.email,
         userCreateDto.name,
@@ -40,10 +41,11 @@ const createUser = async (
       accessToken: accessToken,
       refreshToken: user[0].refresh_token,
     };
+    await client.query('COMMIT');
 
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };

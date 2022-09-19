@@ -1,4 +1,4 @@
-import { AloneListCheckResponseDto, SharedAloneListResponseDto } from '../interfaces/IAloneList';
+import { SharedAloneListResponseDto } from '../interfaces/IAloneList';
 import { TitleUpdateDto, DateUpdateDto, MyTemplateUpdateDto } from '../interfaces/IList';
 import { SharedTogetherListResponseDto } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
@@ -15,6 +15,7 @@ const updateTitle = async (
     let updatedTitle;
     if (titleUpdateDto.title.length > 12) return 'exceed_len';
 
+    await client.query('BEGIN');
     if (titleUpdateDto.isAloned === true) {
       const existList = await aloneListCheckResponse(client, userId, titleUpdateDto.id);
       if (existList.length === 0) return 'no_list';
@@ -52,10 +53,11 @@ const updateTitle = async (
       id: titleUpdateDto.id,
       title: updatedTitle,
     };
+    await client.query('COMMIT');
 
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
@@ -68,17 +70,18 @@ const updateDate = async (
   try {
     let updatedDate;
 
+    await client.query('BEGIN');
     if (dateUpdateDto.isAloned === true) {
       const existList = await aloneListCheckResponse(client, userId, dateUpdateDto.id);
       if (existList.length === 0) return 'no_list';
 
       const { rows: updatedData } = await client.query(
         `
-          UPDATE "packing_list"
-          SET departure_date=$1
-          WHERE id=$2
-          RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
-        `,
+        UPDATE "packing_list"
+        SET departure_date=$1
+        WHERE id=$2
+        RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
+      `,
         [dateUpdateDto.departureDate, dateUpdateDto.id],
       );
       updatedDate = updatedData[0].departureDate;
@@ -91,11 +94,11 @@ const updateDate = async (
 
       const { rows: updatedData } = await client.query(
         `
-          UPDATE "packing_list"
-          SET departure_date=$1
-          WHERE id=$2 OR id=$3
-          RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
-        `,
+        UPDATE "packing_list"
+        SET departure_date=$1
+        WHERE id=$2 OR id=$3
+        RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
+      `,
         [dateUpdateDto.departureDate, togetherListId, aloneListId],
       );
       updatedDate = updatedData[0].departureDate;
@@ -105,10 +108,11 @@ const updateDate = async (
       id: dateUpdateDto.id,
       departureDate: updatedDate,
     };
+    await client.query('COMMIT');
 
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
@@ -140,6 +144,7 @@ const updateMyTemplate = async (
     }
     if (isSaved !== myTemplateUpdateDto.isSaved) return 'no_template';
 
+    await client.query('BEGIN');
     if (myTemplateUpdateDto.isSaved === false) {
       await client.query(
         `
@@ -238,10 +243,11 @@ const updateMyTemplate = async (
       id: myTemplateUpdateDto.id,
       isSaved: returnData[0].isSaved,
     };
+    await client.query('COMMIT');
 
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };

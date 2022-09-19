@@ -20,6 +20,7 @@ const createAloneList = async (
     const check = await folderCheckResponse(client, userId, aloneListCreateDto.folderId, true);
     if (check === 'no_folder') return 'no_folder';
 
+    await client.query('BEGIN');
     const { rows: insertListInfo } = await client.query(
       `
         INSERT INTO "packing_list" (title, departure_date)
@@ -102,10 +103,11 @@ const createAloneList = async (
       inviteCode: insertAloneListInfo[0].inviteCode,
       isSaved: insertListInfo[0].isSaved,
     };
+    await client.query('COMMIT');
 
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
@@ -129,7 +131,7 @@ const getAloneList = async (
     );
     if (existList.length === 0) return 'no_list';
 
-    const category = await aloneCategoryResponse(client, aloneListId);
+  const category = await aloneCategoryResponse(client, aloneListId);
 
     const data: AloneListResponseDto = {
       id: aloneListId.toString(),
@@ -141,11 +143,7 @@ const getAloneList = async (
       isSaved: existList[0].isSaved,
     };
 
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  return data;
 };
 
 const deleteAloneList = async (
@@ -179,6 +177,7 @@ const deleteAloneList = async (
     );
     if (existFolderList.length !== aloneListIdArray.length) return 'no_folder_list';
 
+    await client.query('BEGIN');
     await client.query(
       `
         DELETE
@@ -213,9 +212,11 @@ const deleteAloneList = async (
     const data: AloneListInfoResponseDto = {
       alonePackingList: alonePackingListInfoArray,
     };
+    await client.query('COMMIT');
+
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };

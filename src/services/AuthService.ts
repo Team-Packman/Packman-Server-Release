@@ -33,6 +33,7 @@ const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthRespon
       email: userEmail,
     };
 
+    await client.query('BEGIN');
     if (userInfo.length) {
       if (userInfo[0].is_deleted) {
         await UserService.dropUser(client, userEmail);
@@ -61,9 +62,11 @@ const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthRespon
         };
       }
     }
+    await client.query('COMMIT');
+
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
