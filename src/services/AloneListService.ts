@@ -94,7 +94,6 @@ const createAloneList = async (
     }
 
     const aloneListCategory = await aloneCategoryResponse(client, aloneListId);
-    await client.query('COMMIT');
 
     const data: AloneListResponseDto = {
       id: aloneListId.toString(),
@@ -104,6 +103,7 @@ const createAloneList = async (
       inviteCode: insertAloneListInfo[0].inviteCode,
       isSaved: insertListInfo[0].isSaved,
     };
+    await client.query('COMMIT');
 
     return data;
   } catch (error) {
@@ -204,11 +204,12 @@ const deleteAloneList = async (
       `,
       [folderId],
     );
-    await client.query('COMMIT');
 
     const data: AloneListInfoResponseDto = {
       alonePackingList: alonePackingListInfoArray,
     };
+    await client.query('COMMIT');
+
     return data;
   } catch (error) {
     await client.query('ROLLBACK');

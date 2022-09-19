@@ -146,7 +146,6 @@ const createTogetherList = async (
 
     const togetherCategory = await togetherCategoryResponse(client, togetherListId);
     const myListCategory = await aloneCategoryResponse(client, myListId);
-    await client.query('COMMIT');
 
     const data: TogetherListResponseDto = {
       id: togetherMyId.toString(),
@@ -164,6 +163,7 @@ const createTogetherList = async (
         category: myListCategory,
       },
     };
+    await client.query('COMMIT');
 
     return data;
   } catch (error) {
@@ -302,12 +302,12 @@ const updatePacker = async (
     );
 
     const togetherCategory = await togetherCategoryResponse(client, packerUpdateDto.listId);
-    await client.query('COMMIT');
 
     const data: TogetherListCategoryResponseDto = {
       id: packerUpdateDto.listId,
       category: togetherCategory,
     };
+    await client.query('COMMIT');
 
     return data;
   } catch (error) {
@@ -590,11 +590,12 @@ const deleteTogetherList = async (
       `,
       [folderId],
     );
-    await client.query('COMMIT');
 
     const data: TogetherListInfoResponseDto = {
       togetherPackingList: togetherPackingListInfoArray,
     };
+    await client.query('COMMIT');
+
     return data;
   } catch (error) {
     await client.query('ROLLBACK');

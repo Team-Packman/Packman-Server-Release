@@ -7,40 +7,47 @@ const createUser = async (
   client: any,
   userCreateDto: UserCreateDto,
 ): Promise<AuthResponseDto | string> => {
-  if (userCreateDto.nickname.length > 4) return 'exceed_len';
+  try {
+    if (userCreateDto.nickname.length > 4) return 'exceed_len';
 
-  const refreshToken = jwtHandler.getRefreshToken();
-  userCreateDto.refreshToken = refreshToken;
+    const refreshToken = jwtHandler.getRefreshToken();
+    userCreateDto.refreshToken = refreshToken;
 
-  const { rows: user } = await client.query(
-    `
+    await client.query('BEGIN');
+    const { rows: user } = await client.query(
+      `
       INSERT INTO "user" (email, name, nickname, profile_image, refresh_token)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING id, name, nickname, email, profile_image, refresh_token
     `,
-    [
-      userCreateDto.email,
-      userCreateDto.name,
-      userCreateDto.nickname,
-      userCreateDto.profileImage,
-      userCreateDto.refreshToken,
-    ],
-  );
+      [
+        userCreateDto.email,
+        userCreateDto.name,
+        userCreateDto.nickname,
+        userCreateDto.profileImage,
+        userCreateDto.refreshToken,
+      ],
+    );
 
-  const accessToken = jwtHandler.getAccessToken(user[0].id);
+    const accessToken = jwtHandler.getAccessToken(user[0].id);
 
-  const data: AuthResponseDto = {
-    isAlreadyUser: true,
-    id: user[0].id.toString(),
-    name: user[0].name,
-    nickname: user[0].nickname,
-    email: user[0].email,
-    profileImage: user[0].profile_image,
-    accessToken: accessToken,
-    refreshToken: user[0].refresh_token,
-  };
+    const data: AuthResponseDto = {
+      isAlreadyUser: true,
+      id: user[0].id.toString(),
+      name: user[0].name,
+      nickname: user[0].nickname,
+      email: user[0].email,
+      profileImage: user[0].profile_image,
+      accessToken: accessToken,
+      refreshToken: user[0].refresh_token,
+    };
+    await client.query('COMMIT');
 
-  return data;
+    return data;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  }
 };
 
 const getUser = async (client: any, userId: string): Promise<UserResponseDto | string> => {

@@ -1,4 +1,4 @@
-import { AloneListCheckResponseDto, SharedAloneListResponseDto } from '../interfaces/IAloneList';
+import { SharedAloneListResponseDto } from '../interfaces/IAloneList';
 import { TitleUpdateDto, DateUpdateDto, MyTemplateUpdateDto } from '../interfaces/IList';
 import { SharedTogetherListResponseDto } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
@@ -11,48 +11,55 @@ const updateTitle = async (
   userId: number,
   titleUpdateDto: TitleUpdateDto,
 ): Promise<TitleUpdateDto | string> => {
-  let updatedTitle;
-  if (titleUpdateDto.title.length > 12) return 'exceed_len';
+  try {
+    let updatedTitle;
+    if (titleUpdateDto.title.length > 12) return 'exceed_len';
 
-  if (titleUpdateDto.isAloned === true) {
-    const existList = await aloneListCheckResponse(client, userId, titleUpdateDto.id);
-    if (existList.length === 0) return 'no_list';
+    await client.query('BEGIN');
+    if (titleUpdateDto.isAloned === true) {
+      const existList = await aloneListCheckResponse(client, userId, titleUpdateDto.id);
+      if (existList.length === 0) return 'no_list';
 
-    const { rows: updatedData } = await client.query(
-      `
+      const { rows: updatedData } = await client.query(
+        `
           UPDATE "packing_list"
           SET title=$1
           WHERE id=$2
           RETURNING title 
         `,
-      [titleUpdateDto.title, titleUpdateDto.id],
-    );
-    updatedTitle = updatedData[0].title;
-  } else {
-    const existList = await togetherListCheckResponse(client, userId, titleUpdateDto.id);
-    if (existList.length < 2) return 'no_list';
+        [titleUpdateDto.title, titleUpdateDto.id],
+      );
+      updatedTitle = updatedData[0].title;
+    } else {
+      const existList = await togetherListCheckResponse(client, userId, titleUpdateDto.id);
+      if (existList.length < 2) return 'no_list';
 
-    const togetherListId = existList[0].togetherListId;
-    const aloneListId = existList[0].myListId;
+      const togetherListId = existList[0].togetherListId;
+      const aloneListId = existList[0].myListId;
 
-    const { rows: updatedData } = await client.query(
-      `
+      const { rows: updatedData } = await client.query(
+        `
           UPDATE "packing_list"
           SET title=$1
           WHERE id=$2 OR id=$3
           RETURNING title
         `,
-      [titleUpdateDto.title, togetherListId, aloneListId],
-    );
-    updatedTitle = updatedData[0].title;
+        [titleUpdateDto.title, togetherListId, aloneListId],
+      );
+      updatedTitle = updatedData[0].title;
+    }
+
+    const data = {
+      id: titleUpdateDto.id,
+      title: updatedTitle,
+    };
+    await client.query('COMMIT');
+
+    return data;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
   }
-
-  const data = {
-    id: titleUpdateDto.id,
-    title: updatedTitle,
-  };
-
-  return data;
 };
 
 const updateDate = async (
@@ -60,47 +67,54 @@ const updateDate = async (
   userId: number,
   dateUpdateDto: DateUpdateDto,
 ): Promise<DateUpdateDto | string> => {
-  let updatedDate;
+  try {
+    let updatedDate;
 
-  if (dateUpdateDto.isAloned === true) {
-    const existList = await aloneListCheckResponse(client, userId, dateUpdateDto.id);
-    if (existList.length === 0) return 'no_list';
+    await client.query('BEGIN');
+    if (dateUpdateDto.isAloned === true) {
+      const existList = await aloneListCheckResponse(client, userId, dateUpdateDto.id);
+      if (existList.length === 0) return 'no_list';
 
-    const { rows: updatedData } = await client.query(
-      `
+      const { rows: updatedData } = await client.query(
+        `
         UPDATE "packing_list"
         SET departure_date=$1
         WHERE id=$2
         RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
       `,
-      [dateUpdateDto.departureDate, dateUpdateDto.id],
-    );
-    updatedDate = updatedData[0].departureDate;
-  } else {
-    const existList = await togetherListCheckResponse(client, userId, dateUpdateDto.id);
-    if (existList.length < 2) return 'no_list';
+        [dateUpdateDto.departureDate, dateUpdateDto.id],
+      );
+      updatedDate = updatedData[0].departureDate;
+    } else {
+      const existList = await togetherListCheckResponse(client, userId, dateUpdateDto.id);
+      if (existList.length < 2) return 'no_list';
 
-    const togetherListId = existList[0].togetherListId;
-    const aloneListId = existList[0].myListId;
+      const togetherListId = existList[0].togetherListId;
+      const aloneListId = existList[0].myListId;
 
-    const { rows: updatedData } = await client.query(
-      `
+      const { rows: updatedData } = await client.query(
+        `
         UPDATE "packing_list"
         SET departure_date=$1
         WHERE id=$2 OR id=$3
         RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
       `,
-      [dateUpdateDto.departureDate, togetherListId, aloneListId],
-    );
-    updatedDate = updatedData[0].departureDate;
+        [dateUpdateDto.departureDate, togetherListId, aloneListId],
+      );
+      updatedDate = updatedData[0].departureDate;
+    }
+
+    const data = {
+      id: dateUpdateDto.id,
+      departureDate: updatedDate,
+    };
+    await client.query('COMMIT');
+
+    return data;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
   }
-
-  const data = {
-    id: dateUpdateDto.id,
-    departureDate: updatedDate,
-  };
-
-  return data;
 };
 
 const updateMyTemplate = async (
@@ -224,12 +238,12 @@ const updateMyTemplate = async (
       `,
       [aloneListId],
     );
-    await client.query('COMMIT');
 
     const data: MyTemplateUpdateDto = {
       id: myTemplateUpdateDto.id,
       isSaved: returnData[0].isSaved,
     };
+    await client.query('COMMIT');
 
     return data;
   } catch (error) {
