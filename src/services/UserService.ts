@@ -98,8 +98,6 @@ const updateUser = async (
   userId: string,
 ): Promise<UserResponseDto | string> => {
   try {
-    await client.query('BEGIN');
-
     if (userUpdateDto.nickname.length > 4) return 'exceed_len';
     const { rows: existUser } = await client.query(
       `
@@ -109,7 +107,11 @@ const updateUser = async (
       `,
       [userId],
     );
+
     if (existUser.length === 0) return 'no_user';
+
+    await client.query('BEGIN');
+
     const { rows: user } = await client.query(
       `
         UPDATE "user" 

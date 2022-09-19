@@ -74,8 +74,6 @@ const deleteMember = async (
   try {
     const memberArray: string[] = memberId.split(',');
 
-    await client.query('BEGIN');
-
     const { rows: existUser } = await client.query(
       `
         SELECT *
@@ -125,6 +123,8 @@ const deleteMember = async (
         memberArray.length
       )
         return 'no_member_user';
+
+      await client.query('BEGIN');
 
       await client.query(
         `

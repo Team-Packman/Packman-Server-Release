@@ -9,8 +9,6 @@ const createCategory = async (
   categoryCreateDto: CategoryCreateDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
-    await client.query('BEGIN');
-
     if (categoryCreateDto.name.length > 12) {
       return 'exceed_len';
     }
@@ -37,9 +35,12 @@ const createCategory = async (
       `,
       [categoryCreateDto.listId, categoryCreateDto.name],
     );
+
     if (existCategory.length > 0) {
       return 'duplicate_category';
     }
+
+    await client.query('BEGIN');
 
     await client.query(
       `
@@ -72,8 +73,6 @@ const updateCategory = async (
   categoryUpdateDto: CategoryUpdateDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
-    await client.query('BEGIN');
-
     if (categoryUpdateDto.name.length > 12) {
       return 'exceed_len';
     }
@@ -104,6 +103,8 @@ const updateCategory = async (
         return 'duplicated_category';
       }
     }
+
+    await client.query('BEGIN');
 
     await client.query(
       `
@@ -136,8 +137,6 @@ const deleteCategory = async (
   categoryDeleteDto: CategoryDeleteDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
-    await client.query('BEGIN');
-
     const check = await togetherListCategoryCheckResponse(
       client,
       userId,
@@ -148,6 +147,8 @@ const deleteCategory = async (
     if (check === 'no_list') return 'no_list';
     else if (check === 'no_category') return 'no_category';
     else if (check === 'no_list_category') return 'no_list_category';
+
+    await client.query('BEGIN');
 
     await client.query(
       `

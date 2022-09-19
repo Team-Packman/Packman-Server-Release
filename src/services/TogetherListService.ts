@@ -324,8 +324,6 @@ const addMember = async (
   userId: string,
 ): Promise<string | TogetherAloneResponseDto> => {
   try {
-    await client.query('BEGIN');
-
     const { rows: togetherList } = await client.query(
       `
         SELECT tpl.group_id as "groupId", pl.title as title, pl.departure_date as "departureDate", tpl.id as "togetherId"
@@ -347,7 +345,10 @@ const addMember = async (
       `,
       [userId, togetherList[0].groupId],
     );
+
     if (existMember.length > 0) return 'already_exist_member';
+
+    await client.query('BEGIN');
 
     await client.query(
       `

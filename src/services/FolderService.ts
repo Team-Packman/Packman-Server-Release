@@ -94,9 +94,9 @@ const createFolder = async (
   folderCreateDto: FolderCreateDto,
 ): Promise<AllFolderResponseDto | string> => {
   try {
-    await client.query('BEGIN');
-
     if (folderCreateDto.name.length > 8) return 'exceed_len';
+
+    await client.query('BEGIN');
 
     await client.query(
       `
@@ -125,9 +125,8 @@ const updateFolder = async (
   folderUpdateDto: FolderUpdateDto,
 ): Promise<AllFolderResponseDto | string> => {
   try {
-    await client.query('BEGIN');
-
     if (folderUpdateDto.name.length > 8) return 'exceed_len';
+
     const { rows: existFolder } = await client.query(
       `
         SELECT * 
@@ -139,6 +138,9 @@ const updateFolder = async (
     if (existFolder.length === 0) {
       return 'no_folder';
     }
+
+    await client.query('BEGIN');
+
     await client.query(
       `
         UPDATE "folder"
@@ -167,8 +169,6 @@ const deleteFolder = async (
   folderId: string,
 ): Promise<AllFolderResponseDto | string> => {
   try {
-    await client.query('BEGIN');
-
     const { rows: existFolder } = await client.query(
       `
         SELECT *
@@ -178,6 +178,8 @@ const deleteFolder = async (
       [userId, folderId],
     );
     if (existFolder.length === 0) return 'no_folder';
+
+    await client.query('BEGIN');
 
     if (existFolder[0].is_aloned) {
       await client.query(
