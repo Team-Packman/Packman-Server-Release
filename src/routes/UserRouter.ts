@@ -11,6 +11,7 @@ router.post(
     body('name').notEmpty(),
     body('nickname').notEmpty(),
     body('profileImage').notEmpty(),
+    body('path').notEmpty(),
   ],
   UserController.createUser,
 );
@@ -23,7 +24,6 @@ router.patch(
 );
 
 router.get('/', auth, UserController.getUser);
-
 
 router.delete('/', auth, UserController.deleteUser);
 export default router;
