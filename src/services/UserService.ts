@@ -17,9 +17,9 @@ const createUser = async (
 
     const { rows: user } = await client.query(
       `
-      INSERT INTO "user" (email, name, nickname, profile_image, refresh_token)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, name, nickname, email, profile_image, refresh_token
+      INSERT INTO "user" (email, name, nickname, profile_image, refresh_token, path)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING id, name, nickname, email, profile_image, refresh_token, path
     `,
       [
         userCreateDto.email,
@@ -27,6 +27,7 @@ const createUser = async (
         userCreateDto.nickname,
         userCreateDto.profileImage,
         userCreateDto.refreshToken,
+        userCreateDto.path,
       ],
     );
 
@@ -41,6 +42,7 @@ const createUser = async (
       profileImage: user[0].profile_image,
       accessToken: accessToken,
       refreshToken: user[0].refresh_token,
+      path: user[0].path,
     };
     await client.query('COMMIT');
 

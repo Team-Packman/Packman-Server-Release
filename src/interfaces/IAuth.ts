@@ -7,6 +7,7 @@ export interface AuthResponseDto {
   profileImage?: string;
   accessToken?: string;
   refreshToken?: string;
+  path?: string;
 }
 export interface AuthTokenResponseDto {
   accessToken: string;
