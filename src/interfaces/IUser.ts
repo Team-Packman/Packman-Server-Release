@@ -19,3 +19,11 @@ export interface UserUpdateDto {
   nickname: string;
   profileImage: string;
 }
+
+export interface UserLogDto {
+  name: string;
+  nickname: string;
+  email: string;
+  profileImage: string;
+  path: string;
+}

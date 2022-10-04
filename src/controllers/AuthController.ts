@@ -4,6 +4,7 @@ import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { AuthService } from '../services';
 import db from '../loaders/db';
+import logger from '../config/logger';
 
 /**
  *  @route POST /auth/kakao
@@ -29,7 +30,7 @@ const getKakaoUser = async (req: Request, res: Response) => {
         .send(util.fail(statusCode.BAD_REQUEST, message.INVALID_TOKEN));
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.SUCCESS_GET_TOKEN, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`POST, /auth/kakao, 카카오 로그인/회원가입, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -83,7 +84,7 @@ const getNewToken = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.SUCCESS_REISSUE_TOKEN, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`GET, /auth/token, 토큰 재발급, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));

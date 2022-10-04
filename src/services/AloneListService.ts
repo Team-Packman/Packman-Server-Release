@@ -2,11 +2,13 @@ import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { ListCreateDto } from '../interfaces/IList';
 import {
   AloneListInfoResponseDto,
+  AloneListLogDto,
   AloneListResponseDto,
   InviteAloneListResponseDto,
 } from '../interfaces/IAloneList';
 import { generateInviteCode } from '../modules/generateInviteCode';
 import { folderCheckResponse } from '../modules/folderCheckResponse';
+import logger from '../config/logger';
 
 const createAloneList = async (
   client: any,
@@ -105,6 +107,19 @@ const createAloneList = async (
       isSaved: insertListInfo[0].isSaved,
     };
     await client.query('COMMIT');
+
+    const log: AloneListLogDto = {
+      id: aloneListId.toString(),
+      templateId: aloneListCreateDto.templateId,
+      title: insertListInfo[0].title,
+      departureDate: insertListInfo[0].departureDate,
+      category: aloneListCategory,
+    };
+
+    logger.logger.info(
+      `POST, /list/alone, 혼자 패킹리스트 생성, 200, userId: ${userId}, data: ` +
+        JSON.stringify(log),
+    );
 
     return data;
   } catch (error) {
@@ -251,6 +266,11 @@ const getInviteAloneList = async (
     id: aloneList[0].id,
     isOwner: isOwner,
   };
+
+  logger.logger.info(
+    `GET, /list/alone/invite/:inviteCode, 혼자 패킹리스트 초대, 200, userId: ${userId}, data: ` +
+      JSON.stringify(data),
+  );
 
   return data;
 };
