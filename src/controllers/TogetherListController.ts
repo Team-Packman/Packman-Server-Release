@@ -7,7 +7,6 @@ import { PackerUpdateDto } from '../interfaces/ITogetherList';
 import { ListCreateDto } from '../interfaces/IList';
 import TogetherListService from '../services/TogetherListService';
 import db from '../loaders/db';
-
 /**
  *  @route POST /list/together
  *  @desc create together list
@@ -208,7 +207,7 @@ const deleteTogetherList = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route GET /invite/:inviteCode
+ *  @route GET /list/together/invite/:inviteCode
  *  @desc invite list
  *  @access private
  **/

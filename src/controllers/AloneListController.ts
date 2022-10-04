@@ -81,7 +81,7 @@ const getAloneList = async (req: Request, res: Response) => {
 
 /**
  *  @route DELETE /list/alone/:folderId/:listId
- *  @desc delete alone packinglist
+ *  @desc delete alone list
  *  @access private
  **/
 const deleteAloneList = async (req: Request, res: Response) => {
