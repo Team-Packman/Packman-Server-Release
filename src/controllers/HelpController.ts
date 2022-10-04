@@ -12,11 +12,12 @@ import db from '../loaders/db';
  **/
 const getHelp = async (req: Request, res: Response) => {
   let client;
+  const userId: number = req.body.user.id;
 
   try {
     client = await db.connect(req);
 
-    await HelpService.getHelp(client);
+    await HelpService.getHelp(client, userId);
 
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.SUCCESS_GET_HELP));
   } catch (error) {
