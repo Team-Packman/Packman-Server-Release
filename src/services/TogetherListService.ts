@@ -6,6 +6,7 @@ import {
   TogetherListInfoResponseDto,
   UseForMapInDeleteDto,
   UseForReduceInDeleteDto,
+  TogetherListLogDto,
 } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
@@ -13,6 +14,7 @@ import { ListCreateDto, ListInviteResponseDto } from '../interfaces/IList';
 import { generateInviteCode } from '../modules/generateInviteCode';
 import { folderCheckResponse } from '../modules/folderCheckResponse';
 import { togetherListCheckResponse } from '../modules/togetherListCheckResponse';
+import logger from '../config/logger';
 
 const createTogetherList = async (
   client: any,
@@ -164,7 +166,22 @@ const createTogetherList = async (
         category: myListCategory,
       },
     };
+
     await client.query('COMMIT');
+
+    const log: TogetherListLogDto = {
+      id: togetherMyId.toString(),
+      templateId: togetherListCreateDto.templateId,
+      title: insertListInfo[0].title,
+      departureDate: insertListInfo[0].departureDate,
+      groupId: groupId.toString(),
+      category: togetherCategory,
+    };
+
+    logger.logger.info(
+      `POST, /list/together, 함께 패킹리스트 생성, 200, userId: ${userId}, data: ` +
+        JSON.stringify(log),
+    );
 
     return data;
   } catch (error) {
@@ -667,6 +684,7 @@ const getInviteTogetherList = async (
       id: newPackingList[0].id,
       isMember: isMember,
     };
+
     return data;
   }
 
@@ -674,6 +692,11 @@ const getInviteTogetherList = async (
     id: packingList[0].id,
     isMember: isMember,
   };
+
+  logger.logger.info(
+    `GET, /list/together/invite/:inviteCode, 함께 패킹리스트 초대, 200, userId: ${userId}, data: ` +
+      JSON.stringify(data),
+  );
 
   return data;
 };
