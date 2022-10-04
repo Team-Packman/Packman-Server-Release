@@ -4,6 +4,7 @@ import message from '../modules/responseMessage';
 import util from '../modules/util';
 import db from '../loaders/db';
 import { MemberService } from '../services';
+import logger from '../config/logger';
 
 /**
  *  @route GET /member/:groupId
@@ -37,7 +38,7 @@ const getMember = async (req: Request, res: Response) => {
       res.status(statusCode.OK).send(util.success(statusCode.OK, message.SUCCESS_GET_MEMBER, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`GET, /member/:groupId, 함께 패킹 그룹 멤버 조회, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -86,7 +87,9 @@ const deleteMember = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.SUCCESS_DELETE_MEMBER, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `DELETE, /member/:groupId/:memberId, 함께 패킹 그룹 멤버 삭제, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));

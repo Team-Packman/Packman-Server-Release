@@ -6,6 +6,7 @@ import { validationResult } from 'express-validator';
 import { CategoryCreateDto, CategoryUpdateDto, CategoryDeleteDto } from '../interfaces/ICategory';
 import { AloneListCategoryService } from '../services';
 import db from '../loaders/db';
+import logger from '../config/logger';
 
 /**
  *  @route POST /list/alone/category
@@ -42,7 +43,7 @@ const createCategory = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.CREATE_ALONE_CATEGORY_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`POST, /list/alone/category, 혼자 패킹리스트 카테고리 생성, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -92,7 +93,9 @@ const updateCategory = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.UPDATE_ALONE_CATEGORY_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `PATCH, /list/alone/category, 혼자 패킹리스트 카테고리 수정, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -132,7 +135,9 @@ const deleteCategory = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.DELETE_ALONE_CATEGORY_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `DELETE, /list/alone/category, 혼자 패킹리스트 카테고리 삭제, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));

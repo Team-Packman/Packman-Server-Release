@@ -4,6 +4,7 @@ import message from '../modules/responseMessage';
 import util from '../modules/util';
 import db from '../loaders/db';
 import { TemplateService } from '../services';
+import logger from '../config/logger';
 
 /**
  *  @route GET /template/alone
@@ -23,7 +24,7 @@ const getAloneTemplateList = async (req: Request, res: Response) => {
       .status(statusCode.OK)
       .send(util.success(statusCode.OK, message.GET_ALONE_TEMPLATE_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`GET, /template/alone, 혼자 패킹 템플릿 리스트 조회, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -50,7 +51,7 @@ const getTogetherTemplateList = async (req: Request, res: Response) => {
       .status(statusCode.OK)
       .send(util.success(statusCode.OK, message.GET_TOGETHER_TEMPLATE_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`GET, /template/together, 함께 패킹 템플릿 리스트 조회, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -83,7 +84,7 @@ const getTemplate = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.READ_DETAILED_TEMPLATE_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`GET, /template/:templateId, 템플릿 상세 조회, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));

@@ -6,6 +6,7 @@ import { validationResult } from 'express-validator';
 import { TitleUpdateDto, DateUpdateDto, MyTemplateUpdateDto } from '../interfaces/IList';
 import { ListService } from '../services';
 import db from '../loaders/db';
+import logger from '../config/logger';
 
 /**
  *  @route PATCH /list/title
@@ -41,7 +42,7 @@ const updateTitle = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.UPDATE_LIST_TITLE_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`PATCH, /list/title, 패킹리스트 제목 수정, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -79,7 +80,7 @@ const updateDate = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.UPDATE_LIST_DATE_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`PATCH, /list/departureDate, 패킹리스트 출발 날짜 수정, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -120,7 +121,9 @@ const updateMyTemplate = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.UPDATE_LIST_MY_TEMPLATE_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `PATCH, /list/myTemplate, 패킹리스트 나만의 템플릿 추가 및 업데이트, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -155,7 +158,9 @@ const getSharedList = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.GET_INVITE_LIST_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `GET, /list/:listType/share/:inviteCode, 공유된 패킹리스트 조회, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));

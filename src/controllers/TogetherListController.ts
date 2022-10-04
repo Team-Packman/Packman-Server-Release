@@ -7,6 +7,8 @@ import { PackerUpdateDto } from '../interfaces/ITogetherList';
 import { ListCreateDto } from '../interfaces/IList';
 import TogetherListService from '../services/TogetherListService';
 import db from '../loaders/db';
+import logger from '../config/logger';
+
 /**
  *  @route POST /list/together
  *  @desc create together list
@@ -44,7 +46,7 @@ const createTogetherList = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.CREATE_TOGETHER_LIST_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`POST, /list/together, 함께 패킹리스트 생성, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -75,7 +77,7 @@ const getTogetherList = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.READ_TOGETHER_LIST_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`GET, /list/together/:listId, 함께 패킹리스트 조회, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -121,7 +123,9 @@ const updatePacker = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.UPDATE_PACKER_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `PATCH, /list/together/packer, 함께 패킹 리스트 담당자 배정, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -131,7 +135,7 @@ const updatePacker = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route POST / add-member
+ *  @route POST /add-member
  *  @desc add member
  *  @access private
  **/
@@ -159,7 +163,7 @@ const addMember = async (req: Request, res: Response) => {
       res.status(statusCode.OK).send(util.success(statusCode.OK, message.SUCCESS_ADD_MEMBER, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`POST, /add-member, 그룹원 추가, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -197,7 +201,9 @@ const deleteTogetherList = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.DELETE_TOGETHER_LIST_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `DELETE, /list/together/:folderId/:listId, 함께 패킹리스트 삭제, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -227,7 +233,9 @@ const getInviteTogetherList = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.SUCCESS_INVITE_TOGETHER_PACKING, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `GET, /list/together/invite/:inviteCode, 함께 패킹리스트 초대, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
