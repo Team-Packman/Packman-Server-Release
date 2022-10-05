@@ -5,7 +5,7 @@ import { config } from 'dotenv';
 config();
 
 // DB Config (유저, 호스트, DB 이름, 패스워드)를 로딩해줍시다.
-import dbConfig from '../config/index';
+import dbConfig from '../loaders/dbConfig';
 
 // NODE_ENV라는 글로벌 환경변수를 사용해서, 현재 환경이 어떤 '모드'인지 판별해줍시다.
 const devMode = process.env.NODE_ENV === 'development';

@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon",
-    "build": "tsc && node dist",
+    "local": "set NODE_ENV=local&& nodemon",
+    "dev": "set NODE_ENV=development&& nodemon",
+    "prod": "set NODE_ENV=production&& nodemon",
+    "build": "set NODE_ENV=production&& tsc && node dist",
     "lint": "eslint ."
   },
   "author": "",
