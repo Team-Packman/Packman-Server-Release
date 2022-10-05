@@ -6,9 +6,10 @@ import { validationResult } from 'express-validator';
 import { CategoryCreateDto, CategoryDeleteDto, CategoryUpdateDto } from '../interfaces/ICategory';
 import { TogetherListCategoryService } from '../services';
 import db from '../loaders/db';
+import logger from '../config/logger';
 
 /**
- *  @route POST /category
+ *  @route POST /list/together/category
  *  @desc create together category
  *  @access private
  **/
@@ -25,7 +26,11 @@ const createCategory = async (req: Request, res: Response) => {
   try {
     client = await db.connect(req);
     const userId = req.body.user.id;
-    const data = await TogetherListCategoryService.createCategory(client, userId, categoryCreateDto);
+    const data = await TogetherListCategoryService.createCategory(
+      client,
+      userId,
+      categoryCreateDto,
+    );
 
     if (data === 'exceed_len') {
       res
@@ -43,7 +48,9 @@ const createCategory = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.CREATE_TOGETHER_CATEGORY_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `POST, /list/together/category, 함께 패킹 리스트 카테고리 생성, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -53,7 +60,7 @@ const createCategory = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route PATCH /category
+ *  @route PATCH /list/together/category
  *  @desc update together category
  *  @access private
  **/
@@ -70,7 +77,11 @@ const updateCategory = async (req: Request, res: Response) => {
   try {
     client = await db.connect(req);
     const userId = req.body.user.id;
-    const data = await TogetherListCategoryService.updateCategory(client, userId, categoryUpdateDto);
+    const data = await TogetherListCategoryService.updateCategory(
+      client,
+      userId,
+      categoryUpdateDto,
+    );
 
     if (data === 'no_list') {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
@@ -94,7 +105,9 @@ const updateCategory = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.UPDATE_TOGETHER_CATEGORY_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `PATCH, /list/together/category, 함께 패킹 리스트 카테고리 수정, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -104,7 +117,7 @@ const updateCategory = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route DELETE /category
+ *  @route DELETE /list/together/category/:listId/:categoryId
  *  @desc delete together category
  *  @access private
  **/
@@ -119,7 +132,11 @@ const deleteCategory = async (req: Request, res: Response) => {
   try {
     client = await db.connect(req);
     const userId = req.body.user.id;
-    const data = await TogetherListCategoryService.deleteCategory(client, userId, categoryDeleteDto);
+    const data = await TogetherListCategoryService.deleteCategory(
+      client,
+      userId,
+      categoryDeleteDto,
+    );
     if (data === 'no_list') {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     } else if (data === 'no_category') {
@@ -134,7 +151,9 @@ const deleteCategory = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.DELETE_TOGETHER_CATEGORY_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `DELETE, /list/together/category/:listId/:categoryId, 함께 패킹 리스트 카테고리 삭제, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));

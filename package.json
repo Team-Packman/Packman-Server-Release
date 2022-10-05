@@ -27,6 +27,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
+    "app-root-path": "^3.1.0",
     "axios": "^0.27.2",
     "cors": "^2.8.5",
     "dayjs": "^1.11.5",
@@ -35,7 +36,12 @@
     "express-validator": "^6.14.2",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.37",
     "nanoid": "3.3.4",
-    "pg": "^8.7.3"
+    "pg": "^8.7.3",
+    "process": "^0.11.10",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
   }
 }

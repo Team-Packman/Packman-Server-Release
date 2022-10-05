@@ -1,11 +1,15 @@
 import { TemplateListResponseDto, DetailedTemplateResponseDto } from '../interfaces/ITemplate';
 import { templateListResponse } from '../modules/templateListResponse';
+import logger from '../config/logger';
 
 const getAloneTemplateList = async (
   client: any,
   userId: number,
 ): Promise<TemplateListResponseDto | string> => {
   const aloneTemplateList = await templateListResponse(client, userId, true);
+
+  logger.logger.info(`GET, /template/alone, 혼자 패킹 템플릿 리스트 조회, 200, userId: ${userId}`);
+
   return aloneTemplateList;
 };
 
@@ -14,6 +18,9 @@ const getTogetherTemplateList = async (
   userId: number,
 ): Promise<TemplateListResponseDto | string> => {
   const togetherTemplateList = await templateListResponse(client, userId, false);
+  logger.logger.info(
+    `GET, /template/together, 함께 패킹 템플릿 리스트 조회, 200, userId: ${userId}`,
+  );
   return togetherTemplateList;
 };
 
@@ -59,6 +66,7 @@ const getTemplate = async (
     title: templateTitle,
     category: category,
   };
+
   return templateResponse;
 };
 

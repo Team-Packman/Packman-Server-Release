@@ -12,6 +12,7 @@ import AloneListCategoryRouter from './AloneListCategoryRouter';
 import AloneListPackRouter from './AloneListPackRouter';
 import TemplateRouter from './TemplateRouter';
 import MemberRouter from './MemberRouter';
+import HelpRouter from './HelpRouter';
 
 const router = Router();
 
@@ -28,5 +29,6 @@ router.use('/list/alone/category', AloneListCategoryRouter);
 router.use('/list/alone/pack', AloneListPackRouter);
 router.use('/template', TemplateRouter);
 router.use('/member', MemberRouter);
+router.use('/help', HelpRouter);
 
 export default router;

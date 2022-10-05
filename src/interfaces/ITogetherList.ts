@@ -27,7 +27,14 @@ export interface TogetherListResponseDto {
   };
   isMember?: boolean;
 }
-
+export interface TogetherListLogDto {
+  id: string;
+  templateId: string;
+  title: string;
+  departureDate: string;
+  groupId: string;
+  category: TogetherCategoryResponseDto[];
+}
 export interface SharedTogetherListResponseDto {
   id: string;
   title: string;

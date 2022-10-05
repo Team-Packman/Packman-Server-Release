@@ -4,6 +4,7 @@ export interface UserCreateDto {
   nickname: string;
   profileImage: string;
   refreshToken: string;
+  path: string;
 }
 export interface UserResponseDto {
   id: string;
@@ -17,4 +18,12 @@ export interface UserResponseDto {
 export interface UserUpdateDto {
   nickname: string;
   profileImage: string;
+}
+
+export interface UserLogDto {
+  name: string;
+  nickname: string;
+  email: string;
+  profileImage: string;
+  path: string;
 }

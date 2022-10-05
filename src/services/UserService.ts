@@ -1,5 +1,6 @@
+import logger from '../config/logger';
 import { AuthResponseDto } from '../interfaces/IAuth';
-import { UserCreateDto, UserResponseDto, UserUpdateDto } from '../interfaces/IUser';
+import { UserCreateDto, UserLogDto, UserResponseDto, UserUpdateDto } from '../interfaces/IUser';
 import jwtHandler from '../modules/jwtHandler';
 import FolderService from './FolderService';
 
@@ -17,9 +18,9 @@ const createUser = async (
 
     const { rows: user } = await client.query(
       `
-      INSERT INTO "user" (email, name, nickname, profile_image, refresh_token)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, name, nickname, email, profile_image, refresh_token
+      INSERT INTO "user" (email, name, nickname, profile_image, refresh_token, path)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING id, name, nickname, email, profile_image, refresh_token, path
     `,
       [
         userCreateDto.email,
@@ -27,6 +28,7 @@ const createUser = async (
         userCreateDto.nickname,
         userCreateDto.profileImage,
         userCreateDto.refreshToken,
+        userCreateDto.path,
       ],
     );
 
@@ -41,8 +43,22 @@ const createUser = async (
       profileImage: user[0].profile_image,
       accessToken: accessToken,
       refreshToken: user[0].refresh_token,
+      path: user[0].path,
     };
     await client.query('COMMIT');
+
+    const log: UserLogDto = {
+      name: user[0].name,
+      nickname: user[0].nickname,
+      email: user[0].email,
+      profileImage: user[0].profile_image,
+      path: user[0].path,
+    };
+
+    logger.logger.info(
+      `POST, /user/profile, 닉네임/프로필 등록, 200, userId: ${data.id}, data: ` +
+        JSON.stringify(log),
+    );
 
     return data;
   } catch (error) {
