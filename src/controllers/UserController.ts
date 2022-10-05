@@ -38,7 +38,7 @@ const createUser = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.SUCCESS_CREATE_USER, data));
   } catch (error) {
-    logger.logger.error(`POST, /user/profile, 닉네임, 프로필 등록, 500, ${error}`);
+    logger.logger.error(`POST, /user/profile, 닉네임/프로필 등록, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -82,7 +82,7 @@ const updateUser = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.SUCCESS_UPDATE_USER, data));
     }
   } catch (error) {
-    logger.logger.error(`PATCH, /user/profile, 닉네임, 프로필 수정, 500, ${error}`);
+    logger.logger.error(`PATCH, /user/profile, 닉네임/프로필 등록 수정, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -108,7 +108,7 @@ const getUser = async (req: Request, res: Response) => {
 
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.SUCCESS_GET_USER, data));
   } catch (error) {
-    logger.logger.error(`GET, /user, 회원 조회하기, 500, ${error}`);
+    logger.logger.error(`GET, /user, 회원 조회, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -133,7 +133,7 @@ const deleteUser = async (req: Request, res: Response) => {
 
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.SUCCESS_DELETE_USER, data));
   } catch (error) {
-    logger.logger.error(`DELETE, /user, 회원 탈퇴하기, 500, ${error}`);
+    logger.logger.error(`DELETE, /user, 회원 탈퇴, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
