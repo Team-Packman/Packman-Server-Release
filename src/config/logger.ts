@@ -2,14 +2,12 @@ import { createLogger, transports, format } from 'winston';
 import winstonDaily from 'winston-daily-rotate-file'; // 로그 파일 일자별로 ㄴ생성
 import appRoot from 'app-root-path'; // app root 경로를 가져오는 lib
 import process from 'process';
+import moment from 'moment';
+import 'moment-timezone';
 
 const logDir = `${appRoot}/logs`; // logs 디렉토리 하위에 로그파일 저장
 
-const { combine, timestamp, printf, colorize, simple } = format;
-
-const logFormat = printf(({ level, message, timestamp }) => {
-  return `${timestamp}, ${level}:, ${message}`; // log 출력 포맷 정의
-});
+const { combine, printf, colorize, simple } = format;
 
 const opts = {
   info: new winstonDaily({
@@ -44,15 +42,20 @@ const opts = {
   }),
 };
 
+moment.tz.setDefault('Asia/Seoul');
+
+const timestamp = () => moment().format('YYYY-MM-DD HH:mm:ss');
+
+const logFormat = printf(({ level, message }) => {
+  return `${timestamp()}, ${level}:, ${message}`; // log 출력 포맷 정의
+});
+
 /**
  * Log Level
  * error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
  */
 const logger = createLogger({
   format: combine(
-    timestamp({
-      format: 'YYYY-MM-DD HH:mm:ss',
-    }),
     logFormat, // log 출력 포맷
   ),
   transports: [

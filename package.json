@@ -36,6 +36,8 @@
     "express-validator": "^6.14.2",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.37",
     "nanoid": "3.3.4",
     "pg": "^8.7.3",
     "process": "^0.11.10",
