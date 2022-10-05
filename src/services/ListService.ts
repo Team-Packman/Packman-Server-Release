@@ -79,11 +79,11 @@ const updateDate = async (
 
       const { rows: updatedData } = await client.query(
         `
-        UPDATE "packing_list"
-        SET departure_date=$1
-        WHERE id=$2
-        RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
-      `,
+          UPDATE "packing_list"
+          SET departure_date=$1
+          WHERE id=$2
+          RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
+       `,
         [dateUpdateDto.departureDate, dateUpdateDto.id],
       );
       updatedDate = updatedData[0].departureDate;
@@ -96,11 +96,11 @@ const updateDate = async (
 
       const { rows: updatedData } = await client.query(
         `
-        UPDATE "packing_list"
-        SET departure_date=$1
-        WHERE id=$2 OR id=$3
-        RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
-      `,
+          UPDATE "packing_list"
+          SET departure_date=$1
+          WHERE id=$2 OR id=$3
+          RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
+       `,
         [dateUpdateDto.departureDate, togetherListId, aloneListId],
       );
       updatedDate = updatedData[0].departureDate;
@@ -273,7 +273,7 @@ const getSharedList = async (
       FROM "${table}" pl
       JOIN packing_list p on pl.id = p.id
       WHERE pl.invite_code= $1 AND p.is_deleted = false
-      `,
+    `,
     [inviteCode],
   );
 
@@ -283,10 +283,10 @@ const getSharedList = async (
 
   const { rows: listInfo } = await client.query(
     `
-        SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate"
-        FROM "packing_list" p
-        WHERE p.id= $1
-      `,
+      SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate"
+      FROM "packing_list" p
+      WHERE p.id= $1
+    `,
     [listId],
   );
 

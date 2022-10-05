@@ -17,14 +17,14 @@ const getRecentCreatedList = async (
 ): Promise<RecentCreatedListResponseDto | string> => {
   const { rows: aloneList } = await client.query(
     `
-        SELECT pl.id::text, apl.is_aloned
-        FROM "folder" f
-        JOIN folder_packing_list fpl ON f.id = fpl.folder_id
-        JOIN packing_list pl ON fpl.list_id = pl.id
-        JOIN alone_packing_list apl ON pl.id = apl.id
-        WHERE f.user_id = $1 AND pl.is_deleted = false
-        ORDER BY pl.created_at DESC 
-      `,
+      SELECT pl.id::text, apl.is_aloned
+      FROM "folder" f
+      JOIN folder_packing_list fpl ON f.id = fpl.folder_id
+      JOIN packing_list pl ON fpl.list_id = pl.id
+      JOIN alone_packing_list apl ON pl.id = apl.id
+      WHERE f.user_id = $1 AND pl.is_deleted = false
+      ORDER BY pl.created_at DESC 
+    `,
     [userId],
   );
 
@@ -36,10 +36,10 @@ const getRecentCreatedList = async (
   if (aloneList[0].is_aloned === false) {
     const { rows: togetherListId } = await client.query(
       `
-          SELECT tapl.id::TEXT as id, tapl.together_packing_list_id::TEXT AS "togetherId"
-          FROM "together_alone_packing_list" tapl
-          WHERE tapl.my_packing_list_id = $1
-        `,
+        SELECT tapl.id::TEXT as id, tapl.together_packing_list_id::TEXT AS "togetherId"
+        FROM "together_alone_packing_list" tapl
+        WHERE tapl.my_packing_list_id = $1
+      `,
       [recentListId],
     );
 
@@ -49,15 +49,15 @@ const getRecentCreatedList = async (
 
   const { rows: recentList } = await client.query(
     `
-        SELECT  pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
-          Count(CASE WHEN p.is_checked = false THEN p.id END) AS remain,
-          Count(p.id) AS total
-        FROM   "packing_list" pl
-        LEFT JOIN category c ON pl.id = c.list_id
-        LEFT JOIN pack p ON c.id = p.category_id
-        WHERE pl.id = $1
-        GROUP BY pl.departure_date, pl.title
-      `,
+      SELECT  pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
+        Count(CASE WHEN p.is_checked = false THEN p.id END) AS remain,
+        Count(p.id) AS total
+      FROM   "packing_list" pl
+      LEFT JOIN category c ON pl.id = c.list_id
+      LEFT JOIN pack p ON c.id = p.category_id
+      WHERE pl.id = $1
+      GROUP BY pl.departure_date, pl.title
+    `,
     [recentListId],
   );
 
@@ -234,11 +234,11 @@ const getFolders = async (client: any, userId: string): Promise<AllFolderRespons
 const getTogetherFolders = async (client: any, userId: string): Promise<FolderResponseDto[]> => {
   const { rows: togetherFolders } = await client.query(
     `
-        SELECT f.id::text, f.name
-        FROM "folder" f
-        WHERE f.user_id = $1 and f.is_aloned = false
-        ORDER BY f.id DESC
-      `,
+      SELECT f.id::text, f.name
+      FROM "folder" f
+      WHERE f.user_id = $1 and f.is_aloned = false
+      ORDER BY f.id DESC
+    `,
     [userId],
   );
 
@@ -250,11 +250,11 @@ const getTogetherFolders = async (client: any, userId: string): Promise<FolderRe
 const getAloneFolders = async (client: any, userId: string): Promise<FolderResponseDto[]> => {
   const { rows: aloneFolders } = await client.query(
     `
-        SELECT f.id::text, f.name
-        FROM "folder" f
-        WHERE f.user_id = $1 and f.is_aloned = true
-        ORDER BY f.id DESC
-      `,
+      SELECT f.id::text, f.name
+      FROM "folder" f
+      WHERE f.user_id = $1 and f.is_aloned = true
+      ORDER BY f.id DESC
+    `,
     [userId],
   );
 
@@ -270,10 +270,10 @@ const getTogetherListInFolder = async (
 ): Promise<TogetherListInFolderResponseDto | string> => {
   const { rows: existFolder } = await client.query(
     `
-        SELECT *
-        FROM "folder" f
-        WHERE f.id = $1 and f.is_aloned = false
-      `,
+      SELECT *
+      FROM "folder" f
+      WHERE f.id = $1 and f.is_aloned = false
+    `,
     [folderId],
   );
 
@@ -281,10 +281,10 @@ const getTogetherListInFolder = async (
 
   const { rows: currentFolder } = await client.query(
     `
-        SELECT f.id::text, f.name
-        FROM "folder" f
-        WHERE f.user_id = $1 and f.id = $2  
-      `,
+      SELECT f.id::text, f.name
+      FROM "folder" f
+      WHERE f.user_id = $1 and f.id = $2  
+    `,
     [userId, folderId],
   );
 
@@ -292,21 +292,21 @@ const getTogetherListInFolder = async (
 
   const { rows: folder } = await client.query(
     `
-        SELECT f.id::text, f.name
-        FROM "folder" f
-        WHERE f.user_id = $1 and f.is_aloned = false
-        ORDER BY f.id DESC
-      `,
+      SELECT f.id::text, f.name
+      FROM "folder" f
+      WHERE f.user_id = $1 and f.is_aloned = false
+      ORDER BY f.id DESC
+    `,
     [userId],
   );
 
   const { rows: listNum } = await client.query(
     `
-        SELECT COUNT(*) as "listNum"
-        FROM folder_packing_list fpl
-        JOIN packing_list pl on pl.id = fpl.list_id
-        WHERE fpl.folder_id = $1 and pl.is_deleted = false
-      `,
+      SELECT COUNT(*) as "listNum"
+      FROM folder_packing_list fpl
+      JOIN packing_list pl on pl.id = fpl.list_id
+      WHERE fpl.folder_id = $1 and pl.is_deleted = false
+    `,
     [folderId],
   );
 
@@ -323,7 +323,7 @@ const getTogetherListInFolder = async (
       WHERE fpl.folder_id = $1 and pl.is_deleted = false
       GROUP BY tapl.together_packing_list_id, pl.title, pl.departure_date, tapl.id
       ORDER BY tapl.id DESC
-      `,
+    `,
     [folderId],
   );
 
@@ -344,10 +344,10 @@ const getAloneListInFolder = async (
 ): Promise<AloneListInFolderResponseDto | string> => {
   const { rows: existFolder } = await client.query(
     `
-        SELECT *
-        FROM "folder" f
-        WHERE f.id = $1 and f.is_aloned = true
-      `,
+      SELECT *
+      FROM "folder" f
+      WHERE f.id = $1 and f.is_aloned = true
+    `,
     [folderId],
   );
 
@@ -355,10 +355,10 @@ const getAloneListInFolder = async (
 
   const { rows: currentFolder } = await client.query(
     `
-        SELECT f.id::text, f.name
-        FROM "folder" f
-        WHERE f.user_id = $1 and f.id = $2  
-      `,
+      SELECT f.id::text, f.name
+      FROM "folder" f
+      WHERE f.user_id = $1 and f.id = $2  
+    `,
     [userId, folderId],
   );
 
@@ -366,38 +366,38 @@ const getAloneListInFolder = async (
 
   const { rows: folder } = await client.query(
     `
-        SELECT f.id::text, f.name
-        FROM "folder" f
-        WHERE f.user_id = $1 and f.is_aloned = true
-        ORDER BY f.id DESC
-      `,
+      SELECT f.id::text, f.name
+      FROM "folder" f
+      WHERE f.user_id = $1 and f.is_aloned = true
+      ORDER BY f.id DESC
+    `,
     [userId],
   );
 
   const { rows: listNum } = await client.query(
     `
-        SELECT COUNT(*) as "listNum"
-        FROM folder_packing_list fpl
-        JOIN packing_list pl on pl.id = fpl.list_id
-        WHERE fpl.folder_id = $1 and pl.is_deleted = false
-      `,
+      SELECT COUNT(*) as "listNum"
+      FROM folder_packing_list fpl
+      JOIN packing_list pl on pl.id = fpl.list_id
+      WHERE fpl.folder_id = $1 and pl.is_deleted = false
+    `,
     [folderId],
   );
 
   const { rows: aloneList } = await client.query(
     `
-        SELECT apl.id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
-          Count(p.id) AS "packTotalNum",
-          Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum"
-        FROM folder_packing_list fpl
-        JOIN packing_list pl on fpl.list_id = pl.id
-        JOIN alone_packing_list apl on pl.id = apl.id
-        LEFT JOIN category c ON pl.id = c.list_id
-        LEFT JOIN pack p ON c.id = p.category_id
-        WHERE fpl.folder_id = $1 and pl.is_deleted = false and apl.is_aloned = true
-        GROUP BY apl.id, pl.title, pl.departure_date
-        ORDER BY apl.id DESC
-      `,
+      SELECT apl.id::text as id, pl.title, TO_CHAR(pl.departure_date,'YYYY-MM-DD') as "departureDate",
+        Count(p.id) AS "packTotalNum",
+        Count(CASE WHEN p.is_checked = false THEN p.id END) AS "packRemainNum"
+      FROM folder_packing_list fpl
+      JOIN packing_list pl on fpl.list_id = pl.id
+      JOIN alone_packing_list apl on pl.id = apl.id
+      LEFT JOIN category c ON pl.id = c.list_id
+      LEFT JOIN pack p ON c.id = p.category_id
+      WHERE fpl.folder_id = $1 and pl.is_deleted = false and apl.is_aloned = true
+      GROUP BY apl.id, pl.title, pl.departure_date
+      ORDER BY apl.id DESC
+    `,
     [folderId],
   );
 

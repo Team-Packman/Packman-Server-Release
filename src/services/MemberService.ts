@@ -25,7 +25,7 @@ const getMember = async (
       JOIN "user" u on ug.user_id = u.id
       WHERE ug.group_id = $1 and u.is_deleted = false
       ORDER BY ug.id
-      `,
+    `,
     [groupId],
   );
 
@@ -41,7 +41,7 @@ const getMember = async (
       JOIN together_packing_list tpl on g.id = tpl.group_id
       JOIN packing_list pl on tpl.id = pl.id
       WHERE g.id = $1 AND pl.is_deleted = false
-      `,
+    `,
     [groupId],
   );
 
@@ -92,11 +92,11 @@ const deleteMember = async (
 
     const { rows: existUserGroup } = await client.query(
       `
-      SELECT ug.user_id::text as id
-      FROM "user_group" ug
-      JOIN "user" u on ug.user_id = u.id
-      WHERE ug.group_id = $1 AND u.is_deleted = false
-      ORDER BY  ug.id
+        SELECT ug.user_id::text as id
+        FROM "user_group" ug
+        JOIN "user" u on ug.user_id = u.id
+        WHERE ug.group_id = $1 AND u.is_deleted = false
+        ORDER BY  ug.id
       `,
       [groupId],
     );
@@ -125,7 +125,7 @@ const deleteMember = async (
         `
           DELETE FROM "user_group"
           WHERE group_id = $1 AND user_id IN (${memberArray})
-          `,
+        `,
         [groupId],
       );
 
@@ -137,7 +137,7 @@ const deleteMember = async (
           JOIN together_alone_packing_list tapl on fpl.list_id = tapl.my_packing_list_id
           JOIN together_packing_list tpl on tapl.together_packing_list_id = tpl.id
           WHERE f.user_id IN (${memberArray}) AND tpl.group_id = $1
-          `,
+        `,
         [groupId],
       );
 
@@ -152,11 +152,11 @@ const deleteMember = async (
 
       const { rows: member } = await client.query(
         `
-        SELECT u.id::TEXT, u.nickname, u.profile_image AS "profileImage"
-        FROM "user_group" ug
-        JOIN "user" u on ug.user_id = u.id
-        WHERE ug.group_id = $1 and u.is_deleted = false
-        ORDER BY ug.id
+          SELECT u.id::TEXT, u.nickname, u.profile_image AS "profileImage"
+          FROM "user_group" ug
+          JOIN "user" u on ug.user_id = u.id
+          WHERE ug.group_id = $1 and u.is_deleted = false
+          ORDER BY ug.id
         `,
         [groupId],
       );
