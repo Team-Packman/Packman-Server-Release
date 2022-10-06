@@ -18,8 +18,10 @@ app.use(
       'http://localhost:3000',
       'https://www.packman.kr',
       'https://www.packgirl.ml',
+      'https://api.packman.kr',
+      'https://api.packgirl.ml',
       `${config.baseUrl}`,
-      ` ${config.baseUrlDev}`,
+      `${config.baseUrlDev}`,
     ],
   }),
 );
