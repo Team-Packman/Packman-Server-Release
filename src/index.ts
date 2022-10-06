@@ -23,7 +23,6 @@ app.use(
       'https://packman-beryl.vercel.app',
       'https://www.packgirl.ml',
       'https://api.packgirl.ml',
-      'https://packgirl.vercel.app',
     ],
     optionsSuccessStatus: 200,
   }),
