@@ -76,7 +76,7 @@ const createUser = async (
 const getUser = async (client: any, userId: string): Promise<UserResponseDto | string> => {
   const { rows: existUser } = await client.query(
     `
-      SELECT u.id::TEXT, u.nickname, u.email, u.profile_image AS "profileImage"
+      SELECT u.id::TEXT, u.email, u.nickname, u.profile_image AS "profileImage"
       FROM "user" u
       WHERE u.id = $1 and u.is_deleted = false
     `,
@@ -142,8 +142,8 @@ const updateUser = async (
 
     const data: UserResponseDto = {
       id: userId,
-      nickname: user[0].nickname,
       email: user[0].email,
+      nickname: user[0].nickname,
       profileImage: user[0].profile_image,
     };
 

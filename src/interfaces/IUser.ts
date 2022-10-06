@@ -10,8 +10,8 @@ export interface UserCreateDto {
 }
 export interface UserResponseDto {
   id: string;
-  nickname: string;
   email: string;
+  nickname: string;
   profileImage: string;
   accessToken?: string;
   refreshToken?: string;
