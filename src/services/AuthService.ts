@@ -17,6 +17,15 @@ const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthRespon
 
     const userEmail = response.data.kakao_account.email;
     const userName = response.data.kakao_account.profile.nickname;
+    let userGender = response.data.kakao_account.gender;
+    let userAge = response.data.kakao_account.age_range;
+
+    // 동의 시 false, 비동의 시 true
+    const userGenderAgree = response.data.kakao_account.gender_needs_agreement;
+    const userAgeAgree = response.data.kakao_account.age_range_needs_agreement;
+
+    userGender = userGenderAgree === true ? null : userGender;
+    userAge = userAgeAgree === true ? null : userAge;
 
     const { rows: userInfo } = await client.query(
       `
@@ -29,8 +38,10 @@ const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthRespon
 
     let data: AuthResponseDto = {
       isAlreadyUser: false,
-      name: userName,
       email: userEmail,
+      name: userName,
+      gender: userGender,
+      ageRange: userAge,
     };
 
     await client.query('BEGIN');
@@ -54,15 +65,19 @@ const getKakaoUser = async (client: any, kakaoToken: string): Promise<AuthRespon
         data = {
           isAlreadyUser: true,
           id: userInfo[0].id.toString(),
-          name: userInfo[0].name,
-          nickname: userInfo[0].nickname,
           email: userInfo[0].email,
+          name: userInfo[0].name,
+          gender: userGender,
+          ageRange: userAge,
+          nickname: userInfo[0].nickname,
           profileImage: userInfo[0].profile_image,
           accessToken: accessToken,
           refreshToken: refreshToken,
         };
       }
     }
+
+    console.log(data);
 
     await client.query('COMMIT');
 
