@@ -34,6 +34,14 @@ const opts = {
     maxFiles: 30,
     zippedArchive: true,
   }),
+  http: new winstonDaily({
+    level: 'http',
+    datePattern: 'YYYY-MM-DD',
+    dirname: logDir,
+    filename: `%DATE%.http.log`,
+    maxFiles: 30,
+    zippedArchive: true,
+  }),
   console: new transports.Console({
     format: combine(
       colorize(), // 색깔 넣어서 출력
@@ -63,6 +71,8 @@ const logger = createLogger({
     opts.info,
     // error 레벨 로그를 저장할 파일 설정
     opts.error,
+    // http 레벨 로그를 저장할 파일 설정
+    opts.http,
   ],
 
   exceptionHandlers: [opts.exception],
@@ -73,13 +83,11 @@ if (process.env.NODE_ENV !== 'production') {
   logger.add(opts.console);
 }
 
-const stream = {
-  write: (message: any) => {
-    logger.log(message);
-  },
-};
-
+export class LoggerStream {
+  write(message: string) {
+    logger.http(message.substring(0, message.lastIndexOf('\n')));
+  }
+}
 export default {
   logger,
-  stream,
 };
