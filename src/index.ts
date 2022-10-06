@@ -4,8 +4,12 @@ import routes from './routes';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import config from './config';
+import morgan from 'morgan';
+import { LoggerStream } from './config/logger';
 
 dotenv.config();
+
+const morganFormat = process.env.NODE_ENV !== 'production' ? 'dev' : 'combined';
 
 app.use(
   cors({
@@ -24,8 +28,16 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(
+  morgan(morganFormat, {
+    skip: (req, res) => {
+      return res.statusCode < 400;
+    },
+    stream: new LoggerStream(),
+  }),
+);
+
 app.use(routes); //라우터
-// error handler
 
 interface ErrorType {
   message: string;
