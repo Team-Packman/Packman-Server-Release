@@ -1,6 +1,8 @@
 export interface UserCreateDto {
   email: string;
   name: string;
+  gender: string;
+  ageRange: string;
   nickname: string;
   profileImage: string;
   refreshToken: string;
@@ -8,8 +10,8 @@ export interface UserCreateDto {
 }
 export interface UserResponseDto {
   id: string;
-  nickname: string;
   email: string;
+  nickname: string;
   profileImage: string;
   accessToken?: string;
   refreshToken?: string;
@@ -21,9 +23,11 @@ export interface UserUpdateDto {
 }
 
 export interface UserLogDto {
-  name: string;
-  nickname: string;
   email: string;
+  name: string;
+  gender: string;
+  ageRange: string;
+  nickname: string;
   profileImage: string;
   path: string;
 }

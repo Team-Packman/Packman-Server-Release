@@ -18,13 +18,15 @@ const createUser = async (
 
     const { rows: user } = await client.query(
       `
-        INSERT INTO "user" (email, name, nickname, profile_image, refresh_token, path)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING id, name, nickname, email, profile_image, refresh_token, path
+        INSERT INTO "user" (email, name, gender, age_range, nickname, profile_image, refresh_token, path)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING id, name, gender, age_range, nickname, email, profile_image, refresh_token, path
      `,
       [
         userCreateDto.email,
         userCreateDto.name,
+        userCreateDto.gender,
+        userCreateDto.ageRange,
         userCreateDto.nickname,
         userCreateDto.profileImage,
         userCreateDto.refreshToken,
@@ -37,9 +39,11 @@ const createUser = async (
     const data: AuthResponseDto = {
       isAlreadyUser: true,
       id: user[0].id.toString(),
-      name: user[0].name,
-      nickname: user[0].nickname,
       email: user[0].email,
+      name: user[0].name,
+      gender: user[0].gender,
+      ageRange: user[0].age_range,
+      nickname: user[0].nickname,
       profileImage: user[0].profile_image,
       accessToken: accessToken,
       refreshToken: user[0].refresh_token,
@@ -48,9 +52,11 @@ const createUser = async (
     await client.query('COMMIT');
 
     const log: UserLogDto = {
-      name: user[0].name,
-      nickname: user[0].nickname,
       email: user[0].email,
+      name: user[0].name,
+      gender: user[0].gender,
+      ageRange: user[0].age_range,
+      nickname: user[0].nickname,
       profileImage: user[0].profile_image,
       path: user[0].path,
     };
@@ -70,7 +76,7 @@ const createUser = async (
 const getUser = async (client: any, userId: string): Promise<UserResponseDto | string> => {
   const { rows: existUser } = await client.query(
     `
-      SELECT u.id::TEXT, u.nickname, u.email, u.profile_image AS "profileImage"
+      SELECT u.id::TEXT, u.email, u.nickname, u.profile_image AS "profileImage"
       FROM "user" u
       WHERE u.id = $1 and u.is_deleted = false
     `,
@@ -136,8 +142,8 @@ const updateUser = async (
 
     const data: UserResponseDto = {
       id: userId,
-      nickname: user[0].nickname,
       email: user[0].email,
+      nickname: user[0].nickname,
       profileImage: user[0].profile_image,
     };
 
