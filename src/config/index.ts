@@ -27,6 +27,11 @@ export default {
   baseUrl: process.env.BASE_URL as string,
 
   /**
+   * baseUrl_dev
+   */
+  baseUrlDev: process.env.BASE_URL_DEV as string,
+
+  /**
    * jwt Secret
    */
 
