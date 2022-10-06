@@ -17,9 +17,11 @@ app.use(
     origin: [
       'http://localhost:3000',
       'https://www.packman.kr',
-      config.baseUrl,
       'https://api.packman.kr',
+      config.baseUrl,
       'https://packman-beryl.vercel.app',
+      'https://www.packgirl.ml',
+      'https://api.packgirl.ml',
     ],
     optionsSuccessStatus: 200,
   }),
