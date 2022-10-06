@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "local": "set NODE_ENV=local&& nodemon",
-    "dev": "set NODE_ENV=development&& nodemon",
-    "prod": "set NODE_ENV=production&& nodemon",
-    "build": "set NODE_ENV=production&& tsc && node dist",
+    "local": "cross-env NODE_ENV=local nodemon",
+    "dev": "cross-env NODE_ENV=development nodemon",
+    "prod": "cross-env NODE_ENV=production nodemon",
+    "build-dev": "cross-env NODE_ENV=development&& tsc && node dist",
+    "build-prod": "cross-env NODE_ENV=production&& tsc && node dist",
     "lint": "eslint ."
   },
   "author": "",
@@ -33,6 +34,7 @@
     "app-root-path": "^3.1.0",
     "axios": "^0.27.2",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "dayjs": "^1.11.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
