@@ -134,14 +134,14 @@ const getAloneList = async (
 ): Promise<AloneListResponseDto | string> => {
   const { rows: existList } = await client.query(
     `
-        SELECT pl.title,TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate",
-               pl.is_saved AS "isSaved", apl.invite_code AS "inviteCode",
-               fpl.folder_id::text AS "folderId"
-        FROM "alone_packing_list" apl
-        JOIN "packing_list" pl ON apl.id=pl.id
-        JOIN "folder_packing_list" fpl ON pl.id=fpl.list_id
-        WHERE apl.id=$1 AND apl.is_aloned=true AND pl.is_deleted=false
-      `,
+      SELECT pl.title,TO_CHAR(pl.departure_date,'YYYY-MM-DD') AS "departureDate",
+              pl.is_saved AS "isSaved", apl.invite_code AS "inviteCode",
+              fpl.folder_id::text AS "folderId"
+      FROM "alone_packing_list" apl
+      JOIN "packing_list" pl ON apl.id=pl.id
+      JOIN "folder_packing_list" fpl ON pl.id=fpl.list_id
+      WHERE apl.id=$1 AND apl.is_aloned=true AND pl.is_deleted=false
+    `,
     [aloneListId],
   );
   if (existList.length === 0) return 'no_list';
@@ -245,13 +245,13 @@ const getInviteAloneList = async (
 ): Promise<InviteAloneListResponseDto | string> => {
   const { rows: aloneList } = await client.query(
     `
-        SELECT apl.id::TEXT, f.user_id as "userId"
-        FROM alone_packing_list apl
-        JOIN packing_list pl on apl.id = pl.id
-        JOIN folder_packing_list fpl on apl.id = fpl.list_id
-        JOIN folder f on fpl.folder_id = f.id
-        WHERE apl.invite_code = $1 AND pl.is_deleted = false
-      `,
+      SELECT apl.id::TEXT, f.user_id as "userId"
+      FROM alone_packing_list apl
+      JOIN packing_list pl on apl.id = pl.id
+      JOIN folder_packing_list fpl on apl.id = fpl.list_id
+      JOIN folder f on fpl.folder_id = f.id
+      WHERE apl.invite_code = $1 AND pl.is_deleted = false
+    `,
     [inviteCode],
   );
 

@@ -646,7 +646,7 @@ const getInviteTogetherList = async (
       JOIN "packing_list" as pl ON pl.id = t.id
       JOIN together_alone_packing_list tapl on t.id = tapl.together_packing_list_id
       WHERE t.invite_code = $1 AND pl.is_deleted = false
-      `,
+    `,
     [inviteCode],
   );
   if (packingList.length === 0) return 'no_list';
@@ -656,10 +656,10 @@ const getInviteTogetherList = async (
 
   const { rows: existMember } = await client.query(
     `
-          SELECT *
-          FROM "user_group" as ug
-          WHERE ug.user_id = $1 AND ug.group_id = $2
-        `,
+      SELECT *
+      FROM "user_group" as ug
+      WHERE ug.user_id = $1 AND ug.group_id = $2
+    `,
     [userId, packingList[0].group_id],
   );
 
@@ -668,13 +668,13 @@ const getInviteTogetherList = async (
   if (isMember === true) {
     const { rows: newPackingList } = await client.query(
       `
-            SELECT tal.id::text
-            FROM "together_alone_packing_list" tal 
-            JOIN "folder_packing_list" fl ON tal.my_packing_list_id = fl.list_id
-            JOIN "folder" f ON f.id = fl.folder_id
-            JOIN "packing_list" pl ON pl.id =  fl.list_id
-            WHERE tal.together_packing_list_id = $1 AND f.user_id = $2 AND pl.is_deleted = false
-          `,
+        SELECT tal.id::text
+        FROM "together_alone_packing_list" tal 
+        JOIN "folder_packing_list" fl ON tal.my_packing_list_id = fl.list_id
+        JOIN "folder" f ON f.id = fl.folder_id
+        JOIN "packing_list" pl ON pl.id =  fl.list_id
+        WHERE tal.together_packing_list_id = $1 AND f.user_id = $2 AND pl.is_deleted = false
+      `,
       [packingList[0].togetherId, userId],
     );
 

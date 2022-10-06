@@ -31,13 +31,13 @@ const getTemplate = async (
 ): Promise<DetailedTemplateResponseDto | string> => {
   const { rows: template } = await client.query(
     `
-        SELECT t.title
-        FROM "template" t
-        WHERE t.id = $1 AND t.is_deleted = false AND (
-          CASE WHEN t.user_id IS NOT NULL THEN t.user_id=$2
-          ELSE true
-          END)
-      `,
+      SELECT t.title
+      FROM "template" t
+      WHERE t.id = $1 AND t.is_deleted = false AND (
+        CASE WHEN t.user_id IS NOT NULL THEN t.user_id=$2
+        ELSE true
+        END)
+    `,
     [templateId, userId],
   );
   if (template.length === 0) {
@@ -47,17 +47,17 @@ const getTemplate = async (
 
   const { rows: category } = await client.query(
     `
-        SELECT c.id::text, c.name,	COALESCE(json_agg(json_build_object(
-            'id', p.id::text,
-            'name', p.name
-        ) ORDER BY p.id
-        ) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
-        FROM "template_category" c
-        LEFT JOIN "template_pack" p ON c.id = p.category_id
-        WHERE c.template_id=$1
-        GROUP BY c.id
-        ORDER BY c.id
-      `,
+      SELECT c.id::text, c.name,	COALESCE(json_agg(json_build_object(
+          'id', p.id::text,
+          'name', p.name
+      ) ORDER BY p.id
+      ) FILTER(WHERE p.id IS NOT NULL),'[]') AS "pack"
+      FROM "template_category" c
+      LEFT JOIN "template_pack" p ON c.id = p.category_id
+      WHERE c.template_id=$1
+      GROUP BY c.id
+      ORDER BY c.id
+    `,
     [templateId],
   );
 

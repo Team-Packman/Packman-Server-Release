@@ -88,10 +88,10 @@ const getNewToken = async (
 
   const { rows: existUser } = await client.query(
     `
-        SELECT *
-        FROM "user" u
-        WHERE u.id = $1 and is_deleted = false
-      `,
+      SELECT *
+      FROM "user" u
+      WHERE u.id = $1 and is_deleted = false
+    `,
     [userId],
   );
 
@@ -99,9 +99,9 @@ const getNewToken = async (
 
   const { rows: refresh } = await client.query(
     `
-        SELECT u.refresh_token
-        FROM "user" u
-        WHERE u.id = $1
+      SELECT u.refresh_token
+      FROM "user" u
+      WHERE u.id = $1
     `,
     [userId],
   );
