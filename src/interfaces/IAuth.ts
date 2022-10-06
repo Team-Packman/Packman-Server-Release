@@ -1,9 +1,11 @@
 export interface AuthResponseDto {
   isAlreadyUser: boolean;
   id?: string;
-  name: string;
-  nickname?: string;
   email: string;
+  name: string;
+  gender?: string;
+  ageRange?: string;
+  nickname?: string;
   profileImage?: string;
   accessToken?: string;
   refreshToken?: string;
