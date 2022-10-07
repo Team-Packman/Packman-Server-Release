@@ -20,7 +20,9 @@ app.use(
       'https://api.packgirl.ml',
       `${config.baseUrl}`,
       `${config.baseUrlDev}`,
+      'https://packman-bery1.vercel.app',
     ],
+    optionsSuccessStatus: 200,
   }),
 );
 
