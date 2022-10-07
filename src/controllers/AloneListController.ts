@@ -6,6 +6,7 @@ import { validationResult } from 'express-validator';
 import { ListCreateDto } from '../interfaces/IList';
 import { AloneListService } from '../services';
 import db from '../loaders/db';
+import logger from '../config/logger';
 
 /**
  *  @route POST /list/alone
@@ -40,7 +41,7 @@ const createAloneList = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.CREATE_ALONE_LIST_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`POST, /list/alone, 혼자 패킹리스트 생성, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -70,7 +71,7 @@ const getAloneList = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.READ_ALONE_LIST_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`GET, /list/alone/:listId, 혼자 패킹리스트 조회, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -81,18 +82,19 @@ const getAloneList = async (req: Request, res: Response) => {
 
 /**
  *  @route DELETE /list/alone/:folderId/:listId
- *  @desc delete alone packinglist
+ *  @desc delete alone list
  *  @access private
  **/
 const deleteAloneList = async (req: Request, res: Response) => {
   let client;
+  const userId: number = req.body.user.id;
   const { folderId } = req.params;
   const { listId } = req.params;
 
   try {
     client = await db.connect(req);
 
-    const data = await AloneListService.deleteAloneList(client, folderId, listId);
+    const data = await AloneListService.deleteAloneList(client, userId, folderId, listId);
 
     if (data === 'no_folder')
       res.status(statusCode.NOT_FOUND).send(util.success(statusCode.NOT_FOUND, message.NO_FOLDER));
@@ -107,7 +109,9 @@ const deleteAloneList = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.DELETE_ALONE_LIST_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `DELETE, /list/alone/:folderId/:listId, 혼자 패킹리스트 삭제, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -139,7 +143,7 @@ const getInviteAloneList = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.GET_INVITE_ALONE_LIST_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`GET, /list/alone/invite/:inviteCode, 혼자 패킹리스트 초대, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));

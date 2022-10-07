@@ -4,6 +4,8 @@ import routes from './routes';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import config from './config';
+import morgan from 'morgan';
+import { LoggerStream } from './config/logger';
 
 dotenv.config();
 
@@ -13,19 +15,28 @@ app.use(
     origin: [
       'http://localhost:3000',
       'https://www.packman.kr',
-      config.baseUrl,
+      'https://www.packgirl.ml',
       'https://api.packman.kr',
-      'https://packman-beryl.vercel.app',
+      'https://api.packgirl.ml',
+      `${config.baseUrl}`,
+      `${config.baseUrlDev}`,
     ],
-    optionsSuccessStatus: 200,
   }),
 );
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(
+  morgan('combined', {
+    skip: (req, res) => {
+      return res.statusCode < 400;
+    },
+    stream: new LoggerStream(),
+  }),
+);
+
 app.use(routes); //라우터
-// error handler
 
 interface ErrorType {
   message: string;

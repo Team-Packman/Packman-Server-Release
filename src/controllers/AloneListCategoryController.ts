@@ -6,6 +6,7 @@ import { validationResult } from 'express-validator';
 import { CategoryCreateDto, CategoryUpdateDto, CategoryDeleteDto } from '../interfaces/ICategory';
 import { AloneListCategoryService } from '../services';
 import db from '../loaders/db';
+import logger from '../config/logger';
 
 /**
  *  @route POST /list/alone/category
@@ -21,10 +22,10 @@ const createCategory = async (req: Request, res: Response) => {
   }
   let client;
   const categoryCreateDto: CategoryCreateDto = req.body;
-
+  const userId = req.body.user.id;
   try {
     client = await db.connect(req);
-    const data = await AloneListCategoryService.createCategory(client, categoryCreateDto);
+    const data = await AloneListCategoryService.createCategory(client, userId, categoryCreateDto);
 
     if (data === 'exceed_len') {
       res
@@ -42,7 +43,7 @@ const createCategory = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.CREATE_ALONE_CATEGORY_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`POST, /list/alone/category, 혼자 패킹리스트 카테고리 생성, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -65,10 +66,10 @@ const updateCategory = async (req: Request, res: Response) => {
   }
   let client;
   const categoryUpdateDto: CategoryUpdateDto = req.body;
-
+  const userId = req.body.user.id;
   try {
     client = await db.connect(req);
-    const data = await AloneListCategoryService.updateCategory(client, categoryUpdateDto);
+    const data = await AloneListCategoryService.updateCategory(client, userId, categoryUpdateDto);
 
     if (data === 'no_list') {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
@@ -92,7 +93,9 @@ const updateCategory = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.UPDATE_ALONE_CATEGORY_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `PATCH, /list/alone/category, 혼자 패킹리스트 카테고리 수정, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -114,9 +117,10 @@ const deleteCategory = async (req: Request, res: Response) => {
     listId: listId,
     categoryId: categoryId,
   };
+  const userId = req.body.user.id;
   try {
     client = await db.connect(req);
-    const data = await AloneListCategoryService.deleteCategory(client, categoryDeleteDto);
+    const data = await AloneListCategoryService.deleteCategory(client, userId, categoryDeleteDto);
     if (data === 'no_list') {
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
     } else if (data === 'no_category') {
@@ -131,7 +135,9 @@ const deleteCategory = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.DELETE_ALONE_CATEGORY_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `DELETE, /list/alone/category, 혼자 패킹리스트 카테고리 삭제, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));

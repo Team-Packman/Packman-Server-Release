@@ -8,11 +8,20 @@ export interface AloneListCategoryResponseDto {
 
 export interface AloneListResponseDto {
   id: string;
+  folderId?: string;
   title: string;
   departureDate: string;
   category: AloneCategoryResponseDto[];
   inviteCode: string;
   isSaved: boolean;
+}
+
+export interface AloneListLogDto {
+  id: string;
+  templateId: string;
+  title: string;
+  departureDate: string;
+  category: AloneCategoryResponseDto[];
 }
 
 export interface SharedAloneListResponseDto {
@@ -29,4 +38,11 @@ export interface AloneListInfoResponseDto {
 export interface InviteAloneListResponseDto {
   id: string;
   isOwner: boolean;
+}
+
+export interface AloneListCheckResponseDto {
+  title: string;
+  departureDate: string;
+  isSaved: boolean;
+  inviteCode: string;
 }

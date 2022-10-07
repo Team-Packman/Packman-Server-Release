@@ -1,37 +1,28 @@
 import { PackCreateDto, PackUpdateDto, PackDeleteDto } from '../interfaces/IPack';
 import { AloneListCategoryResponseDto } from '../interfaces/IAloneList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
+import { aloneListCategoryCheckResponse } from '../modules/aloneListCategoryCheckResponse';
 
 const createPack = async (
   client: any,
+  userId: number,
   packCreateDto: PackCreateDto,
 ): Promise<AloneListCategoryResponseDto | string> => {
   try {
     if (packCreateDto.name.length > 12) return 'exceed_len';
 
-    const { rows: existList } = await client.query(
-      `
-        SELECT *
-        FROM "packing_list" as pl
-        JOIN alone_packing_list apl on pl.id = apl.id
-        WHERE apl.id = $1 and pl.is_deleted = false
-      `,
-      [packCreateDto.listId],
+    const check = await aloneListCategoryCheckResponse(
+      client,
+      userId,
+      packCreateDto.listId,
+      packCreateDto.categoryId,
     );
 
-    if (existList.length === 0) return 'no_list';
+    if (check === 'no_list') return 'no_list';
+    else if (check === 'no_category') return 'no_category';
+    else if (check === 'no_list_category') return 'no_list_category';
 
-    const { rows: existCategory } = await client.query(
-      `
-        SELECT *
-        FROM "category" as c
-        WHERE c.id = $1
-      `,
-      [packCreateDto.categoryId],
-    );
-
-    if (existCategory.length === 0) return 'no_category';
-    if (existCategory[0].list_id != packCreateDto.listId) return 'no_list_category';
+    await client.query('BEGIN');
 
     await client.query(
       `
@@ -47,44 +38,34 @@ const createPack = async (
       id: packCreateDto.listId,
       category: category,
     };
+
+    await client.query('COMMIT');
+
     return aloneListCategoryResponseDto;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
 
 const updatePack = async (
   client: any,
+  userId: number,
   packUpdateDto: PackUpdateDto,
 ): Promise<AloneListCategoryResponseDto | string> => {
   try {
     if (packUpdateDto.name.length > 12) return 'exceed_len';
 
-    const { rows: existList } = await client.query(
-      `
-        SELECT *
-        FROM "packing_list" as pl
-        JOIN alone_packing_list apl on pl.id = apl.id
-        WHERE apl.id = $1 and pl.is_deleted = false
-      `,
-      [packUpdateDto.listId],
+    const check = await aloneListCategoryCheckResponse(
+      client,
+      userId,
+      packUpdateDto.listId,
+      packUpdateDto.categoryId,
     );
 
-    if (existList.length === 0) return 'no_list';
-
-    const { rows: existCategory } = await client.query(
-      `
-        SELECT *
-        FROM "category" as c
-        WHERE c.id = $1
-      `,
-      [packUpdateDto.categoryId],
-    );
-
-    if (existCategory.length === 0) return 'no_category';
-
-    if (existCategory[0].list_id != packUpdateDto.listId) return 'no_list_category';
+    if (check === 'no_list') return 'no_list';
+    else if (check === 'no_category') return 'no_category';
+    else if (check === 'no_list_category') return 'no_list_category';
 
     const { rows: existPack } = await client.query(
       `
@@ -98,6 +79,8 @@ const updatePack = async (
     if (existPack.length === 0) return 'no_pack';
 
     if (existPack[0].category_id != packUpdateDto.categoryId) return 'no_category_pack';
+
+    await client.query('BEGIN');
 
     await client.query(
       `
@@ -114,42 +97,32 @@ const updatePack = async (
       id: packUpdateDto.listId,
       category: category,
     };
+
+    await client.query('COMMIT');
+
     return aloneListCategoryResponseDto;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
 
 const deletePack = async (
   client: any,
+  userId: number,
   packDeleteDto: PackDeleteDto,
 ): Promise<AloneListCategoryResponseDto | string> => {
   try {
-    const { rows: existList } = await client.query(
-      `
-        SELECT *
-        FROM "packing_list" as pl
-        JOIN alone_packing_list apl on pl.id = apl.id
-        WHERE apl.id = $1 and pl.is_deleted = false
-      `,
-      [packDeleteDto.listId],
+    const check = await aloneListCategoryCheckResponse(
+      client,
+      userId,
+      packDeleteDto.listId,
+      packDeleteDto.categoryId,
     );
 
-    if (existList.length === 0) return 'no_list';
-
-    const { rows: existCategory } = await client.query(
-      `
-        SELECT *
-        FROM "category" as c
-        WHERE c.id = $1
-      `,
-      [packDeleteDto.categoryId],
-    );
-
-    if (existCategory.length === 0) return 'no_category';
-
-    if (existCategory[0].list_id != packDeleteDto.listId) return 'no_list_category';
+    if (check === 'no_list') return 'no_list';
+    else if (check === 'no_category') return 'no_category';
+    else if (check === 'no_list_category') return 'no_list_category';
 
     const { rows: existPack } = await client.query(
       `
@@ -163,6 +136,8 @@ const deletePack = async (
     if (existPack.length === 0) return 'no_pack';
 
     if (existPack[0].category_id != packDeleteDto.categoryId) return 'no_category_pack';
+
+    await client.query('BEGIN');
 
     await client.query(
       `
@@ -178,9 +153,12 @@ const deletePack = async (
       id: packDeleteDto.listId,
       category: category,
     };
+
+    await client.query('COMMIT');
+
     return aloneListCategoryResponseDto;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };

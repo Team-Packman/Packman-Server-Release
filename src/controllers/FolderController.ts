@@ -5,6 +5,7 @@ import util from '../modules/util';
 import { validationResult } from 'express-validator';
 import { FolderService } from '../services';
 import db from '../loaders/db';
+import logger from '../config/logger';
 
 /**
  *  @route GET /folder/recentCreatedList
@@ -26,7 +27,7 @@ const getRecentCreatedList = async (req: Request, res: Response) => {
       .status(statusCode.OK)
       .send(util.success(statusCode.OK, message.SUCCESS_GET_RECENT_CREATED_LIST, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`GET, /folder/recentCreatedList, 최근 생성된 리스트 조회, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -63,7 +64,7 @@ const createFolder = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.SUCCESS_CREATE_FOLDER, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`POST, /folder, 폴더 생성, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -72,13 +73,12 @@ const createFolder = async (req: Request, res: Response) => {
   }
 };
 
-
 /**
  *  @route PATCH /folder
  *  @desc update folder
  *  @access private
  **/
- const updateFolder = async (req: Request, res: Response) => {
+const updateFolder = async (req: Request, res: Response) => {
   const error = validationResult(req);
   if (!error.isEmpty()) {
     return res
@@ -96,17 +96,14 @@ const createFolder = async (req: Request, res: Response) => {
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
     } else if (data === 'no_folder') {
-      res
-        .status(statusCode.BAD_REQUEST)
-        .send(util.fail(statusCode.BAD_REQUEST, message.NO_FOLDER));
+      res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.NO_FOLDER));
     } else {
       res
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.SUCCESS_UPDATE_FOLDER, data));
     }
   } catch (error) {
-    
-    console.log(error);
+    logger.logger.error(`PATCH, /folder, 폴더 이름 수정, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -114,7 +111,6 @@ const createFolder = async (req: Request, res: Response) => {
     if (client !== undefined) client.release();
   }
 };
-
 
 /**
  *  @route GET /folder
@@ -129,7 +125,7 @@ const getFolders = async (req: Request, res: Response) => {
     const data = await FolderService.getFolders(client, userId);
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.SUCCESS_GET_FOLDERS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`GET, /folder, 폴더 조회, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -143,7 +139,7 @@ const getFolders = async (req: Request, res: Response) => {
  *  @desc delete folder
  *  @access private
  **/
- const deleteFolder = async (req: Request, res: Response) => {
+const deleteFolder = async (req: Request, res: Response) => {
   const error = validationResult(req);
   if (!error.isEmpty()) {
     return res
@@ -162,13 +158,12 @@ const getFolders = async (req: Request, res: Response) => {
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, message.EXCEED_LENGTH));
     } else {
-    res
-      .status(statusCode.OK)
-      .send(util.success(statusCode.OK, message.SUCCESS_DELETE_FOLDER, data));
+      res
+        .status(statusCode.OK)
+        .send(util.success(statusCode.OK, message.SUCCESS_DELETE_FOLDER, data));
     }
   } catch (error) {
-    
-    console.log(error);
+    logger.logger.error(`DELETE, /folder, 폴더 삭제, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -197,7 +192,7 @@ const getTogetherFolders = async (req: Request, res: Response) => {
       }),
     );
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`GET, /folder/together, 함께 패킹리스트 폴더 조회, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -224,7 +219,7 @@ const getAloneFolders = async (req: Request, res: Response) => {
       .status(statusCode.OK)
       .send(util.success(statusCode.OK, message.SUCCESS_GET_ALONE_FOLDERS, { aloneFolder: data }));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`GET, /folder/alone, 혼자 패킹리스트 폴더 조회, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -260,7 +255,9 @@ const getTogetherListInFolder = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.SUCCESS_GET_TOGETHER_LIST_IN_FOLDER, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `GET, /folder/list/together/:folderId, 폴더 안 함께 패킹리스트 조회, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -296,7 +293,9 @@ const getAloneListInFolder = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.SUCCESS_GET_ALONE_LIST_IN_FOLDER, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `GET, /folder/list/alone/:folderId, 폴더 안 혼자 패킹리스트 조회, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));

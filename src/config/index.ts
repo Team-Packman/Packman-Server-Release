@@ -21,15 +21,15 @@ export default {
    */
   port: parseInt(process.env.PORT as string, 10) as number,
 
-  user: process.env.PROD_DB_USER,
-  host: process.env.PROD_DB_HOST,
-  database: process.env.PROD_DB_DB,
-  password: process.env.PROD_DB_PASSWORD,
-
   /**
    * baseUrl
    */
   baseUrl: process.env.BASE_URL as string,
+
+  /**
+   * baseUrl_dev
+   */
+  baseUrlDev: process.env.BASE_URL_DEV as string,
 
   /**
    * jwt Secret

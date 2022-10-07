@@ -6,6 +6,7 @@ import { validationResult } from 'express-validator';
 import { PackCreateDto, PackUpdateDto, PackDeleteDto } from '../interfaces/IPack';
 import { AloneListPackService } from '../services';
 import db from '../loaders/db';
+import logger from '../config/logger';
 
 /**
  *  @route POST /list/alone/pack
@@ -21,12 +22,14 @@ const createPack = async (req: Request, res: Response) => {
   }
 
   let client;
+
   const packCreateDto: PackCreateDto = req.body;
+  const userId = req.body.user.id;
 
   try {
     client = await db.connect(req);
 
-    const data = await AloneListPackService.createPack(client, packCreateDto);
+    const data = await AloneListPackService.createPack(client, userId, packCreateDto);
 
     if (data === 'exceed_len')
       res
@@ -46,7 +49,7 @@ const createPack = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.CREATE_ALONE_PACK_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`POST, /list/alone/pack, 혼자 패킹리스트 짐 생성, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -69,11 +72,14 @@ const updatePack = async (req: Request, res: Response) => {
   }
 
   let client;
+
   const packUpdateDto: PackUpdateDto = req.body;
+  const userId = req.body.user.id;
+
   try {
     client = await db.connect(req);
 
-    const data = await AloneListPackService.updatePack(client, packUpdateDto);
+    const data = await AloneListPackService.updatePack(client, userId, packUpdateDto);
 
     if (data === 'exceed_len')
       res
@@ -99,7 +105,7 @@ const updatePack = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.UPDATE_ALONE_PACK_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`PATCH, /list/alone/pack, 혼자 패킹리스트 짐 수정, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -123,10 +129,11 @@ const deletePack = async (req: Request, res: Response) => {
     categoryId: categoryId,
     packId: packId,
   };
+  const userId = req.body.user.id;
 
   try {
     client = await db.connect(req);
-    const data = await AloneListPackService.deletePack(client, packDeleteDto);
+    const data = await AloneListPackService.deletePack(client, userId, packDeleteDto);
 
     if (data === 'no_list')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_ALONE_LIST));
@@ -148,7 +155,9 @@ const deletePack = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.DELETE_ALONE_PACK_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `DELETE, /list/alone/pack/:listId/:categoryId/:packId, 혼자 패킹리스트 짐 삭제, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));

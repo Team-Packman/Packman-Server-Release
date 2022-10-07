@@ -6,6 +6,7 @@ import { validationResult } from 'express-validator';
 import { TitleUpdateDto, DateUpdateDto, MyTemplateUpdateDto } from '../interfaces/IList';
 import { ListService } from '../services';
 import db from '../loaders/db';
+import logger from '../config/logger';
 
 /**
  *  @route PATCH /list/title
@@ -22,12 +23,13 @@ const updateTitle = async (req: Request, res: Response) => {
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
 
+  const userId: number = req.body.user.id;
   const titleUpdateDto: TitleUpdateDto = req.body;
 
   try {
     client = await db.connect(req);
 
-    const data = await ListService.updateTitle(client, titleUpdateDto);
+    const data = await ListService.updateTitle(client, userId, titleUpdateDto);
 
     if (data === 'exceed_len')
       res
@@ -40,7 +42,7 @@ const updateTitle = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.UPDATE_LIST_TITLE_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`PATCH, /list/title, 패킹리스트 제목 수정, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -63,13 +65,13 @@ const updateDate = async (req: Request, res: Response) => {
       .status(statusCode.BAD_REQUEST)
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
-
+  const userId: number = req.body.user.id;
   const dateUpdateDto: DateUpdateDto = req.body;
 
   try {
     client = await db.connect(req);
 
-    const data = await ListService.updateDate(client, dateUpdateDto);
+    const data = await ListService.updateDate(client, userId, dateUpdateDto);
 
     if (data === 'no_list')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
@@ -78,7 +80,7 @@ const updateDate = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.UPDATE_LIST_DATE_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`PATCH, /list/departureDate, 패킹리스트 출발 날짜 수정, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -102,12 +104,12 @@ const updateMyTemplate = async (req: Request, res: Response) => {
       .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
 
+  const userId: number = req.body.user.id;
   const myTemplateUpdateDto: MyTemplateUpdateDto = req.body;
 
   try {
     client = await db.connect(req);
 
-    const userId: number = req.body.user.id;
     const data = await ListService.updateMyTemplate(client, userId, myTemplateUpdateDto);
 
     if (data === 'no_list')
@@ -119,7 +121,9 @@ const updateMyTemplate = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.UPDATE_LIST_MY_TEMPLATE_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `PATCH, /list/myTemplate, 패킹리스트 나만의 템플릿 추가 및 업데이트, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -154,7 +158,9 @@ const getSharedList = async (req: Request, res: Response) => {
         .status(statusCode.OK)
         .send(util.success(statusCode.OK, message.GET_INVITE_LIST_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `GET, /list/:listType/share/:inviteCode, 공유된 패킹리스트 조회, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));

@@ -6,11 +6,15 @@ import {
   TogetherListInfoResponseDto,
   UseForMapInDeleteDto,
   UseForReduceInDeleteDto,
+  TogetherListLogDto,
 } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
 import { ListCreateDto, ListInviteResponseDto } from '../interfaces/IList';
 import { generateInviteCode } from '../modules/generateInviteCode';
+import { folderCheckResponse } from '../modules/folderCheckResponse';
+import { togetherListCheckResponse } from '../modules/togetherListCheckResponse';
+import logger from '../config/logger';
 
 const createTogetherList = async (
   client: any,
@@ -22,15 +26,10 @@ const createTogetherList = async (
 
     if (togetherListCreateDto.title.length > 12) return 'exceed_len';
 
-    const { rows: existFolder } = await client.query(
-      `
-        SELECT *
-        FROM "folder"
-        WHERE id=$1 AND is_aloned=false AND folder.user_id=$2
-      `,
-      [togetherListCreateDto.folderId, userId],
-    );
-    if (existFolder.length === 0) return 'no_folder';
+    const check = await folderCheckResponse(client, userId, togetherListCreateDto.folderId, false);
+    if (check === 'no_folder') return 'no_folder';
+
+    await client.query('BEGIN');
 
     const { rows: insertListInfo } = await client.query(
       `
@@ -168,9 +167,25 @@ const createTogetherList = async (
       },
     };
 
+    await client.query('COMMIT');
+
+    const log: TogetherListLogDto = {
+      id: togetherMyId.toString(),
+      templateId: togetherListCreateDto.templateId,
+      title: insertListInfo[0].title,
+      departureDate: insertListInfo[0].departureDate,
+      groupId: groupId.toString(),
+      category: togetherCategory,
+    };
+
+    logger.logger.info(
+      `POST, /list/together, 함께 패킹리스트 생성, 200, userId: ${userId}, data: ` +
+        JSON.stringify(log),
+    );
+
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
@@ -180,100 +195,87 @@ const getTogetherList = async (
   listId: string,
   userId: number,
 ): Promise<TogetherListResponseDto | string> => {
-  try {
-    const { rows: existList } = await client.query(
-      `
-        SELECT *
-        FROM "together_alone_packing_list" as l
-        JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
-        WHERE l.id=$1 AND p.is_deleted=false
-        ORDER BY p.id
-      `,
-      [listId],
-    );
-    if (existList.length < 2) return 'no_list';
+  const existList = await togetherListCheckResponse(client, userId, listId);
 
-    const { rows: etcDataArray } = await client.query(
-      `
-        SELECT ta.together_packing_list_id::text AS "togetherListId", ta.my_packing_list_id::text AS "myListId",
-          t.group_id::text AS "groupId", t.invite_code AS "inviteCode",
-          p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate"
-        FROM (SELECT * FROM "together_alone_packing_list" WHERE id=$1) ta
-        JOIN "together_packing_list" t ON ta.together_packing_list_id=t.id
-        JOIN "packing_list" p ON t.id=p.id
-      `,
-      [listId],
-    );
-    const etcData = etcDataArray[0];
+  if (existList.length < 2) return 'no_list';
 
-    const togetherCategory = await togetherCategoryResponse(client, etcData.togetherListId);
-    const myCategory = await aloneCategoryResponse(client, etcData.myListId);
+  const { rows: etcData } = await client.query(
+    `
+      SELECT tpl.group_id::text AS "groupId", tpl.invite_code AS "inviteCode"
+      FROM "together_packing_list" tpl
+      WHERE tpl.id=$1
+    `,
+    [existList[0].togetherListId],
+  );
 
-    const { rows: groupInfo } = await client.query(
-      `
-        SELECT g.id::text AS "id",
-          COALESCE(json_agg(json_build_object(
-              'id', u.id::text,
-              'nickname', u.nickname,
-              'profileImage',u.profile_image
-              ) ORDER BY ug.id) FILTER(WHERE u.id IS NOT NULL AND u.is_deleted=false),'[]') AS "member"
-        FROM "user_group" ug
-        JOIN "user" u ON ug.user_id=u.id
-        RIGHT JOIN "group" g ON ug.group_id=g.id
-        WHERE g.id=$1
-        GROUP BY g.id
-      `,
-      [etcData.groupId],
-    );
+  const togetherCategory = await togetherCategoryResponse(client, existList[0].togetherListId);
+  const myCategory = await aloneCategoryResponse(client, existList[0].myListId);
 
-    const { rows: isMember } = await client.query(
-      `
-        SELECT EXISTS(
-        SELECT *
-        FROM "user_group" ug
-        WHERE ug.group_id=$1 AND ug.user_id=$2)
-      `,
-      [etcData.groupId, userId],
-    );
+  const { rows: groupInfo } = await client.query(
+    `
+      SELECT g.id::text AS "id",
+        COALESCE(json_agg(json_build_object(
+            'id', u.id::text,
+            'nickname', u.nickname,
+            'profileImage',u.profile_image
+            ) ORDER BY ug.id) FILTER(WHERE u.id IS NOT NULL AND u.is_deleted=false),'[]') AS "member"
+      FROM "user_group" ug
+      JOIN "user" u ON ug.user_id=u.id
+      RIGHT JOIN "group" g ON ug.group_id=g.id
+      WHERE g.id=$1
+      GROUP BY g.id
+    `,
+    [etcData[0].groupId],
+  );
 
-    const data: TogetherListResponseDto = {
-      id: listId,
-      title: etcData.title,
-      departureDate: etcData.departureDate,
-      togetherPackingList: {
-        id: etcData.togetherListId,
-        groupId: etcData.groupId,
-        category: togetherCategory,
-        inviteCode: etcData.inviteCode,
-        isSaved: existList[1].is_saved,
-      },
-      myPackingList: {
-        id: etcData.myListId,
-        category: myCategory,
-      },
-      group: groupInfo[0],
-      isMember: isMember[0].exists,
-    };
+  const { rows: isMember } = await client.query(
+    `
+      SELECT EXISTS(
+      SELECT *
+      FROM "user_group" ug
+      WHERE ug.group_id=$1 AND ug.user_id=$2)
+    `,
+    [etcData[0].groupId, userId],
+  );
 
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  const data: TogetherListResponseDto = {
+    id: listId,
+    folderId: existList[0].folderId,
+    title: existList[0].title,
+    departureDate: existList[0].departureDate,
+    togetherPackingList: {
+      id: existList[0].togetherListId,
+      groupId: etcData[0].groupId,
+      category: togetherCategory,
+      inviteCode: etcData[0].inviteCode,
+      isSaved: existList[1].isSaved,
+    },
+    myPackingList: {
+      id: existList[0].myListId,
+      category: myCategory,
+    },
+    group: groupInfo[0],
+    isMember: isMember[0].exists,
+  };
+
+  return data;
 };
 
 const updatePacker = async (
   client: any,
+  userId: number,
   packerUpdateDto: PackerUpdateDto,
 ): Promise<TogetherListCategoryResponseDto | string> => {
   try {
     const { rows: existList } = await client.query(
       `
-        SELECT *
-        FROM "packing_list" pl
-        WHERE pl.id =$1  AND pl.is_deleted=false
+        SELECT tpl.group_id AS "groupId"
+        FROM "together_packing_list" tpl
+        JOIN "packing_list" pl ON tpl.id=pl.id
+        JOIN "user_group" ug ON tpl.group_id=ug.group_id
+        WHERE tpl.id=$1  AND pl.is_deleted=false AND ug.user_id=$2
       `,
-      [packerUpdateDto.listId],
+      [packerUpdateDto.listId, userId],
     );
     if (existList.length === 0) return 'no_list';
 
@@ -303,11 +305,14 @@ const updatePacker = async (
       `
         SELECT *
         FROM "user" u
-        WHERE u.id=$1 AND u.is_deleted = false
+        JOIN "user_group" ug ON u.id=ug.user_id
+        WHERE u.id=$1 AND u.is_deleted = false AND ug.group_id=$2
      `,
-      [packerUpdateDto.packerId],
+      [packerUpdateDto.packerId, existList[0].groupId],
     );
     if (existUser.length === 0) return 'no_user';
+
+    await client.query('BEGIN');
 
     await client.query(
       `
@@ -325,9 +330,11 @@ const updatePacker = async (
       category: togetherCategory,
     };
 
+    await client.query('COMMIT');
+
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
@@ -359,7 +366,10 @@ const addMember = async (
       `,
       [userId, togetherList[0].groupId],
     );
+
     if (existMember.length > 0) return 'already_exist_member';
+
+    await client.query('BEGIN');
 
     await client.query(
       `
@@ -442,9 +452,11 @@ const addMember = async (
       listId: aloneTogether[0].id,
     };
 
+    await client.query('COMMIT');
+
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
@@ -459,15 +471,8 @@ const deleteTogetherList = async (
     // listMappingIdArray는 혼자-함께 패킹리스트 연결 id를 의미(together_alone_packing_list table의 id)
     const listMappingIdArray: string[] = listMappingId.split(',');
 
-    const { rows: existFolder } = await client.query(
-      `
-        SELECT *
-        FROM "folder" as f
-        WHERE f.id=$1 AND f.is_aloned=false AND f.user_id=$2
-      `,
-      [folderId, userId],
-    );
-    if (existFolder.length === 0) return 'no_folder';
+    const check = await folderCheckResponse(client, userId, folderId, false);
+    if (check === 'no_folder') return 'no_folder';
 
     const { rows: existList } = await client.query(
       `
@@ -510,6 +515,8 @@ const deleteTogetherList = async (
      **/
 
     // 공통 - together list의 pack에 현재 user가 packer로 등록되어 있을 경우packer_id를 null로 변경
+    await client.query('BEGIN');
+
     await client.query(
       `
         UPDATE "pack" p
@@ -564,6 +571,7 @@ const deleteTogetherList = async (
     );
 
     let deleteTogetherListIdArray: number[] = [];
+
     if (deleteItemArray.length !== 0) {
       // 삭제해야 할 together_packing_list의 id 배열
       deleteTogetherListIdArray = await deleteItemArray.map(
@@ -616,9 +624,12 @@ const deleteTogetherList = async (
     const data: TogetherListInfoResponseDto = {
       togetherPackingList: togetherPackingListInfoArray,
     };
+
+    await client.query('COMMIT');
+
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
@@ -628,61 +639,66 @@ const getInviteTogetherList = async (
   inviteCode: string,
   userId: number,
 ): Promise<ListInviteResponseDto | string> => {
-  try {
-    const { rows: packingList } = await client.query(
-      `
+  const { rows: packingList } = await client.query(
+    `
       SELECT tapl.id::text, t.group_id, t.id AS "togetherId"
       FROM "together_packing_list" as t
       JOIN "packing_list" as pl ON pl.id = t.id
       JOIN together_alone_packing_list tapl on t.id = tapl.together_packing_list_id
       WHERE t.invite_code = $1 AND pl.is_deleted = false
-      `,
-      [inviteCode],
-    );
-    if (packingList.length === 0) return 'no_list';
+    `,
+    [inviteCode],
+  );
+  if (packingList.length === 0) return 'no_list';
 
-    // 이미 추가된 멤버인지
-    let isMember = false;
+  // 이미 추가된 멤버인지
+  let isMember = false;
 
-    const { rows: existMember } = await client.query(
+  const { rows: existMember } = await client.query(
+    `
+      SELECT *
+      FROM "user_group" as ug
+      WHERE ug.user_id = $1 AND ug.group_id = $2
+    `,
+    [userId, packingList[0].group_id],
+  );
+
+  if (existMember.length > 0) isMember = true;
+
+  if (isMember === true) {
+    const { rows: newPackingList } = await client.query(
       `
-          SELECT *
-          FROM "user_group" as ug
-          WHERE ug.user_id = $1 AND ug.group_id = $2
-        `,
-      [userId, packingList[0].group_id],
+        SELECT tal.id::text
+        FROM "together_alone_packing_list" tal 
+        JOIN "folder_packing_list" fl ON tal.my_packing_list_id = fl.list_id
+        JOIN "folder" f ON f.id = fl.folder_id
+        JOIN "packing_list" pl ON pl.id =  fl.list_id
+        WHERE tal.together_packing_list_id = $1 AND f.user_id = $2 AND pl.is_deleted = false
+      `,
+      [packingList[0].togetherId, userId],
     );
-    if (existMember.length > 0) isMember = true;
 
-    if (isMember === true) {
-      const { rows: newPackingList } = await client.query(
-        `
-            SELECT tal.id::text
-            FROM "together_alone_packing_list" tal 
-            JOIN "folder_packing_list" fl ON tal.my_packing_list_id = fl.list_id
-            JOIN "folder" f ON f.id = fl.folder_id
-            JOIN "packing_list" pl ON pl.id =  fl.list_id
-            WHERE tal.together_packing_list_id = $1 AND f.user_id = $2 AND pl.is_deleted = false
-          `,
-        [packingList[0].togetherId, userId],
-      );
-      if (newPackingList.length === 0) return 'no_list';
-      const data: ListInviteResponseDto = {
-        id: newPackingList[0].id,
-        isMember: isMember,
-      };
-      return data;
-    }
+    if (newPackingList.length === 0) return 'no_list';
 
     const data: ListInviteResponseDto = {
-      id: packingList[0].id,
+      id: newPackingList[0].id,
       isMember: isMember,
     };
+
     return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
   }
+
+  const data: ListInviteResponseDto = {
+    id: packingList[0].id,
+    isMember: isMember,
+  };
+
+  logger.logger.info(
+    `GET, /list/together/invite/:inviteCode, 함께 패킹리스트 초대, 200, userId: ${userId}, data: ` +
+      JSON.stringify(data),
+  );
+
+  return data;
 };
 
 export default {

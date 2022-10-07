@@ -2,26 +2,23 @@ import { SharedAloneListResponseDto } from '../interfaces/IAloneList';
 import { TitleUpdateDto, DateUpdateDto, MyTemplateUpdateDto } from '../interfaces/IList';
 import { SharedTogetherListResponseDto } from '../interfaces/ITogetherList';
 import { aloneCategoryResponse } from '../modules/aloneCategoryResponse';
+import { aloneListCheckResponse } from '../modules/aloneListCheckResponse';
 import { togetherCategoryResponse } from '../modules/togetherCategoryResponse';
+import { togetherListCheckResponse } from '../modules/togetherListCheckResponse';
 
 const updateTitle = async (
   client: any,
+  userId: number,
   titleUpdateDto: TitleUpdateDto,
 ): Promise<TitleUpdateDto | string> => {
   try {
     let updatedTitle;
     if (titleUpdateDto.title.length > 12) return 'exceed_len';
 
+    await client.query('BEGIN');
+
     if (titleUpdateDto.isAloned === true) {
-      const { rows: existList } = await client.query(
-        `
-          SELECT *
-          FROM "alone_packing_list" as l
-          JOIN "packing_list" p ON l.id=p.id
-          WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
-        `,
-        [titleUpdateDto.id],
-      );
+      const existList = await aloneListCheckResponse(client, userId, titleUpdateDto.id);
       if (existList.length === 0) return 'no_list';
 
       const { rows: updatedData } = await client.query(
@@ -35,19 +32,11 @@ const updateTitle = async (
       );
       updatedTitle = updatedData[0].title;
     } else {
-      const { rows: existList } = await client.query(
-        `
-          SELECT together_packing_list_id, my_packing_list_id
-          FROM "together_alone_packing_list" as l
-          JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
-          WHERE l.id=$1 AND p.is_deleted=false
-        `,
-        [titleUpdateDto.id],
-      );
+      const existList = await togetherListCheckResponse(client, userId, titleUpdateDto.id);
       if (existList.length < 2) return 'no_list';
 
-      const togetherListId = existList[0].together_packing_list_id;
-      const aloneListId = existList[0].my_packing_list_id;
+      const togetherListId = existList[0].togetherListId;
+      const aloneListId = existList[0].myListId;
 
       const { rows: updatedData } = await client.query(
         `
@@ -65,31 +54,27 @@ const updateTitle = async (
       id: titleUpdateDto.id,
       title: updatedTitle,
     };
+    await client.query('COMMIT');
 
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
 
 const updateDate = async (
   client: any,
+  userId: number,
   dateUpdateDto: DateUpdateDto,
 ): Promise<DateUpdateDto | string> => {
   try {
     let updatedDate;
 
+    await client.query('BEGIN');
+
     if (dateUpdateDto.isAloned === true) {
-      const { rows: existList } = await client.query(
-        `
-          SELECT *
-          FROM "alone_packing_list" as l
-          JOIN "packing_list" p ON l.id=p.id
-          WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
-        `,
-        [dateUpdateDto.id],
-      );
+      const existList = await aloneListCheckResponse(client, userId, dateUpdateDto.id);
       if (existList.length === 0) return 'no_list';
 
       const { rows: updatedData } = await client.query(
@@ -98,24 +83,16 @@ const updateDate = async (
           SET departure_date=$1
           WHERE id=$2
           RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
-        `,
+       `,
         [dateUpdateDto.departureDate, dateUpdateDto.id],
       );
       updatedDate = updatedData[0].departureDate;
     } else {
-      const { rows: existList } = await client.query(
-        `
-          SELECT together_packing_list_id, my_packing_list_id
-          FROM "together_alone_packing_list" as l
-          JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
-          WHERE l.id=$1 AND p.is_deleted=false
-        `,
-        [dateUpdateDto.id],
-      );
+      const existList = await togetherListCheckResponse(client, userId, dateUpdateDto.id);
       if (existList.length < 2) return 'no_list';
 
-      const togetherListId = existList[0].together_packing_list_id;
-      const aloneListId = existList[0].my_packing_list_id;
+      const togetherListId = existList[0].togetherListId;
+      const aloneListId = existList[0].myListId;
 
       const { rows: updatedData } = await client.query(
         `
@@ -123,7 +100,7 @@ const updateDate = async (
           SET departure_date=$1
           WHERE id=$2 OR id=$3
           RETURNING TO_CHAR(departure_date,'YYYY-MM-DD') AS "departureDate"
-        `,
+       `,
         [dateUpdateDto.departureDate, togetherListId, aloneListId],
       );
       updatedDate = updatedData[0].departureDate;
@@ -133,10 +110,11 @@ const updateDate = async (
       id: dateUpdateDto.id,
       departureDate: updatedDate,
     };
+    await client.query('COMMIT');
 
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
@@ -154,36 +132,21 @@ const updateMyTemplate = async (
     let listId: string = myTemplateUpdateDto.id;
 
     if (myTemplateUpdateDto.isAloned === true) {
-      const { rows: existList } = await client.query(
-        `
-          SELECT *
-          FROM "alone_packing_list" as l
-          JOIN "packing_list" p ON l.id=p.id
-          WHERE l.id=$1 AND l.is_aloned=true AND p.is_deleted=false
-        `,
-        [myTemplateUpdateDto.id],
-      );
+      const existList = await aloneListCheckResponse(client, userId, myTemplateUpdateDto.id);
       if (existList.length === 0) return 'no_list';
       title = existList[0].title;
-      isSaved = existList[0].is_saved;
+      isSaved = existList[0].isSaved;
     } else {
-      const { rows: existList } = await client.query(
-        `
-          SELECT *
-          FROM "together_alone_packing_list" as l
-          JOIN "packing_list" p ON l.together_packing_list_id=p.id OR l.my_packing_list_id=p.id
-          WHERE l.id=$1 AND p.is_deleted=false
-          ORDER BY p.id
-        `,
-        [myTemplateUpdateDto.id],
-      );
+      const existList = await togetherListCheckResponse(client, userId, myTemplateUpdateDto.id);
       if (existList.length < 2) return 'no_list';
-      listId = existList[0].together_packing_list_id.toString();
-      aloneListId = existList[0].my_packing_list_id.toString();
+      listId = existList[0].togetherListId;
+      aloneListId = existList[0].myListId;
       title = existList[0].title;
-      isSaved = existList[1].is_saved;
+      isSaved = existList[1].isSaved;
     }
     if (isSaved !== myTemplateUpdateDto.isSaved) return 'no_template';
+
+    await client.query('BEGIN');
 
     if (myTemplateUpdateDto.isSaved === false) {
       await client.query(
@@ -284,9 +247,11 @@ const updateMyTemplate = async (
       isSaved: returnData[0].isSaved,
     };
 
+    await client.query('COMMIT');
+
     return data;
   } catch (error) {
-    console.log(error);
+    await client.query('ROLLBACK');
     throw error;
   }
 };
@@ -296,62 +261,57 @@ const getSharedList = async (
   listType: string,
   inviteCode: string,
 ): Promise<SharedAloneListResponseDto | SharedTogetherListResponseDto | string> => {
-  try {
-    let table;
+  let table;
 
-    if (listType === 'alone') table = 'alone_packing_list';
-    else if (listType === 'together') table = 'together_packing_list';
-    else return 'invalid_list_type';
+  if (listType === 'alone') table = 'alone_packing_list';
+  else if (listType === 'together') table = 'together_packing_list';
+  else return 'invalid_list_type';
 
-    const { rows: list } = await client.query(
-      `
+  const { rows: list } = await client.query(
+    `
       SELECT pl.id::TEXT
       FROM "${table}" pl
       JOIN packing_list p on pl.id = p.id
       WHERE pl.invite_code= $1 AND p.is_deleted = false
-      `,
-      [inviteCode],
-    );
+    `,
+    [inviteCode],
+  );
 
-    if (list.length === 0) return 'no_list';
+  if (list.length === 0) return 'no_list';
 
-    const listId = list[0].id;
+  const listId = list[0].id;
 
-    const { rows: listInfo } = await client.query(
-      `
-        SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate"
-        FROM "packing_list" p
-        WHERE p.id= $1
-      `,
-      [listId],
-    );
+  const { rows: listInfo } = await client.query(
+    `
+      SELECT p.title AS "title", TO_CHAR(p.departure_date,'YYYY-MM-DD') AS "departureDate"
+      FROM "packing_list" p
+      WHERE p.id= $1
+    `,
+    [listId],
+  );
 
-    if (listType === 'alone') {
-      const category = await aloneCategoryResponse(client, listId);
+  if (listType === 'alone') {
+    const category = await aloneCategoryResponse(client, listId);
 
-      const data: SharedAloneListResponseDto = {
-        id: listId,
-        title: listInfo[0].title,
-        departureDate: listInfo[0].departureDate,
-        category: category,
-      };
+    const data: SharedAloneListResponseDto = {
+      id: listId,
+      title: listInfo[0].title,
+      departureDate: listInfo[0].departureDate,
+      category: category,
+    };
 
-      return data;
-    } else {
-      const category = await togetherCategoryResponse(client, listId);
+    return data;
+  } else {
+    const category = await togetherCategoryResponse(client, listId);
 
-      const data: SharedTogetherListResponseDto = {
-        id: listId,
-        title: listInfo[0].title,
-        departureDate: listInfo[0].departureDate,
-        category: category,
-      };
+    const data: SharedTogetherListResponseDto = {
+      id: listId,
+      title: listInfo[0].title,
+      departureDate: listInfo[0].departureDate,
+      category: category,
+    };
 
-      return data;
-    }
-  } catch (error) {
-    console.log(error);
-    throw error;
+    return data;
   }
 };
 

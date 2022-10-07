@@ -115,6 +115,9 @@ const message = {
   // 랜딩
   DUPLICATED_PHONE: '이미 제출되었습니다!',
   SUCCESS_CREATE_LANDING_USER: '랜딩페이지 유저 생성 성공',
+
+  // 엿보기
+  SUCCESS_GET_HELP: '엿보기 조회 성공',
 };
 
 export default message;

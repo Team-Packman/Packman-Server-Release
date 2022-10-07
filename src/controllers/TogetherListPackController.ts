@@ -6,6 +6,7 @@ import { validationResult } from 'express-validator';
 import { PackCreateDto, PackUpdateDto, PackDeleteDto } from '../interfaces/IPack';
 import { TogetherListPackService } from '../services';
 import db from '../loaders/db';
+import logger from '../config/logger';
 
 /**
  *  @route POST /list/together/pack
@@ -22,11 +23,12 @@ const createPack = async (req: Request, res: Response) => {
 
   let client;
   const packCreateDto: PackCreateDto = req.body;
+  const userId = req.body.user.id;
 
   try {
     client = await db.connect(req);
 
-    const data = await TogetherListPackService.createPack(client, packCreateDto);
+    const data = await TogetherListPackService.createPack(client, userId, packCreateDto);
 
     if (data === 'exceed_len')
       res
@@ -46,7 +48,7 @@ const createPack = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.CREATE_TOGETHER_PACK_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`POST, /list/together/pack, 함께 패킹리스트 짐 생성, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -70,10 +72,12 @@ const updatePack = async (req: Request, res: Response) => {
 
   let client;
   const packUpdateDto: PackUpdateDto = req.body;
+  const userId = req.body.user.id;
+
   try {
     client = await db.connect(req);
 
-    const data = await TogetherListPackService.updatePack(client, packUpdateDto);
+    const data = await TogetherListPackService.updatePack(client, userId, packUpdateDto);
 
     if (data === 'exceed_len')
       res
@@ -99,7 +103,7 @@ const updatePack = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.UPDATE_TOGETHER_PACK_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(`PATCH, /list/together/pack, 함께 패킹리스트 짐 수정, 500, ${error}`);
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -109,7 +113,7 @@ const updatePack = async (req: Request, res: Response) => {
 };
 
 /**
- *  @route DELETE /list/together/pack
+ *  @route DELETE /list/together/pack/:listId/:categoryId/:packId
  *  @desc delete together pack
  *  @access private
  **/
@@ -123,10 +127,11 @@ const deletePack = async (req: Request, res: Response) => {
     categoryId: categoryId,
     packId: packId,
   };
+  const userId = req.body.user.id;
 
   try {
     client = await db.connect(req);
-    const data = await TogetherListPackService.deletePack(client, packDeleteDto);
+    const data = await TogetherListPackService.deletePack(client, userId, packDeleteDto);
 
     if (data === 'no_list')
       res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NO_LIST));
@@ -148,7 +153,9 @@ const deletePack = async (req: Request, res: Response) => {
         .send(util.success(statusCode.OK, message.DELETE_TOGETHER_PACK_SUCCESS, data));
     }
   } catch (error) {
-    console.log(error);
+    logger.logger.error(
+      `DELETE, /list/together/pack/:listId/:categoryId/:packId, 함께 패킹리스트 짐 삭제, 500, ${error}`,
+    );
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));

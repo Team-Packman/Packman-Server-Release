@@ -4,6 +4,7 @@ import { ListInfoResponseDto } from './IList';
 
 export interface TogetherListResponseDto {
   id: string;
+  folderId?: string;
   title: string;
   departureDate: string;
   togetherPackingList: {
@@ -26,7 +27,14 @@ export interface TogetherListResponseDto {
   };
   isMember?: boolean;
 }
-
+export interface TogetherListLogDto {
+  id: string;
+  templateId: string;
+  title: string;
+  departureDate: string;
+  groupId: string;
+  category: TogetherCategoryResponseDto[];
+}
 export interface SharedTogetherListResponseDto {
   id: string;
   title: string;
@@ -64,4 +72,13 @@ export interface UseForReduceInDeleteDto {
 
 export interface InviteTogetherListResponseDto {
   title: string;
+}
+
+export interface TogetherListCheckResponseDto {
+  title: string;
+  departureDate: string;
+  isSaved: boolean;
+  myListId: string;
+  togetherListId: string;
+  folderId: string;
 }
