@@ -7,8 +7,8 @@
     "local": "cross-env NODE_ENV=local nodemon",
     "dev": "cross-env NODE_ENV=development nodemon",
     "prod": "cross-env NODE_ENV=production nodemon",
-    "build-dev": "cross-env NODE_ENV=development&& tsc && node dist",
-    "build-prod": "cross-env NODE_ENV=production&& tsc && node dist",
+    "build-dev": "cross-env NODE_ENV=development node dist/index.js",
+    "build-prod": "cross-env NODE_ENV=production node dist/index.js",
     "lint": "eslint ."
   },
   "author": "",
