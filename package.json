@@ -9,6 +9,8 @@
     "prod": "cross-env NODE_ENV=production nodemon",
     "build-dev": "tsc && cross-env NODE_ENV=development node dist",
     "build-prod": "tsc && cross-env NODE_ENV=production node dist",
+    "start-dev": "cross-env NODE_ENV=development pm2 start dist",
+    "start-prod": "cross-env NODE_ENV=production pm2 start dist",
     "lint": "eslint ."
   },
   "author": "",
