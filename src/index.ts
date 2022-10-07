@@ -9,8 +9,6 @@ import { LoggerStream } from './config/logger';
 
 dotenv.config();
 
-const morganFormat = process.env.NODE_ENV !== 'production' ? 'dev' : 'combined';
-
 app.use(
   cors({
     credentials: true,
@@ -30,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(
-  morgan(morganFormat, {
+  morgan('combined', {
     skip: (req, res) => {
       return res.statusCode < 400;
     },
